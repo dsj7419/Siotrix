@@ -3,16 +3,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using GynBot.Common.Attributes;
+using GynBot.Common.Enums;
 using Discord.WebSocket;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace GynBot.Modules.Public
 {
-    public class PublicModule : ModuleBase
+    [Name("Basic Commands")]
+    public class PublicModule : ModuleBase<SocketCommandContext>
     {
+
         [Command("invite")]
-        [Summary("Returns the OAuth2 Invite URL of the bot")]
+        [Remarks("Returns the OAuth2 Invite URL of the bot")]
+        [MinPermissions(AccessLevel.User)]
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
@@ -20,25 +25,9 @@ namespace GynBot.Modules.Public
                 $"A user with `MANAGE_SERVER` can invite me to your server here: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
         }
 
-        [Command("leave")]
-        [Summary("Instructs the bot to leave this Guild.")]
-        [RequireUserPermission(GuildPermission.ManageGuild)]
-        public async Task Leave()
-        {
-            if (Context.Guild == null) { await ReplyAsync("This command can only be ran in a server."); return; }
-            await ReplyAsync("Leaving~");
-            await Context.Guild.LeaveAsync();
-        }
-
-        [Command("say")]
-        [Alias("echo")]
-        [Summary("Echos the provided input")]
-        public async Task Say([Remainder] string input)
-        {
-            await ReplyAsync(input);
-        }
-
         [Command("info")]
+        [Remarks("General Information")]
+        [MinPermissions(AccessLevel.User)]
         public async Task Info()
         {
             var application = await Context.Client.GetApplicationInfoAsync();

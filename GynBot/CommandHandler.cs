@@ -1,48 +1,45 @@
-﻿using System.Threading.Tasks;
-using System.Reflection;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
+using GynBot.Common.Types;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace GynBot
 {
     public class CommandHandler
     {
-        private CommandService commands;
-        private DiscordSocketClient client;
-        private IDependencyMap map;
+        private DiscordSocketClient _client;
+        private CommandService _cmds;
 
-        public async Task Install(IDependencyMap _map)
+        public async Task Install(DiscordSocketClient c)
         {
-            // Create Command Service, inject it into Dependency Map
-            client = _map.Get<DiscordSocketClient>();
-            commands = new CommandService();
-            _map.Add(commands);
-            map = _map;
+            _client = c;                                                 // Save an instance of the discord client.
+            _cmds = new CommandService();                                // Create a new instance of the commandservice.                              
 
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await _cmds.AddModulesAsync(Assembly.GetEntryAssembly());    // Load all modules from the assembly.
 
-            client.MessageReceived += HandleCommand;
+            _client.MessageReceived += HandleCommand;                    // Register the messagereceived event to handle commands.
         }
 
-        public async Task HandleCommand(SocketMessage parameterMessage)
+        private async Task HandleCommand(SocketMessage s)
         {
-            // Don't handle the command if it is a system message
-            var message = parameterMessage as SocketUserMessage;
-            if (message == null) return;
+            var msg = s as SocketUserMessage;
+            if (msg == null)                                    // Check if the received message is from a user.
+                return;
 
-            // Mark where the prefix ends and the command begins
-            int argPos = 0;
-            // Determine if the message has a valid prefix, adjust argPos 
-            if (!(message.HasMentionPrefix(client.CurrentUser, ref argPos) || message.HasCharPrefix('!', ref argPos))) return;
+            var map = new DependencyMap();                      // Create a new dependecy map.
+            map.Add(_cmds);
+            var context = new SocketCommandContext(_client, msg);     // Create a new command context.
 
-            // Create a Command Context
-            var context = new CommandContext(client, message);
-            // Execute the Command, store the result
-            var result = await commands.ExecuteAsync(context, argPos, map);
+            int argPos = 0;                                     // Check if the message has either a string or mention prefix.
+            if (msg.HasStringPrefix(Configuration.Load().Prefix, ref argPos) ||
+                msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            {                                                   // Try and execute a command with the given context.
+                var result = await _cmds.ExecuteAsync(context, argPos, map);
 
-            // If the command failed, notify the user
-            if (!result.IsSuccess)
-                await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
+                if (!result.IsSuccess)                          // If execution failed, reply with the error message.
+                    await context.Channel.SendMessageAsync(result.ToString());
+            }
         }
     }
 }

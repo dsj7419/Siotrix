@@ -1,45 +1,61 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using Discord.Commands;
+using GynBot.Common.Types;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace GynBot
 {
     public class Program
     {
-        // Convert our sync main to an async main.
-        public static void Main(string[] args) =>
-            new Program().Start().GetAwaiter().GetResult();
+        public static void Main(string[] args)
+            => new Program().Start().GetAwaiter().GetResult();
 
-        private DiscordSocketClient client;
-        private CommandHandler handler;
+        private DiscordSocketClient _client;
+        private CommandHandler _commands;
 
         public async Task Start()
         {
-            // Define the DiscordSocketClient
-            client = new DiscordSocketClient();
+            EnsureConfigExists();                            // Ensure the configuration file has been created.
+                                                             // Create a new instance of DiscordSocketClient.
+            _client = new DiscordSocketClient(new DiscordSocketConfig()
+            {
+                LogLevel = LogSeverity.Verbose                  // Specify console verbose information level.
+            });
 
-            var token = "Mjc1NTIxMjI2OTA0OTYxMDI0.C3TTVw.cVtCtX5Uz8TVTa30fWaMf7yNBEU";
+            _client.Log += (l)                               // Register the console log event.
+                => Task.Run(()
+                => Console.WriteLine($"[{l.Severity}] {l.Source}: {l.Exception?.ToString() ?? l.Message}"));
 
-            // Login and connect to Discord.
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.ConnectAsync();
+            await _client.LoginAsync(TokenType.Bot, Configuration.Load().Token);
+            await _client.ConnectAsync();
 
-            var map = new DependencyMap();
-            map.Add(client);
+            _commands = new CommandHandler();               // Initialize the command handler service
+            await _commands.Install(_client);
 
-            handler = new CommandHandler();
-            await handler.Install(map);
-
-            // Block this program until it is closed.
-            await Task.Delay(-1);
+            await Task.Delay(-1);                            // Prevent the console window from closing.
         }
 
-        private Task Log(LogMessage msg)
+        public static void EnsureConfigExists()
         {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
+            if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "data")))
+                Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "data"));
+
+            string loc = Path.Combine(AppContext.BaseDirectory, "data/configuration.json");
+
+            if (!File.Exists(loc))                              // Check if the configuration file exists.
+            {
+                var config = new Configuration();               // Create a new configuration object.
+
+                Console.WriteLine("The configuration file has been created at 'data\\configuration.json', " +
+                              "please enter your information.");
+                Console.Write("Token: ");
+
+                config.Token = Console.ReadLine();              // Read the bot token from console.
+                config.Save();                                  // Save the new configuration object to file.
+            }
+            Console.WriteLine("Configuration Loaded...");
         }
     }
 }
