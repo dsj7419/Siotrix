@@ -6,7 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Discord.Addons.InteractiveCommands" Version="1.1.3-ci-00023" />
     <PackageReference Include="Discord.Addons.MpGame" Version="0.8.17-rc" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc-00588" />
-    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc-00588" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc-00592" />
+    <PackageReference Include="Discord.Net.Core" Version="1.0.0-rc-00592" />
   </ItemGroup>
 </Project>

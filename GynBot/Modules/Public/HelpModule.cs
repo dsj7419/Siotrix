@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GynBot.Modules.Public
 {
+    [Name("Help Command")]
     public class HelpModule : ModuleBase<SocketCommandContext>
     {
         private CommandService _service;
@@ -22,7 +23,7 @@ namespace GynBot.Modules.Public
             var builder = new EmbedBuilder()
             {
                 Color = new Color(114, 137, 218),
-                Description = "These are the commands you can use"
+                Description = "These are the commands you can use:"
             };
 
             foreach (var module in _service.Modules)
