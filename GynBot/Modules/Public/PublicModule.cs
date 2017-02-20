@@ -1,97 +1,192 @@
-﻿namespace GynBot.Modules.Public
-{
-    using Comparers;
-    using Extensions;
-    using Modules.Public.Services;
-    using Discord;
-    using Discord.Commands;
-    using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.InteropServices;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using GynBot.Common.Attributes;
+using GynBot.Common.Enums;
+using GynBot.Common.Types;
+using Discord.WebSocket;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using System.Reflection;
 
-    [Name("Public")]
-    public partial class PublicModule : ModuleBase
-    {
-        public PublicModule(IDependencyMap map)
+namespace GynBot.Modules.Public
+{
+    [Name("Basic Commands")]
+    public class PublicModule : ModuleBase<SocketCommandContext>
+    {        
+
+        [Command("invite")]
+        [Remarks("Returns the OAuth2 Invite URL of the bot")]
+        [MinPermissions(AccessLevel.User)]
+        public async Task Invite()
         {
-            _service = map.Get<CommandService>();
+            var application = await Context.Client.GetApplicationInfoAsync();
+            await ReplyAsync(
+                $"A user with `MANAGE_SERVER` can invite me to your server here: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
         }
 
-        [Command("help"),
-            Alias("commands", "command", "cmds", "cmd"),
-            Summary("Information about the bot's commands.")]
-        public async Task HelpAsync([Remainder, Summary("Command/Module name to search for")]string name = "")
+        [Command("info")]
+        [Remarks("General Information about the Bot and Server")]
+        [MinPermissions(AccessLevel.User)]
+        public async Task Info()
         {
-            var modules = _service.Modules.OrderBy(x => x.Name);
-            var commands = modules.SelectMany(m => m.Commands.Select(x => x).Distinct(new CommandNameComparer()));
+            var application = await Context.Client.GetApplicationInfoAsync();
+            var Color = new Color(114, 137, 218);
+            var Author = $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n";
 
-            var cmd = commands.FirstOrDefault(x => x.Aliases.Contains(name.ToLower()));
-            var module = modules.FirstOrDefault(x => x.Name.ToLower().Contains(name.ToLower()));
-            var helpMode = name == "" ? HelpMode.All : cmd != null ? HelpMode.Command : module != null ? HelpMode.Module : HelpMode.All;
-
-            switch (helpMode)
+            var builder = new EmbedBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl("http://cdn.mysitemyway.com/etc-mysitemyway/icons/legacy-previews/icons-256/blue-jelly-icons-alphanumeric/069500-blue-jelly-icon-alphanumeric-information1.png")
+                .WithName("GynBot - A multi-purpose bot with a single global purpose")
+                .WithUrl("https://discord.gg/RMUPGSf"))
+            .WithColor(Color)
+            .WithThumbnailUrl("https://s-media-cache-ak0.pinimg.com/564x/b5/a9/30/b5a930c07975d0935afbe210363edcde.jpg")
+            .WithTitle("Information Sheet")
+            .WithDescription($"Have Gynbot join your server! Use the command {Format.Bold("invite")} to see how!")
+            .AddField(x =>
             {
-                case HelpMode.All:
-                    var errMsg = name == "" ? "" :
-                        module == null && cmd == null ? "Module/Command not found, showing generic help instead." : "";
-                    await ReplyAsync(errMsg, embed: HelpService.GetGenericHelpEmbed(modules, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+                x.Name = $"- Author: {application.Owner.Username} (ID {application.Owner.Id})";
+                x.Value = $"- Library: Discord.Net ({DiscordConfig.Version})";
+            })
+            .AddField(x =>
+            {
+                x.Name = $"- Runtime: {RuntimeInformation.FrameworkDescription} {RuntimeInformation.OSArchitecture}";
+                x.Value = $"- Uptime: {GetUptime()}\n\n";
+            })
+            .AddField(x =>
+            {
+                x.Name = $"{Format.Bold("Stats")}\n";
+                x.Value = $"- Heap Size: {GetHeapSize()} MB\n";
+            })
+            .AddField(x =>
+            {
+                x.Name = $"Guilds: { (Context.Client as DiscordSocketClient).Guilds.Count}\n";
+                x.Value = $"- Channels: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Channels.Count)}";
+            })
+            .AddField(x =>
+            {
+                x.Name = $"{Format.Bold("User Numbers")}\n";
+                x.Value = $"- Users: {(Context.Client as DiscordSocketClient).Guilds.Sum(g => g.Users.Count)}";
+            })
+            .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl("http://www.supagrowth.com/img/PBN-hunter-icon.ico")
+                .WithText("Holding down the fort since 2017."))
+            .WithTimestamp(DateTime.UtcNow);
 
-                case HelpMode.Module:
-                    if (!module.CanExecute(Context))
-                    {
-                        await ReplyAsync("You do not have permission to see information for this module.");
-                        return;
-                    }
-                    await ReplyAsync("", embed: HelpService.GetModuleHelpEmbed(module, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+            await ReplyAsync("", false, builder.Build());
+            
+        }
 
-                case HelpMode.Command:
-                    if (!cmd.CanExecute(Context))
-                    {
-                        await ReplyAsync("You do not have permission to see information for this command.");
-                        return;
-                    }
-                    await ReplyAsync("", embed: HelpService.GetCommandHelpEmbed(cmd, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+        [Command("eval")]
+        [Remarks("Evaluate C# Code -- use ```<text>``` to engage")]
+        [MinPermissions(AccessLevel.User)]
+        public async Task Eval([Remainder] string code)
+        {
+            var msg = this.Context.Message;
+
+            var cs1 = code.IndexOf("```") + 3;
+            cs1 = code.IndexOf('\n', cs1) + 1;
+            var cs2 = code.IndexOf("```", cs1);
+            var cs = code.Substring(cs1, cs2 - cs1);
+
+            var nmsg = await this.SendEmbedAsync(BuildEmbed("Evaluating...", null, 0));
+
+            try
+            {
+                var globals = new EvalGlobals()
+                {
+                    Message = this.Context.Message as SocketUserMessage
+                };
+
+                var sopts = ScriptOptions.Default;
+                sopts = sopts.WithImports("System", "System.Linq", "Discord", "Discord.WebSocket");
+                sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
+
+                var script = CSharpScript.Create(cs, sopts, typeof(EvalGlobals));
+                script.Compile();
+                var result = await script.RunAsync(globals);         
+
+                if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
+                    await this.SendEmbedAsync(BuildEmbed("Evaluation Result", result.ReturnValue.ToString(), 2), nmsg);
+                else
+                    await this.SendEmbedAsync(BuildEmbed("Evaluation Successful", "No result was returned.", 2), nmsg);
+            }
+            catch (Exception ex)
+            {
+                await this.SendEmbedAsync(BuildEmbed("Evaluation Failure", string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message), 1), nmsg);
             }
         }
 
-        [Command("info"), Summary("Information about the bot.")]
-        public async virtual Task InfoAsync()
+        private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed)
         {
-            var app = await Context.Client.GetApplicationInfoAsync().ConfigureAwait(false);
-            var completedChannelCount =
-                await Task.WhenAll((await Context.Client.GetGuildsAsync()).Select(async g => await g.GetChannelsAsync()));
-            var completedUserCount =
-                await Task.WhenAll((await Context.Client.GetGuildsAsync()).Select(async g => await g.GetUsersAsync()));
-            await
-                ReplyAsync
-                    ($"{Format.Bold("Info")}\n" + $"- Author: {app.Owner.Username} (ID: {app.Owner.Id})\n" +
-                     $"- Assembly: {Assembly.GetEntryAssembly().GetName().Name} {Assembly.GetEntryAssembly().GetName().Version}\n" +
-                     $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
-                     $"- Runtime: {RuntimeInformation.FrameworkDescription} {RuntimeInformation.OSArchitecture}\n" +
-                     $"- Uptime: {GetUptime()}\n\n" + $"{Format.Bold("Stats")}\n" + $"- Heap Size: {GetHeapSize()} MB\n" +
-                     $"- Guilds: {(await Context.Client.GetGuildsAsync().ConfigureAwait(false)).Count}\n" +
-                     $"- Channels: {completedChannelCount.Sum(c => c.Count)} " +
-                     $"- Users: {completedUserCount.Sum(u => u.Count)}").ConfigureAwait(false);
+            return this.SendEmbedAsync(embed, null, this.Context.Message);
         }
 
-        [Command("join"), Alias("invite"), Summary("Returns the Invite URL of the bot.")]
-        public async virtual Task JoinAsync()
+        private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, IUserMessage nmsg)
         {
-            var app = await Context.Client.GetApplicationInfoAsync().ConfigureAwait(false);
-            await ReplyAsync($"<https://discordapp.com/oauth2/authorize?permissions=67496960&client_id={app.Id}&scope=bot>").ConfigureAwait(false);
+            return this.SendEmbedAsync(embed, null, nmsg);
         }
 
-        CommandService _service;
+        private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, string content)
+        {
+            return this.SendEmbedAsync(embed, content, this.Context.Message);
+        }
 
-        static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString(CultureInfo.InvariantCulture);
+        private async Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, string content, IUserMessage nmsg)
+        {
+            var msg = nmsg;
+            var mod = msg.Author.Id == this.Context.Client.CurrentUser.Id;
 
-        static string GetUptime() => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\ hh\:mm\:ss");
+            if (mod)
+                await msg.ModifyAsync(x =>
+                {
+                    x.Embed = embed.Build();
+                    if (!string.IsNullOrWhiteSpace(content))
+                        x.Content = content;
+                    else
+                        x.Content = msg.Content;
+                });
+            else if (!string.IsNullOrWhiteSpace(content))
+                msg = await msg.Channel.SendMessageAsync(string.Concat(msg.Author.Mention, ": ", content), false, embed);
+            else
+                msg = await msg.Channel.SendMessageAsync(msg.Author.Mention, false, embed);
+
+            return msg;
+        }
+
+        private static EmbedBuilder BuildEmbed(string title, string desc, int type)
+        {
+            var embed = new EmbedBuilder()
+            {
+                Title = title,
+                Description = desc
+            };
+            switch (type)
+            {
+                default:
+                case 0:
+                    embed.Color = new Color(0, 127, 255);
+                    break;
+
+                case 1:
+                    embed.Color = new Color(255, 0, 0);
+                    break;
+
+                case 2:
+                    embed.Color = new Color(127, 255, 0);
+                    break;
+            }
+            if (type == 1)
+                embed.ThumbnailUrl = "http://i.imgur.com/F9HGvxs.jpg";
+            return embed;
+        }
+
+        private static string GetUptime()
+            => (DateTime.Now - Process.GetCurrentProcess().StartTime).ToString(@"dd\.hh\:mm\:ss");
+        private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString();
     }
 }
