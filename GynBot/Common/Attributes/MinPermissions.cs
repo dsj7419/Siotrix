@@ -36,8 +36,8 @@ namespace GynBot.Common.Attributes
             if (Configuration.Load().Owners.Contains(c.User.Id)) // Give configured owners special access.
                 return AccessLevel.BotOwner;
 
-            var user = c.User as SocketGuildUser;                // Check if the context is in a guild.
-            if (user != null)
+            // Check if the context is in a guild.
+            if (c.User is SocketGuildUser user)
             {
                 if (c.Guild.OwnerId == user.Id)                  // Check if the user is the guild owner.
                     return AccessLevel.ServerOwner;
