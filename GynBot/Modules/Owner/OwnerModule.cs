@@ -15,7 +15,8 @@ namespace GynBot.Modules.Public
     public class OwnerModule : ModuleBase<SocketCommandContext>
     {
         [Command("leave")]
-        [Remarks("Instructs the bot to leave this Guild.")]
+        [Summary("Instructs the bot to leave this Guild.")]
+        [Remarks("leave")]
         [MinPermissions(AccessLevel.ServerOwner)]
         public async Task Leave()
         {

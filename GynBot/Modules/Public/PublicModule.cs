@@ -26,14 +26,15 @@ namespace GynBot.Modules.Public
             _service = map.Get<CommandService>();
         }
 
-        [Command("invite")]
-        [Remarks("Returns the OAuth2 Invite URL of the bot")]
+        [Command("invite"), Alias("join")]
+        [Summary("Returns the OAuth2 Invite URL of the bot")]
         [MinPermissions(AccessLevel.User)]
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
-            await ReplyAsync(
-                $"A user with `MANAGE_SERVER` can invite me to your server here: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
+          /*  await ReplyAsync(
+                $"invite my to your server at: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>"); */
+            await this.SendEmbedAsync(BuildEmbed($"invite my to your server at:{Environment.NewLine} <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>", null, 0));
         }
 
         [Command("help"),
@@ -77,7 +78,8 @@ namespace GynBot.Modules.Public
         }
 
         [Command("info")]
-        [Remarks("General Information about the Bot and Server")]
+        [Summary("General Information about the Bot and Server")]
+        [Remarks("info")]
         [MinPermissions(AccessLevel.User)]
         public async Task Info()
         {

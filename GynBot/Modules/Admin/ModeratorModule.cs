@@ -15,7 +15,8 @@ namespace GynBot.Modules.Public
     public class ModeratorModule : ModuleBase<SocketCommandContext>
     {       
         [Command("say"), Alias("s")]
-        [Remarks("Repeats what the user says.")]
+        [Summary("Repeats what you say.")]
+        [Remarks("say <text>")]
         [MinPermissions(AccessLevel.ServerAdmin)]
         public async Task Say([Remainder] string input)
         {
@@ -23,7 +24,8 @@ namespace GynBot.Modules.Public
         }
 
         [Command("kick")]
-        [Remarks("Kick the specified user.")]
+        [Summary("Kick the specified user.")]
+        [Remarks("kick @user")]
         [MinPermissions(AccessLevel.ServerMod)]
         public async Task Kick([Remainder]SocketGuildUser user)
         {
