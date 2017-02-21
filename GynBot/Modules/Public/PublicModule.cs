@@ -32,9 +32,7 @@ namespace GynBot.Modules.Public
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
-          /*  await ReplyAsync(
-                $"invite my to your server at: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>"); */
-            await this.SendEmbedAsync(BuildEmbed($"invite my to your server at:{Environment.NewLine} <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>", null, 0));
+            await this.SendEmbedAsync(BuildEmbed($"Invite me to your server at:{Environment.NewLine}", $"<https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>", 0));
         }
 
         [Command("help"),
