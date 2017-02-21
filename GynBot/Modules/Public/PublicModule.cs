@@ -6,6 +6,7 @@ using Discord.Commands;
 using GynBot.Common.Attributes;
 using GynBot.Common.Enums;
 using GynBot.Common.Types;
+using GynBot.Modules.Public.Services;
 using Discord.WebSocket;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -17,7 +18,13 @@ namespace GynBot.Modules.Public
 {
     [Name("Basic Commands")]
     public class PublicModule : ModuleBase<SocketCommandContext>
-    {        
+    {
+        private CommandService _service;
+
+        public PublicModule(IDependencyMap map)
+        {
+            _service = map.Get<CommandService>();
+        }
 
         [Command("invite")]
         [Remarks("Returns the OAuth2 Invite URL of the bot")]
@@ -27,6 +34,46 @@ namespace GynBot.Modules.Public
             var application = await Context.Client.GetApplicationInfoAsync();
             await ReplyAsync(
                 $"A user with `MANAGE_SERVER` can invite me to your server here: <https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
+        }
+
+        [Command("help"),
+            Alias("commands", "command", "cmds", "cmd"),
+            Summary("Information about the bot's commands.")]
+        public async Task HelpAsync([Remainder, Summary("Command/Module name to search for")]string name = "")
+        {
+            var modules = _service.Modules.OrderBy(x => x.Name);
+            var commands = modules.SelectMany(m => m.Commands.Select(x => x).Distinct(new CommandNameComparer()));
+
+            var cmd = commands.FirstOrDefault(x => x.Aliases.Contains(name.ToLower()));
+            var module = modules.FirstOrDefault(x => x.Name.ToLower().Contains(name.ToLower()));
+            var helpMode = name == "" ? HelpMode.All : cmd != null ? HelpMode.Command : module != null ? HelpMode.Module : HelpMode.All;
+
+            switch (helpMode)
+            {
+                case HelpMode.All:
+                    var errMsg = name == "" ? "" :
+                        module == null && cmd == null ? "Module/Command not found, showing generic help instead." : "";
+                    await ReplyAsync(errMsg, embed: HelpService.GetGenericHelpEmbed(modules, Context).WithAuthor(Context.Client.CurrentUser));
+                    break;
+
+                case HelpMode.Module:
+                    if (!module.CanExecute(Context))
+                    {
+                        await ReplyAsync("You do not have permission to see information for this module.");
+                        return;
+                    }
+                    await ReplyAsync("", embed: HelpService.GetModuleHelpEmbed(module, Context).WithAuthor(Context.Client.CurrentUser));
+                    break;
+
+                case HelpMode.Command:
+                    if (!cmd.CanExecute(Context))
+                    {
+                        await ReplyAsync("You do not have permission to see information for this command.");
+                        return;
+                    }
+                    await ReplyAsync("", embed: HelpService.GetCommandHelpEmbed(cmd, Context).WithAuthor(Context.Client.CurrentUser));
+                    break;
+            }
         }
 
         [Command("info")]
