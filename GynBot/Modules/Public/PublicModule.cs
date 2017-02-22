@@ -128,47 +128,7 @@ namespace GynBot.Modules.Public
             
         }
 
-        [Command("eval")]
-        [Remarks("Evaluate C# Code -- use ```<text>``` to engage")]
-        [MinPermissions(AccessLevel.User)]
-        public async Task Eval([Remainder] string code)
-        {
-            var msg = this.Context.Message;
-
-            var cs1 = code.IndexOf("```") + 3;
-            cs1 = code.IndexOf('\n', cs1) + 1;
-            var cs2 = code.IndexOf("```", cs1);
-            var cs = code.Substring(cs1, cs2 - cs1);
-
-            var nmsg = await this.SendEmbedAsync(BuildEmbed("Evaluating...", null, 0));
-
-            try
-            {
-                var globals = new EvalGlobals()
-                {
-                    Message = this.Context.Message as SocketUserMessage
-                };
-
-                var sopts = ScriptOptions.Default;
-                sopts = sopts.WithImports("System", "System.Linq", "Discord", "Discord.WebSocket");
-                sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
-
-                var script = CSharpScript.Create(cs, sopts, typeof(EvalGlobals));
-                script.Compile();
-                var result = await script.RunAsync(globals);         
-
-                if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
-                    await this.SendEmbedAsync(BuildEmbed("Evaluation Result", result.ReturnValue.ToString(), 2), nmsg);
-                else
-                    await this.SendEmbedAsync(BuildEmbed("Evaluation Successful", "No result was returned.", 2), nmsg);
-            }
-            catch (Exception ex)
-            {
-                await this.SendEmbedAsync(BuildEmbed("Evaluation Failure", string.Concat("**", ex.GetType().ToString(), "**: ", ex.Message), 1), nmsg);
-            }
-        }
-
-        private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed)
+    private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed)
         {
             return this.SendEmbedAsync(embed, null, this.Context.Message);
         }

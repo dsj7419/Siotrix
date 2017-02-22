@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace GynBot.Modules.Public
 {
     [Name("Owner Commands")]
-    public class OwnerModule : ModuleBase<SocketCommandContext>
+    public partial class OwnerModule : ModuleBase<SocketCommandContext>
     {
         [Command("leave")]
         [Summary("Instructs the bot to leave this Guild.")]
