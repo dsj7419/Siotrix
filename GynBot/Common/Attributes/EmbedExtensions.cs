@@ -16,7 +16,7 @@ namespace GynBot.Common.Attributes
             {
                 builder.WithName(user.Username);
             }
-            builder.WithIconUrl(user.AvatarUrl);
+            builder.WithIconUrl(user.AvatarId);
             return builder;
         }
 
