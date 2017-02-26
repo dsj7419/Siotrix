@@ -41,7 +41,7 @@ namespace GynBot.Modules.Public
         public async Task PowerdownAsync()
         {
             await ReplyAsync("Powering down!").ConfigureAwait(false);
-            await Context.Client.DisconnectAsync().ConfigureAwait(false);
+            await Context.Client.StopAsync().ConfigureAwait(false);
             await Task.Delay(1500).ConfigureAwait(false);
         }
 

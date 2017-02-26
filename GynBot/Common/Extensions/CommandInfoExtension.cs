@@ -1,11 +1,11 @@
-﻿namespace GynBot.Common.Attributes
+﻿namespace GynBot.Common.Extensions
 {
     using Discord;
     using Discord.Commands;
     using System.Linq;
     using System.Threading.Tasks;
 
-    public static class CommandInfoExtensions
+    public static class CommandInfoExtension
     {
         public static bool CanExecute(this CommandInfo cmd, SocketCommandContext ctx)
         {

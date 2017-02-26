@@ -9,6 +9,7 @@ using Discord;
 using Discord.Commands;
 using System.Linq;
 using System.Reflection;
+using GynBot.Common.Extensions;
 
 namespace GynBot.Modules.Public.Services
 {

@@ -1,8 +1,8 @@
-﻿namespace GynBot.Common.Attributes
+﻿namespace GynBot.Common.Extensions
 {
     using System;
 
-    public static class StringExtensions
+    public static class StringExtension
     {
 
         public static string ToTitleCase(this string str)

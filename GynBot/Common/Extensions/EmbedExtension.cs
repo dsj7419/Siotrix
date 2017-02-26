@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
-namespace GynBot.Common.Attributes
-{
-    public static class EmbedExtensions
+namespace GynBot.Common.Extensions
+{ 
+    public static class EmbedExtension
     {
         public static EmbedAuthorBuilder AsUser(this EmbedAuthorBuilder builder, IUser user)
         {

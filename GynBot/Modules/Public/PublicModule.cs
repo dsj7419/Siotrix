@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System.Reflection;
+using GynBot.Common.Extensions;
 
 namespace GynBot.Modules.Public
 {

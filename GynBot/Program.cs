@@ -29,7 +29,7 @@ namespace GynBot
                 => Console.WriteLine($"[{l.Severity}] {l.Source}: {l.Exception?.ToString() ?? l.Message}"));
 
             await _client.LoginAsync(TokenType.Bot, Configuration.Load().Token);
-            await _client.ConnectAsync();
+            await _client.StartAsync();
 
             _commands = new CommandHandler();               // Initialize the command handler service
             await _commands.Install(_client);
