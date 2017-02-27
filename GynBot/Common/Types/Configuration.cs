@@ -21,11 +21,15 @@ namespace GynBot.Common.Types
         /// <summary> Your bot's login token. </summary>
         public string Token { get; set; }
 
+        /// <summary> npgsql login </summary>
+        public string GynbotDBConnection { get; set; }
+
         public Configuration()
         {
             Prefix = "!";
             Owners = new ulong[] { 0 };
             Token = "";
+            GynbotDBConnection = "";
         }
 
         /// <summary> Save the configuration to the specified file location. </summary>

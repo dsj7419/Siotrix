@@ -53,6 +53,25 @@ namespace GynBot
                 Console.Write("Token: ");
 
                 config.Token = Console.ReadLine();              // Read the bot token from console.
+
+                Console.WriteLine("\nDiscord Bot Owner ID needed. What is your discord ID master?"); // read the bot owner ID
+                Console.Write("Discord ID: ");
+                config.Owners[0] = Convert.ToUInt64(Console.ReadLine());
+
+                Console.WriteLine("\nDatabase information needed:");
+                Console.Write("Host: ");
+                var host = Console.ReadLine();
+                Console.Write("\nPort: ");
+                var port = Console.ReadLine();
+                Console.Write("\nUser Login: ");
+                var userid = Console.ReadLine();
+                Console.Write("\nUser Password: ");
+                var userpass = Console.ReadLine();
+                Console.Write("\nDatabase Name: ");
+                var database = Console.ReadLine();
+
+
+                config.GynbotDBConnection = $"User ID={userid};Password={userpass};Host={host};Port={port};Database={database};Pooling=true;";
                 config.Save();                                  // Save the new configuration object to file.
             }
             Console.WriteLine("Configuration Loaded...");
