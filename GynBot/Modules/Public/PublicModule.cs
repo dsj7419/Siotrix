@@ -6,7 +6,6 @@ using Discord.Commands;
 using GynBot.Common.Attributes;
 using GynBot.Common.Enums;
 using GynBot.Common.Types;
-using GynBot.Modules.Public.Services;
 using Discord.WebSocket;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -14,6 +13,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System.Reflection;
 using GynBot.Common.Extensions;
+using System.Text;
 
 namespace GynBot.Modules.Public
 {
@@ -39,41 +39,27 @@ namespace GynBot.Modules.Public
         [Command("help"),
             Alias("commands", "command", "cmds", "cmd"),
             Summary("Information about the bot's commands.")]
-        public async Task HelpAsync([Remainder, Summary("Command/Module name to search for")]string name = "")
+        public async Task HelpAsync()
         {
-            var modules = _service.Modules.OrderBy(x => x.Name);
-            var commands = modules.SelectMany(m => m.Commands.Select(x => x).Distinct(new CommandNameComparer()));
+            var eb = new EmbedBuilder();
+            var userDm = await Context.User.CreateDMChannelAsync();
+            var Color = new Color(114, 137, 218);
 
-            var cmd = commands.FirstOrDefault(x => x.Aliases.Contains(name.ToLower()));
-            var module = modules.FirstOrDefault(x => x.Name.ToLower().Contains(name.ToLower()));
-            var helpMode = name == "" ? HelpMode.All : cmd != null ? HelpMode.Command : module != null ? HelpMode.Module : HelpMode.All;
-
-            switch (helpMode)
+            foreach (var module in _service.Modules)
             {
-                case HelpMode.All:
-                    var errMsg = name == "" ? "" :
-                        module == null && cmd == null ? "Module/Command not found, showing generic help instead." : "";
-                    await ReplyAsync(errMsg, embed: HelpService.GetGenericHelpEmbed(modules, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+                eb = eb.WithTitle($"Module: {module.Name ?? ""}")
+                       .WithDescription(module.Summary ?? "");
 
-                case HelpMode.Module:
-                    if (!module.CanExecute(Context))
-                    {
-                        await ReplyAsync("You do not have permission to see information for this module.");
-                        return;
-                    }
-                    await ReplyAsync("", embed: HelpService.GetModuleHelpEmbed(module, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+                foreach (var command in module.Commands)
+                {
+                    eb.AddField(new EmbedFieldBuilder().WithName($"Command: !{command.Name ?? ""} {GetParams(command)}").WithValue(command.Summary ?? ""));
+                }
 
-                case HelpMode.Command:
-                    if (!cmd.CanExecute(Context))
-                    {
-                        await ReplyAsync("You do not have permission to see information for this command.");
-                        return;
-                    }
-                    await ReplyAsync("", embed: HelpService.GetCommandHelpEmbed(cmd, Context).WithAuthor(Context.Client.CurrentUser));
-                    break;
+                eb.WithColor(Color);
+                await userDm.SendMessageAsync(string.Empty, embed: eb.Build());
+                eb = new EmbedBuilder();
             }
+            await ReplyAsync($"Check your private messages, {Context.User.Mention}");
         }
 
         [Command("info")]
@@ -85,6 +71,7 @@ namespace GynBot.Modules.Public
             var application = await Context.Client.GetApplicationInfoAsync();
             var Color = new Color(114, 137, 218);
             var Author = $"- Author: {application.Owner.Username} (ID {application.Owner.Id})\n";
+            var prefix = Configuration.Load().Prefix;
 
             var builder = new EmbedBuilder()
             .WithAuthor(new EmbedAuthorBuilder()
@@ -94,7 +81,7 @@ namespace GynBot.Modules.Public
             .WithColor(Color)
             .WithThumbnailUrl("https://s-media-cache-ak0.pinimg.com/564x/b5/a9/30/b5a930c07975d0935afbe210363edcde.jpg")
             .WithTitle("Information Sheet")
-            .WithDescription($"Have Gynbot join your server! Use the command {Format.Bold("invite")} to see how!")
+            .WithDescription($"Have Gynbot join your server! Use the command {Format.Bold($"{prefix}invite")} to see how!")
             .AddField(x =>
             {
                 x.Name = $"- Author: {application.Owner.Username} (ID {application.Owner.Id})";
@@ -177,7 +164,7 @@ namespace GynBot.Modules.Public
             {
                 default:
                 case 0:
-                    embed.Color = new Color(0, 127, 255);
+                    embed.Color = new Color(114, 137, 218);
                     break;
 
                 case 1:
@@ -191,6 +178,19 @@ namespace GynBot.Modules.Public
             if (type == 1)
                 embed.ThumbnailUrl = "http://i.imgur.com/F9HGvxs.jpg";
             return embed;
+        }
+
+        private string GetParams(CommandInfo info)
+        {
+            var sb = new StringBuilder();
+            info.Parameters.ToList().ForEach(x =>
+            {
+                if (x.IsOptional)
+                    sb.Append("[Optional(" + x.Name + ")]");
+                else
+                    sb.Append("[" + x.Name + "]");
+            });
+            return sb.ToString();
         }
 
         private static string GetUptime()
