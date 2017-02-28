@@ -39,6 +39,7 @@ namespace GynBot.Modules.Public
         [Command("help"),
             Alias("commands", "command", "cmds", "cmd"),
             Summary("Information about the bot's commands.")]
+        [MinPermissions(AccessLevel.User)]
         public async Task HelpAsync()
         {
             var eb = new EmbedBuilder();
