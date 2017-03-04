@@ -119,7 +119,7 @@ namespace GynBot.Modules.Public
 
     private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed)
         {
-            return this.SendEmbedAsync(embed, null, this.Context.Message);
+            return this.SendEmbedAsync(embed, null, Context.Message);
         }
 
         private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, IUserMessage nmsg)
@@ -129,13 +129,13 @@ namespace GynBot.Modules.Public
 
         private Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, string content)
         {
-            return this.SendEmbedAsync(embed, content, this.Context.Message);
+            return this.SendEmbedAsync(embed, content, Context.Message);
         }
 
         private async Task<IUserMessage> SendEmbedAsync(EmbedBuilder embed, string content, IUserMessage nmsg)
         {
             var msg = nmsg;
-            var mod = msg.Author.Id == this.Context.Client.CurrentUser.Id;
+            var mod = msg.Author.Id == Context.Client.CurrentUser.Id;
 
             if (mod)
                 await msg.ModifyAsync(x =>

@@ -16,6 +16,7 @@ namespace GynBot.Modules.Public
     [Name("Owner Commands")]
     public partial class OwnerModule : ModuleBase<SocketCommandContext>
     {
+
         [Command("leave")]
         [Summary("Instructs the bot to leave this Guild.")]
         [Remarks("leave")]
@@ -25,6 +26,59 @@ namespace GynBot.Modules.Public
             if (Context.Guild == null) { await ReplyAsync("This command can only be ran in your guild."); return; }
             await ReplyAsync("Leaving~");
             await Context.Guild.LeaveAsync();
+        }
+
+        [Command("ping")]
+        [Summary("Check bot latency.")]
+        [Remarks("ping")]
+        [MinPermissions(AccessLevel.ServerOwner)]
+        public async Task sayasync()
+        {
+
+            if (Context.Message.Content.Contains("ping"))
+            {
+
+                var a = (Context.Client as DiscordSocketClient).Latency;
+                var data = new EmbedBuilder();
+                var fb = new EmbedFieldBuilder();
+
+
+                data.WithTitle("PONG!                                                                                        ");
+                data.WithThumbnailUrl("https://s-media-cache-ak0.pinimg.com/564x/b5/a9/30/b5a930c07975d0935afbe210363edcde.jpg");
+
+                data.AddField(x =>
+                {
+                    x.Name = $"Latency                                                          ";
+                    x.Value = $"{a.ToString()}ms                                                  ";
+                });
+
+
+                data.WithFooter(x =>
+                {
+                    if (a < 300)
+
+                    {
+                        x.Text = "Fast :D";
+                        x.IconUrl = "https://s-media-cache-ak0.pinimg.com/236x/63/62/79/636279b10193e8521a06b6717ebccf14.jpg";
+                        data.WithColor(new Color(0x49ff00));
+                    }
+                    else
+                    {
+                        x.Text = "Slow D:";
+                        x.IconUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/SadSmiley.svg/1024px-SadSmiley.svg.png";
+                        data.WithColor(new Color(0xFF0000));
+                    }
+
+                });
+                data.WithTimestamp(DateTime.UtcNow);
+
+
+
+
+                await ReplyAsync("", embed: data);
+                return;
+            }
+
         }
 
         [Command("echo")]
