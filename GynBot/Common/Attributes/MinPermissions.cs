@@ -11,9 +11,9 @@ namespace GynBot.Common.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class MinPermissionsAttribute : PreconditionAttribute
     {
-        private AccessLevel Level;
+        private AccessLevelEnum Level;
 
-        public MinPermissionsAttribute(AccessLevel level)
+        public MinPermissionsAttribute(AccessLevelEnum level)
         {
             Level = level;
         }
@@ -28,30 +28,30 @@ namespace GynBot.Common.Attributes
                 return Task.FromResult(PreconditionResult.FromError("Insufficient permissions."));
         }
 
-        public AccessLevel GetPermission(ICommandContext c)
+        public AccessLevelEnum GetPermission(ICommandContext c)
         {
             if (c.User.IsBot)                                    // Prevent other bots from executing commands.
-                return AccessLevel.Blocked;
+                return AccessLevelEnum.Blocked;
 
             if (Configuration.Load().Owners.Contains(c.User.Id)) // Give configured owners special access.
-                return AccessLevel.BotOwner;
+                return AccessLevelEnum.BotOwner;
 
             // Check if the context is in a guild.
             if (c.User is SocketGuildUser user)
             {
                 if (c.Guild.OwnerId == user.Id)                  // Check if the user is the guild owner.
-                    return AccessLevel.ServerOwner;
+                    return AccessLevelEnum.ServerOwner;
 
                 if (user.GuildPermissions.Administrator)         // Check if the user has the administrator permission.
-                    return AccessLevel.ServerAdmin;
+                    return AccessLevelEnum.ServerAdmin;
 
                 if (user.GuildPermissions.ManageMessages ||      // Check if the user can ban, kick, or manage messages.
                     user.GuildPermissions.BanMembers ||
                     user.GuildPermissions.KickMembers)
-                    return AccessLevel.ServerMod;
+                    return AccessLevelEnum.ServerMod;
             }
 
-            return AccessLevel.User;                             // If nothing else, return a default permission.
+            return AccessLevelEnum.User;                             // If nothing else, return a default permission.
         }
     }
 }

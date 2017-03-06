@@ -20,7 +20,7 @@ namespace GynBot.Modules.Public
         [Command("leave")]
         [Summary("Instructs the bot to leave this Guild.")]
         [Remarks("leave")]
-        [MinPermissions(AccessLevel.ServerOwner)]
+        [MinPermissions(AccessLevelEnum.ServerOwner)]
         public async Task Leave()
         {
             if (Context.Guild == null) { await ReplyAsync("This command can only be ran in your guild."); return; }
@@ -31,7 +31,7 @@ namespace GynBot.Modules.Public
         [Command("ping")]
         [Summary("Check bot latency.")]
         [Remarks("ping")]
-        [MinPermissions(AccessLevel.ServerOwner)]
+        [MinPermissions(AccessLevelEnum.ServerOwner)]
         public async Task sayasync()
         {
 
@@ -84,7 +84,7 @@ namespace GynBot.Modules.Public
         [Command("echo")]
         [Summary("Echo's input into a specified channel.")]
         [Remarks("say #general I am alive!")]
-        [MinPermissions(AccessLevel.ServerOwner)]
+        [MinPermissions(AccessLevelEnum.ServerOwner)]
         public void Say([Summary("Target channel")] ITextChannel channel, [Remainder, Summary("Text to echo")] string text)
         {
             (Context.Client.GetChannel(channel.Id) as SocketTextChannel)?.SendMessageAsync(text);
@@ -93,7 +93,7 @@ namespace GynBot.Modules.Public
         [Command("powerdown"), Alias("pd")]
         [Summary("Terminates the bot application")]
         [Remarks("powerdown")]
-        [MinPermissions(AccessLevel.BotOwner)]
+        [MinPermissions(AccessLevelEnum.BotOwner)]
         public async Task PowerdownAsync()
         {
             await ReplyAsync("Powering down!").ConfigureAwait(false);
@@ -104,7 +104,7 @@ namespace GynBot.Modules.Public
         [Command("getinvite")]
         [Summary("Makes an invite to the specified guild")]
         [Remarks("getinvite 123456789987654321")]
-        [MinPermissions(AccessLevel.BotOwner)]
+        [MinPermissions(AccessLevelEnum.BotOwner)]
         public async Task GetInviteAsync([Summary("Target guild id")]ulong guild)
         {
             var channel = Context.Client.GetChannel((Context.Client.GetGuild(guild)).DefaultChannel.Id);
@@ -115,7 +115,7 @@ namespace GynBot.Modules.Public
         [Command("guildlist")]
         [Summary("Lists guilds and owner for that guild")]
         [Remarks("guildlist")]
-        [MinPermissions(AccessLevel.BotOwner)]
+        [MinPermissions(AccessLevelEnum.BotOwner)]
         public async Task GuildListAsync()
         {
             var cl = Context.Client as DiscordSocketClient;
@@ -149,7 +149,7 @@ namespace GynBot.Modules.Public
         [Command("broadcast")]
         [Summary("Broadcasts a message to the default channel of all servers the bot is connected to.")]
         [Remarks("broadcast IMPORTANT MESSAGE")]
-        [MinPermissions(AccessLevel.BotOwner)]
+        [MinPermissions(AccessLevelEnum.BotOwner)]
         public async Task Broadcast([Remainder] string broadcast)
         {
             var guilds = Context.Client.Guilds;

@@ -29,7 +29,7 @@ namespace GynBot.Modules.Public
 
         [Command("invite"), Alias("join")]
         [Summary("Returns the OAuth2 Invite URL of the bot")]
-        [MinPermissions(AccessLevel.User)]
+        [MinPermissions(AccessLevelEnum.User)]
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
@@ -39,7 +39,7 @@ namespace GynBot.Modules.Public
         [Command("help"),
             Alias("commands", "command", "cmds", "cmd"),
             Summary("Information about the bot's commands.")]
-        [MinPermissions(AccessLevel.User)]
+        [MinPermissions(AccessLevelEnum.User)]
         public async Task HelpAsync()
         {
             var eb = new EmbedBuilder();
@@ -66,7 +66,7 @@ namespace GynBot.Modules.Public
         [Command("info")]
         [Summary("General Information about the Bot and Server")]
         [Remarks("info")]
-        [MinPermissions(AccessLevel.User)]
+        [MinPermissions(AccessLevelEnum.User)]
         public async Task Info()
         {
             var application = await Context.Client.GetApplicationInfoAsync();

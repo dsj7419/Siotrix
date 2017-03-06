@@ -17,7 +17,7 @@ namespace GynBot.Modules.Public
         [Command("say"), Alias("s")]
         [Summary("Repeats what you say.")]
         [Remarks("say <text>")]
-        [MinPermissions(AccessLevel.ServerAdmin)]
+        [MinPermissions(AccessLevelEnum.ServerAdmin)]
         public async Task Say([Remainder] string input)
         {
             await ReplyAsync(input);
@@ -26,7 +26,7 @@ namespace GynBot.Modules.Public
         [Command("kick")]
         [Summary("Kick the specified user.")]
         [Remarks("kick @user")]
-        [MinPermissions(AccessLevel.ServerMod)]
+        [MinPermissions(AccessLevelEnum.ServerMod)]
         public async Task Kick([Remainder]SocketGuildUser user)
         {
             await ReplyAsync($"bye bye {user.Mention} :wave:");

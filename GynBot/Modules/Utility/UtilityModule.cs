@@ -10,25 +10,13 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    public enum DeleteStrategy
-    {
-        BulkDelete = 0,
-        Manual = 1
-    }
-
-    public enum DeleteType
-    {
-        Self = 0,
-        Bot = 1,
-        All = 2
-    }
 
     [Name("Utility")]
     public class UtilityModule : ModuleBase<SocketCommandContext>
     {
         [Command("purge"), Alias("clean", "cleanup", "prune"), Summary("Cleans the bot's messages")]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
-        [MinPermissions(AccessLevel.ServerMod)]
+        [MinPermissions(AccessLevelEnum.ServerMod)]
         public async Task CleanAsync
         ([Summary("The optional number of messages to delete; defaults to 10")] int count = 10,
          [Summary("The type of messages to delete - Self, Bot, or All")] DeleteType deleteType = DeleteType.Self,
@@ -82,7 +70,7 @@
 
         [Command("requesthelp"), Alias("summonOwner", "reportbug"), RequireContext(ContextType.Guild)]
         [Summary("Gives bot developer an alert that something is wrong, and an invite to the guild to provide assitance. Please use this only as emergency"), Remarks("summonOwner")]
-        [MinPermissions(AccessLevel.ServerOwner)]
+        [MinPermissions(AccessLevelEnum.ServerOwner)]
         public async Task RequestOwnerAsync()
         {
             var owner = Context.Client.GetUser(Configuration.Load().Owners[0]);
