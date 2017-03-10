@@ -17,9 +17,17 @@ namespace GynBot
 
         public async Task Start()
         {
+<<<<<<< HEAD
             EnsureConfigExists();                            // Ensure the configuration file has been created.
                                                              // Create a new instance of DiscordSocketClient.
             _client = new DiscordSocketClient(new DiscordSocketConfig()
+=======
+            BetterConsole.NewLine("====================================  |   GynBot   |  ====================================");
+            BetterConsole.NewLine();
+            Configuration.EnsureConfigExists();                            // Ensure the configuration file has been created.
+                                                            
+            _client = new DiscordSocketClient(new DiscordSocketConfig()     // Create a new instance of DiscordSocketClient.
+>>>>>>> 6008957b9deb708e064a90679205e8bb803fab86
             {
                 LogLevel = LogSeverity.Verbose                  // Specify console verbose information level.
             });
