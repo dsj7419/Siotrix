@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Doggo.Discord.Admin\Doggo.Discord.Admin.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Audio\Doggo.Discord.Audio.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Core\Doggo.Discord.Core.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Events\Doggo.Discord.Events.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Moderation\Doggo.Discord.Moderation.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Roslyn\Doggo.Discord.Roslyn.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Statistics\Doggo.Discord.Statistics.csproj" />
+  </ItemGroup>
+
+</Project>

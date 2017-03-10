@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Doggo.Discord.Core</AssemblyName>
+    <RootNamespace>Doggo.Discord</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net.Rest" Version="1.0.0-rc-00615" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00615" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Commands\src\Doggo.Commands\Doggo.Commands.csproj" />
+    <ProjectReference Include="..\..\..\Core\src\Doggo.Core\Doggo.Core.csproj" />
+  </ItemGroup>
+
+</Project>
