@@ -21,8 +21,8 @@ namespace GynBot
             BetterConsole.NewLine("====================================  |   GynBot   |  ====================================");
             BetterConsole.NewLine();
             Configuration.EnsureConfigExists();                            // Ensure the configuration file has been created.
-                                                             // Create a new instance of DiscordSocketClient.
-            _client = new DiscordSocketClient(new DiscordSocketConfig()
+                                                            
+            _client = new DiscordSocketClient(new DiscordSocketConfig()     // Create a new instance of DiscordSocketClient.
             {
                 LogLevel = LogSeverity.Verbose                  // Specify console verbose information level.
             });

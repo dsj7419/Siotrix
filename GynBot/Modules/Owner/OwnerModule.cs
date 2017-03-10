@@ -6,10 +6,11 @@ using Discord.Commands;
 using GynBot.Common.Attributes;
 using GynBot.Common.Enums;
 using GynBot.Common.Types;
+using GynBot.Common.Utilities;
 using Discord.WebSocket;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
 using System.Text;
+using System.Net.Http;
+using System.IO;
 
 namespace GynBot.Modules.Public
 {
