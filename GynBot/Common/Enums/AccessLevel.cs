@@ -4,7 +4,7 @@
     /// The enum used to specify permission levels. A lower
     /// number means less permissions than a higher number.
     /// </summary>
-    public enum AccessLevelEnum
+    public enum AccessLevel
     {
         Blocked,
         User,

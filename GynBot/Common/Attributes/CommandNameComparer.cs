@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GynBot.Common.Utilities
+namespace GynBot.Common.Attributes
 {
     public class CommandNameComparer : IEqualityComparer<CommandInfo>
     {

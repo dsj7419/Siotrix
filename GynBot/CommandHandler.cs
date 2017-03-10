@@ -1,9 +1,6 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
 using GynBot.Common.Types;
-using GynBot.Common.Utilities;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -16,14 +13,12 @@ namespace GynBot
 
         public async Task Install(DiscordSocketClient c)
         {
-            BetterConsole.Log(LogSeverity.Info, "Commands", $"Loading commands");
             _client = c;                                                 // Save an instance of the discord client.
             _cmds = new CommandService();                                // Create a new instance of the commandservice.                              
 
             await _cmds.AddModulesAsync(Assembly.GetEntryAssembly());    // Load all modules from the assembly.
 
             _client.MessageReceived += HandleCommand;                    // Register the messagereceived event to handle commands.
-            BetterConsole.Log(LogSeverity.Info, "Commands", $"Ready, loaded {_cmds.Commands.Count()} commands");
         }
 
         private async Task HandleCommand(SocketMessage s)
