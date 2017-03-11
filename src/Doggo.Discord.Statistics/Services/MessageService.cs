@@ -90,7 +90,7 @@ namespace Doggo.Discord.Statistics
         {
             using (var db = new LogDatabase())
             {
-                var react = await db.GetReactionAsync(reaction.UserId, reaction.Emoji.Name);
+                var react = await db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emoji.Name);
 
                 react.DeletedAt = DateTime.UtcNow;
 
@@ -99,9 +99,18 @@ namespace Doggo.Discord.Statistics
             }
         }
 
-        private Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
+        private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            return Task.CompletedTask;
+            using (var db = new LogDatabase())
+            {
+                var reacts = await db.GetReactionsAsync(cachemsg.Id);
+
+                foreach (var react in reacts)
+                    react.DeletedAt = DateTime.UtcNow;
+
+                db.Reactions.UpdateRange(reacts);
+                await db.SaveChangesAsync();
+            }
         }
     }
 }
