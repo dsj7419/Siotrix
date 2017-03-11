@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Doggo.Discord.Audio\Doggo.Discord.Audio.csproj" />
     <ProjectReference Include="..\Doggo.Discord.Core\Doggo.Discord.Core.csproj" />
     <ProjectReference Include="..\Doggo.Discord.Events\Doggo.Discord.Events.csproj" />
+    <ProjectReference Include="..\Doggo.Discord.Github\Doggo.Discord.Github.csproj" />
     <ProjectReference Include="..\Doggo.Discord.Moderation\Doggo.Discord.Moderation.csproj" />
     <ProjectReference Include="..\Doggo.Discord.Roslyn\Doggo.Discord.Roslyn.csproj" />
     <ProjectReference Include="..\Doggo.Discord.Statistics\Doggo.Discord.Statistics.csproj" />

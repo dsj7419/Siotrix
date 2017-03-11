@@ -5,6 +5,7 @@ using Doggo.Discord.Audio;
 using Doggo.Discord.Events;
 using Doggo.Discord.Moderation;
 using Doggo.Discord.Roslyn;
+using Doggo.Discord.Github;
 using Doggo.Discord.Statistics;
 using System;
 using System.Linq;
@@ -44,12 +45,14 @@ namespace Doggo.Discord
                 await _service.LoadAudioAsync();
             if (config.Modules.Events)
                 await _service.LoadEventsAsync();
-            if (config.Modules.Statistics)
-                await _service.LoadStatisticsAsync();
             if (config.Modules.Moderation)
                 await _service.LoadModerationAsync();
             if (config.Modules.Roslyn)
                 await _service.LoadRoslynAsync();
+            if (config.Modules.Github)
+                await _service.LoadGithubAsync();
+            if (config.Modules.Statistics)
+                await _service.LoadStatisticsAsync();
 
             _client.MessageReceived += HandleCommandAsync;
             await PrettyConsole.LogAsync("Info", "Commands", $"Loaded {_service.Commands.Count()} commands");

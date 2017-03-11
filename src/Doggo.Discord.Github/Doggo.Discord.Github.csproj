@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Doggo.Discord.Github</AssemblyName>
+    <RootNamespace>Doggo.Discord.Github</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Octokit" Version="0.24.1-alpha0001" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Doggo.Discord.Core\Doggo.Discord.Core.csproj" />
+  </ItemGroup>
+
+</Project>
