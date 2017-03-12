@@ -25,7 +25,6 @@ namespace Doggo.Discord
             {
                 LogLevel = LogSeverity.Verbose,
                 AudioMode = AudioMode.Outgoing,
-                AlwaysDownloadUsers = true,
                 MessageCacheSize = 1000
             });
 

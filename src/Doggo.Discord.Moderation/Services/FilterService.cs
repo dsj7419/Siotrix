@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Discord;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace Doggo.Discord.Moderation
 {
@@ -17,12 +15,38 @@ namespace Doggo.Discord.Moderation
 
         public Task StartAsync()
         {
-            throw new NotImplementedException();
+            _client.MessageReceived += OnMessageReceivedAsync;
+            _client.MessageUpdated += OnMessageUpdatedAsync;
+            _client.GuildMemberUpdated += OnGuildMemberUpdatedAsync;
+            return Task.CompletedTask;
         }
 
         public Task StopAsync()
         {
-            throw new NotImplementedException();
+            _client.MessageReceived -= OnMessageReceivedAsync;
+            _client.MessageUpdated -= OnMessageUpdatedAsync;
+            _client.GuildMemberUpdated -= OnGuildMemberUpdatedAsync;
+            return Task.CompletedTask;
+        }
+        
+        private Task OnMessageReceivedAsync(SocketMessage msg)
+        {
+            return Task.CompletedTask;
+        }
+
+        private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg, ISocketMessageChannel channel)
+        {
+            return Task.CompletedTask;
+        }
+
+        private Task OnGuildMemberUpdatedAsync(SocketGuildUser before, SocketGuildUser after)
+        {
+            return Task.CompletedTask;
+        }
+
+        private bool ContainsFilteredWord(string value)
+        {
+            return false;
         }
     }
 }

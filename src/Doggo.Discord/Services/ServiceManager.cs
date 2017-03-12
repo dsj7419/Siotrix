@@ -78,7 +78,7 @@ namespace Doggo.Discord
 
                 await _antispam.StartAsync();
                 await _filter.StartAsync();
-                await _warning.StartAsync();
+              //  await _warning.StartAsync();
 
                 if (!_map.TryAdd(_antispam))
                     await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Antispam to map");
