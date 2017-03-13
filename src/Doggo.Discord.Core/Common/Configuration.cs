@@ -40,15 +40,4 @@ namespace Doggo.Discord
         public string Discord { get; set; } = "";
         public string Github { get; set; } = "";
     }
-
-    public class DoggoModules
-    {
-        public bool Admin { get; set; } = true;
-        public bool Audio { get; set; } = true;
-        public bool Events { get; set; } = true;
-        public bool Moderation { get; set; } = true;
-        public bool Roslyn { get; set; } = true;
-        public bool Github { get; set; } = true;
-        public bool Statistics { get; set; } = true;
-    }
 }
