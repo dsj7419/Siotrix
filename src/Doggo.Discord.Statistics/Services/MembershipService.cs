@@ -7,6 +7,7 @@ namespace Doggo.Discord.Statistics
     public class MembershipService : IService
     {
         private DiscordSocketClient _client;
+        private LogDatabase _db;
 
         public MembershipService(DiscordSocketClient client)
         {
@@ -15,6 +16,7 @@ namespace Doggo.Discord.Statistics
 
         public async Task StartAsync()
         {
+            _db = new LogDatabase();
             _client.UserJoined += OnUserJoinedAsync;
             _client.UserLeft += OnUserLeftAsync;
             _client.UserPresenceUpdated += OnUserPresenceUpdatedAsync;
@@ -27,6 +29,7 @@ namespace Doggo.Discord.Statistics
             _client.UserJoined -= OnUserJoinedAsync;
             _client.UserLeft -= OnUserLeftAsync;
             _client.UserPresenceUpdated -= OnUserPresenceUpdatedAsync;
+            _db = null;
 
             await PrettyConsole.LogAsync("Info", "Membership", "Service stopped successfully");
         }
@@ -35,22 +38,16 @@ namespace Doggo.Discord.Statistics
         {
             var member = EntityHelper.CreateMembership(user, true);
 
-            using (var db = new LogDatabase())
-            {
-                await db.Memberships.AddAsync(member);
-                await db.SaveChangesAsync();
-            }
+            await _db.Memberships.AddAsync(member);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnUserLeftAsync(SocketGuildUser user)
         {
             var member = EntityHelper.CreateMembership(user, false);
 
-            using (var db = new LogDatabase())
-            {
-                await db.Memberships.AddAsync(member);
-                await db.SaveChangesAsync();
-            }
+            await _db.Memberships.AddAsync(member);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnUserPresenceUpdatedAsync(Optional<SocketGuild> g, SocketUser user, SocketPresence before, SocketPresence after)
@@ -61,11 +58,8 @@ namespace Doggo.Discord.Statistics
             var guild = g.IsSpecified ? g.Value : null;
             var status = EntityHelper.CreateStatus(after, user, guild);
 
-            using (var db = new LogDatabase())
-            {
-                await db.Statuses.AddAsync(status);
-                await db.SaveChangesAsync();
-            }
+            await _db.Statuses.AddAsync(status);
+            await _db.SaveChangesAsync();
         }
     }
 }

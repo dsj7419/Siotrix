@@ -41,10 +41,13 @@ namespace Doggo.Discord.Roslyn
             .AddImports(new string[]
             {
                 "System",
+                "System.Diagnostics",
+                "System.Text",
                 "System.Reflection",
                 "System.Threading.Tasks",
                 "System.Linq",
                 "System.Collections.Generic",
+                "System.Net",
                 "Discord",
                 "Discord.WebSocket"
             });
