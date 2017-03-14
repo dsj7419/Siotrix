@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>Siotrix.Discord.Core</AssemblyName>
+    <RootNamespace>Siotrix.Discord</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00618" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Siotrix.Commands\src\Siotrix.Commands\Siotrix.Commands.csproj" />
+    <ProjectReference Include="..\..\..\Siotrix.Core\src\Siotrix.Core\Siotrix.Core.csproj" />
+  </ItemGroup>
+
+</Project>
