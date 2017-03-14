@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Siotrix.Commands\src\Siotrix.Commands\Siotrix.Commands.csproj" />
-    <ProjectReference Include="..\..\..\Siotrix.Core\src\Siotrix.Core\Siotrix.Core.csproj" />
+    <ProjectReference Include="..\..\..\SiotrixCommands\src\Siotrix.Commands\Siotrix.Commands.csproj" />
+    <ProjectReference Include="..\..\..\SiotrixCore\src\Siotrix.Core\Siotrix.Core.csproj" />
   </ItemGroup>
 
 </Project>
