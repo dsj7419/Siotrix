@@ -8,6 +8,7 @@ namespace Siotrix.Discord.Statistics
     public class MessageService : IService
     {
         private DiscordSocketClient _client;
+        private LogDatabase _db;
 
         public MessageService(DiscordSocketClient client)
         {
@@ -16,6 +17,7 @@ namespace Siotrix.Discord.Statistics
 
         public async Task StartAsync()
         {
+            _db = new LogDatabase();
             _client.MessageReceived += OnMessageReceivedAsync;
             _client.MessageUpdated += OnMesssageUpdatedAsync;
             _client.MessageDeleted += OnMessageDeletedAsync;
@@ -34,6 +36,7 @@ namespace Siotrix.Discord.Statistics
             _client.ReactionAdded -= OnReactionAddedAsync;
             _client.ReactionRemoved -= OnReactionRemovedAsync;
             _client.ReactionsCleared -= OnReactionsClearedAsync;
+            _db = null;
 
             await PrettyConsole.LogAsync("Info", "Message", "Service started successfully");
         }
@@ -42,75 +45,57 @@ namespace Siotrix.Discord.Statistics
         {
             var msg = EntityHelper.CreateMessage(message);
 
-            using (var db = new LogDatabase())
-            {
-                await db.Messages.AddAsync(msg);
-                await db.SaveChangesAsync();
-            }
+            await _db.Messages.AddAsync(msg);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnMesssageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage message, ISocketMessageChannel channel)
         {
-            using (var db = new LogDatabase())
-            {
-                var msg = await db.GetMessageAsync(message.Id);
+            var msg = await _db.GetMessageAsync(message.Id);
 
-                msg.Content = message.Content;
+            msg.Content = message.Content;
 
-                db.Messages.Update(msg);
-                await db.SaveChangesAsync();
-            }
+            _db.Messages.Update(msg);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            using (var db = new LogDatabase())
-            {
-                var msg = await db.GetMessageAsync(cachemsg.Id);
-                
-                msg.DeletedAt = DateTime.UtcNow;
-                
-                db.Messages.Update(msg);
-                await db.SaveChangesAsync();
-            }
+            var msg = await _db.GetMessageAsync(cachemsg.Id);
+
+            msg.DeletedAt = DateTime.UtcNow;
+
+            _db.Messages.Update(msg);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
         {
             var react = EntityHelper.CreateReaction(reaction);
 
-            using (var db = new LogDatabase())
-            {
-                await db.Reactions.AddAsync(react);
-                await db.SaveChangesAsync();
-            }
+            await _db.Reactions.AddAsync(react);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            using (var db = new LogDatabase())
-            {
-                var react = await db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emoji.Name);
+            var react = await _db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emoji.Name);
 
-                react.DeletedAt = DateTime.UtcNow;
+            react.DeletedAt = DateTime.UtcNow;
 
-                db.Reactions.Update(react);
-                await db.SaveChangesAsync();
-            }
+            _db.Reactions.Update(react);
+            await _db.SaveChangesAsync();
         }
 
         private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            using (var db = new LogDatabase())
-            {
-                var reacts = await db.GetReactionsAsync(cachemsg.Id);
+            var reacts = await _db.GetReactionsAsync(cachemsg.Id);
 
-                foreach (var react in reacts)
-                    react.DeletedAt = DateTime.UtcNow;
+            foreach (var react in reacts)
+                react.DeletedAt = DateTime.UtcNow;
 
-                db.Reactions.UpdateRange(reacts);
-                await db.SaveChangesAsync();
-            }
+            _db.Reactions.UpdateRange(reacts);
+            await _db.SaveChangesAsync();
         }
     }
 }
