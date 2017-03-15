@@ -31,23 +31,23 @@ namespace Siotrix.Discord.Statistics
             _client.UserPresenceUpdated -= OnUserPresenceUpdatedAsync;
             _db = null;
 
-            await PrettyConsole.LogAsync("Info", "Membership", "Service stopped successfully");
+            await PrettyConsole.LogAsync("Info", "Membership", "Service stopped successfully").ConfigureAwait(false);
         }
 
         private async Task OnUserJoinedAsync(SocketGuildUser user)
         {
             var member = EntityHelper.CreateMembership(user, true);
 
-            await _db.Memberships.AddAsync(member);
-            await _db.SaveChangesAsync();
+            _db.Memberships.Add(member);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnUserLeftAsync(SocketGuildUser user)
         {
             var member = EntityHelper.CreateMembership(user, false);
 
-            await _db.Memberships.AddAsync(member);
-            await _db.SaveChangesAsync();
+            _db.Memberships.Add(member);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnUserPresenceUpdatedAsync(Optional<SocketGuild> g, SocketUser user, SocketPresence before, SocketPresence after)
@@ -58,8 +58,8 @@ namespace Siotrix.Discord.Statistics
             var guild = g.IsSpecified ? g.Value : null;
             var status = EntityHelper.CreateStatus(after, user, guild);
 
-            await _db.Statuses.AddAsync(status);
-            await _db.SaveChangesAsync();
+            _db.Statuses.Add(status);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

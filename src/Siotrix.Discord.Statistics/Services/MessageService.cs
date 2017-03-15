@@ -25,7 +25,7 @@ namespace Siotrix.Discord.Statistics
             _client.ReactionRemoved += OnReactionRemovedAsync;
             _client.ReactionsCleared += OnReactionsClearedAsync;
 
-            await PrettyConsole.LogAsync("Info", "Message", "Service started successfully");
+            await PrettyConsole.LogAsync("Info", "Message", "Service started successfully").ConfigureAwait(false);
         }
 
         public async Task StopAsync()
@@ -38,15 +38,21 @@ namespace Siotrix.Discord.Statistics
             _client.ReactionsCleared -= OnReactionsClearedAsync;
             _db = null;
 
-            await PrettyConsole.LogAsync("Info", "Message", "Service started successfully");
+            await PrettyConsole.LogAsync("Info", "Message", "Service started successfully").ConfigureAwait(false);
         }
         
         private async Task OnMessageReceivedAsync(SocketMessage message)
         {
-            var msg = EntityHelper.CreateMessage(message);
+            try
+            {
+                var msg = EntityHelper.CreateMessage(message);
 
-            await _db.Messages.AddAsync(msg);
-            await _db.SaveChangesAsync();
+                _db.Messages.Add(msg);
+                await _db.SaveChangesAsync().ConfigureAwait(false);
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.InnerException.ToString());
+            }
         }
 
         private async Task OnMesssageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage message, ISocketMessageChannel channel)
@@ -56,7 +62,7 @@ namespace Siotrix.Discord.Statistics
             msg.Content = message.Content;
 
             _db.Messages.Update(msg);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> cachemsg, ISocketMessageChannel channel)
@@ -66,15 +72,15 @@ namespace Siotrix.Discord.Statistics
             msg.DeletedAt = DateTime.UtcNow;
 
             _db.Messages.Update(msg);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
         {
             var react = EntityHelper.CreateReaction(reaction);
 
-            await _db.Reactions.AddAsync(react);
-            await _db.SaveChangesAsync();
+            _db.Reactions.Add(react);
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
@@ -84,7 +90,7 @@ namespace Siotrix.Discord.Statistics
             react.DeletedAt = DateTime.UtcNow;
 
             _db.Reactions.Update(react);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
@@ -95,7 +101,7 @@ namespace Siotrix.Discord.Statistics
                 react.DeletedAt = DateTime.UtcNow;
 
             _db.Reactions.UpdateRange(reacts);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

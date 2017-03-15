@@ -1,5 +1,5 @@
-﻿using System;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
+using System.Text;
 
 namespace Siotrix.Discord
 {
@@ -10,14 +10,18 @@ namespace Siotrix.Discord
             var guild = (message.Channel as SocketGuildChannel)?.Guild;
             var user = message.Author as SocketGuildUser;
 
+            var formattedContent = string.IsNullOrWhiteSpace(message.Content)
+                ? null
+                : Encoding.UTF8.GetString(Encoding.ASCII.GetBytes(message.Content));
+
             return new DiscordMessage()
             {
                 AuthorId = (long)message.Author.Id,
                 MessageId = (long)message.Id,
-                Content = message.Content,
+                Content = formattedContent,
                 ChannelId = (long)message.Channel.Id,
                 GuildId = (long?)guild?.Id,
-                Name = user?.Nickname ?? user.Username
+                Name = Encoding.UTF8.GetString(Encoding.ASCII.GetBytes(user?.Nickname ?? user.Username))
             };
         }
 

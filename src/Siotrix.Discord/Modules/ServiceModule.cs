@@ -19,11 +19,11 @@ namespace Siotrix.Discord
         [Command, Priority(0)]
         public Task ServicesAsync(string instance)
         {
-            if (_config.Modules.ToString() != instance.ToLower())
+            if (_config.Instance.ToString() != instance.ToLower())
                 return Task.CompletedTask;
 
             var builder = new EmbedBuilder();
-            builder.Title = $"Module configuration for {_config.Modules}";
+            builder.Title = $"Module configuration for {_config.Instance}";
             builder.Description = _config.Modules.ToString();
 
             return Context.ReplyAsync("", builder);
