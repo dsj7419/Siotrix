@@ -7,6 +7,6 @@ namespace Siotrix.Discord.Statistics
     public static class CommandServiceExtensions
     {
         public static Task LoadStatisticsAsync(this CommandService service)
-            => service.AddModulesAsync(Assembly.GetEntryAssembly());
+            => service.AddModulesAsync(typeof(GlobalStatisticsModule).GetTypeInfo().Assembly);
     }
 }
