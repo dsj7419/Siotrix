@@ -45,21 +45,21 @@ namespace Siotrix.Discord
         public async Task StartAsync()
         {
             _handler = new GlobalErrorHandler();
-            await _handler.StartAsync();
+            await _handler.StartAsync().ConfigureAwait(false);
 
             if (_config.Modules.Audio)
-                await StartAudioAsync();
+                await StartAudioAsync().ConfigureAwait(false);
             if (_config.Modules.Events)
-                await StartEventsAsync();
+                await StartEventsAsync().ConfigureAwait(false);
             if (_config.Modules.Statistics)
-                await StartStatisticsAsync();
+                await StartStatisticsAsync().ConfigureAwait(false);
             if (_config.Modules.Moderation)
-                await StartModerationAsync();
+                await StartModerationAsync().ConfigureAwait(false);
 
             if (!_map.TryAdd(this))
                 await PrettyConsole.LogAsync("Error", "Manager", "Unable to add self to map");
             _commands = new CommandHandler(_client, _map);
-            await _commands.StartAsync();
+            await _commands.StartAsync().ConfigureAwait(false);
         }
 
         public async Task StopAsync()

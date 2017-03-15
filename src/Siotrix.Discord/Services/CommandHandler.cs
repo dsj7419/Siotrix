@@ -31,7 +31,7 @@ namespace Siotrix.Discord
             _service = new CommandService(new CommandServiceConfig()
             {
                 CaseSensitiveCommands = false,
-                DefaultRunMode = RunMode.Sync
+                DefaultRunMode = RunMode.Async
             });
 
             _service.AddTypeReader(typeof(Uri), new UriTypeReader());
