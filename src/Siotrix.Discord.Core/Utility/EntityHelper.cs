@@ -21,6 +21,7 @@ namespace Siotrix.Discord
                 Content = formattedContent,
                 ChannelId = (long)message.Channel.Id,
                 GuildId = (long?)guild?.Id,
+                IsBot = message.Author.IsBot,
                 Name = Encoding.UTF8.GetString(Encoding.ASCII.GetBytes(user?.Nickname ?? user.Username))
             };
         }

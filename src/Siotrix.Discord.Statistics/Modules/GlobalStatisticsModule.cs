@@ -12,11 +12,11 @@ namespace Siotrix.Discord.Statistics
         [Command("statistics")]
         public Task GlobalDataAsync()
         {
-            System.Console.WriteLine("\nSuccessfully in daabase table!!!!");
+            System.Console.WriteLine("\nSuccessfully in database table!!!!");
 
             using (var db = new LogDatabase())
             {
-                var query = (from data in db.Messages
+                var query = (from data in db.Messages where !data.IsBot
                              group data by data.Name into stats
                              select new
                              {
@@ -26,9 +26,10 @@ namespace Siotrix.Discord.Statistics
                              }).ToList();
 
                 var builder = new EmbedBuilder()
-                    .WithTitle("Current Statistics Data")
+                    .WithTitle("Statistics Data")
                     .WithColor(new Color(114, 137, 218))
-                    .WithDescription($"Statistics Data for the last: 30 Days")
+                    .WithDescription($"Siotrix Bot")
+                    .WithThumbnailUrl("http://img04.imgland.net/WyZ5FoM.png")
                    .AddField(x =>
                    {
                        x.Name = $"{"Owners ####### "}" + $"{"Number of Messages"}\n";
