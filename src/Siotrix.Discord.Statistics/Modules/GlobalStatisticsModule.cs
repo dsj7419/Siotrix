@@ -9,7 +9,7 @@ namespace Siotrix.Discord.Statistics
 {
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
-        [Command("leaderboard")]
+        [Command("statistics")]
         public Task GlobalDataAsync()
         {
             System.Console.WriteLine("\nSuccessfully in database table!!!!");
