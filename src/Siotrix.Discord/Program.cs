@@ -24,7 +24,6 @@ namespace Siotrix.Discord
             _client = new DiscordSocketClient(new DiscordSocketConfig()
             {
                 LogLevel = LogSeverity.Verbose,
-                AudioMode = AudioMode.Outgoing,
                 MessageCacheSize = 1000
             });
 

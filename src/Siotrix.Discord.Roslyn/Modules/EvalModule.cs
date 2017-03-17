@@ -28,18 +28,17 @@ namespace Siotrix.Discord.Roslyn
         public async Task EvalAsync([Remainder]string code)
         {
             var options = ScriptOptions.Default
-            .AddReferences(new Assembly[]
-            {
+            .AddReferences(           
                 typeof(string).GetTypeInfo().Assembly,
                 typeof(Assembly).GetTypeInfo().Assembly,
                 typeof(Task).GetTypeInfo().Assembly,
                 typeof(Enumerable).GetTypeInfo().Assembly,
                 typeof(List<>).GetTypeInfo().Assembly,
                 typeof(IGuild).GetTypeInfo().Assembly,
-                typeof(SocketGuild).GetTypeInfo().Assembly
-            })
-            .AddImports(new string[]
-            {
+                typeof(SocketGuild).GetTypeInfo().Assembly,
+                typeof(Entity).GetTypeInfo().Assembly
+                )
+            .AddImports(
                 "System",
                 "System.Diagnostics",
                 "System.Text",
@@ -49,16 +48,16 @@ namespace Siotrix.Discord.Roslyn
                 "System.Collections.Generic",
                 "System.Net",
                 "Discord",
-                "Discord.WebSocket"
-            });
+                "Discord.WebSocket",
+                "Siotrix"
+            );
             
             string cleancode = GetCode(code);
-            string reply;
-            string type;
+            string reply, type;
 
             try
             {
-                var result = await CSharpScript.EvaluateAsync(cleancode, options, Context, typeof(SocketCommandContext));
+                var result = await CSharpScript.EvaluateAsync(cleancode, options, Context);
                 type = result.GetType().Name;
                 reply = result.ToString();
             } catch (Exception ex)
@@ -66,41 +65,51 @@ namespace Siotrix.Discord.Roslyn
                 type = ex.GetType().Name;
                 reply = ex.Message;
             }
-            _timer.Stop();
-            
-            var builder = new EmbedBuilder();
-            builder.Color = new Color(197, 187, 62);
-            builder.AddField(x =>
-            {
-                x.Name = "Code";
-                x.Value = $"```cs\n{cleancode}```";
-            });
-            builder.AddField(x =>
-            {
-                x.Name = $"Result<{type}>";
-                x.Value = $"```{reply}```";
-            });
-            builder.WithFooter(x =>
-            {
-                x.Text = $"In {_timer.ElapsedMilliseconds}ms";
-            });
 
-            await Context.ReplyAsync("", embed: builder);
+            var embed = GetEmbed(cleancode, reply, type);
+            await Context.ReplyAsync("", embed: embed);
         }
 
         private string GetCode(string rawmsg)
         {
             string code = rawmsg;
-            
+
             if (code.StartsWith("```"))
                 code = code.Substring(3, code.Length - 6);
             if (code.StartsWith("cs"))
                 code = code.Substring(2, code.Length - 2);
 
             code = code.Trim();
+            code = code.Replace(";\n", ";");
+            code = code.Replace("; ", ";");
             code = code.Replace(";", ";\n");
 
             return code;
         }
+
+        private EmbedBuilder GetEmbed(string code, string result, string resultType)
+        {
+
+            _timer.Stop();
+            
+            var builder = new EmbedBuilder();
+            builder.Color = new Color(25, 185, 0);
+            builder.AddField(x =>
+            {
+                x.Name = "Code";
+                x.Value = $"```cs\n{code}```";
+            });
+            builder.AddField(x =>
+            {
+                x.Name = $"Result<{resultType}>";
+                x.Value = result;
+            });
+            builder.WithFooter(x =>
+            {
+                x.Text = $"In {_timer.ElapsedMilliseconds}ms";
+            });
+
+            return builder;
+        }       
     }
 }
