@@ -29,7 +29,7 @@ namespace Siotrix.Discord
             });
 
             _client.Log += OnLogAsync;
-            
+
             await _client.LoginAsync(TokenType.Bot, Configuration.Load().Tokens.Discord);
             await _client.StartAsync();
 
