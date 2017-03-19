@@ -19,7 +19,7 @@ namespace Siotrix.Discord.Statistics
             _db = new LogDatabase();
             _client.UserJoined += OnUserJoinedAsync;
             _client.UserLeft += OnUserLeftAsync;
-            _client.UserPresenceUpdated += OnUserPresenceUpdatedAsync;
+           // _client.UserPresenceUpdated += OnUserPresenceUpdatedAsync;
 
             await PrettyConsole.LogAsync("Info", "Membership", "Service started successfully");
         }
@@ -28,7 +28,7 @@ namespace Siotrix.Discord.Statistics
         {
             _client.UserJoined -= OnUserJoinedAsync;
             _client.UserLeft -= OnUserLeftAsync;
-            _client.UserPresenceUpdated -= OnUserPresenceUpdatedAsync;
+           // _client.UserPresenceUpdated -= OnUserPresenceUpdatedAsync;
             _db = null;
 
             await PrettyConsole.LogAsync("Info", "Membership", "Service stopped successfully").ConfigureAwait(false);
