@@ -34,11 +34,11 @@ namespace Siotrix.Discord
                     return Task.FromResult(PreconditionResult.FromError("Command must be used in a guild channel"));
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
                     return Task.FromResult(PreconditionResult.FromError($"Command requires guild permission {GuildPermission.Value}"));
-            }
+            }            
 
             if (ChannelPermission.HasValue)
             {
-                var guildChannel = context.Channel as IGuildChannel;
+                var guildChannel = context.Channel as IGuildChannel;                
 
                 ChannelPermissions perms;
                 if (guildChannel != null)

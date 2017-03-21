@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00623" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00643" />
   </ItemGroup>
 
   <ItemGroup>
