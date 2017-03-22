@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Siotrix.Utility;
 
 namespace Siotrix.Discord.Statistics
 {
@@ -17,7 +16,8 @@ namespace Siotrix.Discord.Statistics
 
             using (var db = new LogDatabase())
             {
-                var query = (from data in db.Messages where !data.IsBot
+                var query = (from data in db.Messages
+                             where !data.IsBot
                              group data by data.Name into stats
                              select new
                              {
@@ -27,27 +27,35 @@ namespace Siotrix.Discord.Statistics
                              }).ToList();
                 var numberOfMessags = db.Messages.Where(x => !x.IsBot).Count();
                 var deleteMessages = db.Messages.Where(x => !x.IsBot && x.DeletedAt != null).Count();
-                var guild_query = (from guild in db.Messages where !guild.IsBot
+                var guild_query = (from guild in db.Messages
+                                   where !guild.IsBot
                                    group guild by guild.GuildId into g
                                    select new
                                    {
                                        GuildName = g.Select(t => t.GuildName).First(),
                                        GuildMessages = g.Count(),
                                        GuildId = g.Select(t => t.GuildId).First()
-                                  }).ToList();
-                var active_query = (from active in db.Messages where !active.IsBot
-                              group active by active.ChannelId into x
-                              select new
-                              {
-                                  Count = x.Count(),
-                                  GuildName = x.Select(y => y.GuildName).First(),
-                                  GuildId = x.Select(y => y.GuildId).First(),
-                                  ChannelName = x.Select(y => y.ChannelName).First()
-                              });
+                                   }).ToList();
+                var active_query = (from active in db.Messages
+                                    where !active.IsBot
+                                    group active by active.ChannelId into x
+                                    select new
+                                    {
+                                        Count = x.Count(),
+                                        GuildName = x.Select(y => y.GuildName).First(),
+                                        GuildId = x.Select(y => y.GuildId).First(),
+                                        ChannelName = x.Select(y => y.ChannelName).First()
+                                    });
+                var guild_id = Context.Guild.Id;
+                var color_query = (from t1 in db.Infos join t2 in db.Colors on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
+                                   select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam }).First();
+                byte rColor = Convert.ToByte(color_query.r);
+                byte gColor = Convert.ToByte(color_query.g);
+                byte bColor = Convert.ToByte(color_query.b);
 
                 var builder = new EmbedBuilder()
                     .WithTitle("Statistics Data")
-                    .WithColor(new Color(114, 137, 218))
+                    .WithColor(new Color(rColor, gColor, bColor))
                     .WithDescription($"Siotrix Bot")
                     .WithThumbnailUrl("http://img04.imgland.net/WyZ5FoM.png")
                     .AddField(x =>
@@ -92,21 +100,30 @@ namespace Siotrix.Discord.Statistics
                         int index = 0;
                         foreach (var t in query)
                         {
-                            DateTime current = db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Max(m => m.CreatedAt);
+                            /*DateTime current = db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Max(m => m.CreatedAt);
                             double time = (current - db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Min(m => m.CreatedAt)).TotalHours;
                             DateTime monthago = db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Max(m => m.CreatedAt).AddDays(-30);
                             DateTime weekago = db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Max(m => m.CreatedAt).AddDays(-7);
                             DateTime dayago = db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Max(m => m.CreatedAt).AddDays(-1);
                             int monthCount = db.Messages.Where(p => p.CreatedAt <= current && p.CreatedAt >= monthago && !p.IsBot && p.Name.Equals(t.Name)).Count();
                             int weekCount = db.Messages.Where(p => p.CreatedAt <= current && p.CreatedAt >= weekago && !p.IsBot && p.Name.Equals(t.Name)).Count();
-                            int dayCount = db.Messages.Where(p => p.CreatedAt <= current && p.CreatedAt >= dayago && !p.IsBot && p.Name.Equals(t.Name)).Count();
+                            int dayCount = db.Messages.Where(p => p.CreatedAt <= current && p.CreatedAt >= dayago && !p.IsBot && p.Name.Equals(t.Name)).Count();*/
 
-                            if (time != 0)
+                            DateTime today = DateTime.Now;
+                            double lifeTime = (today - db.Messages.Where(p => p.Name.Equals(t.Name) && !p.IsBot).Min(m => m.CreatedAt)).TotalHours;
+                            DateTime firstDayOfWeek = DateTimeExtensions.FirstDayOfWeek(today);
+                            DateTime lastDayOfWeek = DateTimeExtensions.LastDayOfWeek(today);
+                            DateTime firstDayOfMonth = DateTimeExtensions.FirstDayOfMonth(today);
+                            DateTime lastDayOfMonth = DateTimeExtensions.LastDayOfMonth(today);
+                            int mCount = db.Messages.Where(p => p.CreatedAt <= lastDayOfMonth && p.CreatedAt >= firstDayOfMonth && !p.IsBot && p.Name.Equals(t.Name)).Count();
+                            int wCount = db.Messages.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek && !p.IsBot && p.Name.Equals(t.Name)).Count();
+                            int dCount = db.Messages.Where(p => p.CreatedAt.Date == today.Date && !p.IsBot && p.Name.Equals(t.Name)).Count();
+                            if (lifeTime != 0)
                             {
                                 index++;
                                 x.Value += $"{index}{")"}\t{Format.Underline(t.Name)}\n\t\t{Format.Italics("Total number of messages:")}\t{t.Count}\t{"messages"}\n\t\t" +
-                                $"{Format.Italics("Messages / hour lifetime:")}\t{Math.Round((t.Count / time), 2)}\t{"messages/hour"}\n\t\t" +
-                                $"{Format.Italics("Messages this D/W/M:")}\t{dayCount}/{weekCount}/{monthCount}\t{"messages"}\n";
+                                $"{Format.Italics("Messages / hour lifetime:")}\t{Math.Round((t.Count / lifeTime), 2)}\t{"messages/hour"}\n\t\t" +
+                                $"{Format.Italics("Messages this D/W/M:")}\t{dCount}/{wCount}/{mCount}\t{"messages"}\n";
                             }
                         };
                     })
@@ -114,11 +131,11 @@ namespace Siotrix.Discord.Statistics
                     {
                         x.Name = $"Per Guild Per Users:";
                         int guild_index = 0;
-                     
+
                         foreach (var t in guild_query)
                         {
                             var list = db.Messages.Where(o => o.GuildId == t.GuildId && !o.IsBot).ToList();
-                            if(list != null)
+                            if (list != null)
                             {
                                 var users = from w in list group w by w.Name into y select new { Name = y.Select(p => p.Name).First() };
                                 guild_index++;
@@ -128,25 +145,35 @@ namespace Siotrix.Discord.Statistics
                                     int i = 0;
                                     string str = null;
                                     var details = list.Where(z => z.Name == user.Name);
-                                    DateTime current = list.Where(p => p.Name.Equals(user.Name)).Max(m => m.CreatedAt);
+                                    /*DateTime current = list.Where(p => p.Name.Equals(user.Name)).Max(m => m.CreatedAt);
                                     DateTime monthago = list.Where(p => p.Name.Equals(user.Name)).Max(m => m.CreatedAt).AddDays(-30);
                                     DateTime weekago = list.Where(p => p.Name.Equals(user.Name)).Max(m => m.CreatedAt).AddDays(-7);
                                     DateTime dayago = list.Where(p => p.Name.Equals(user.Name)).Max(m => m.CreatedAt).AddDays(-1);
                                     int monthCount = details.Where(p => p.CreatedAt <= current && p.CreatedAt >= monthago).Count();
                                     int weekCount = details.Where(p => p.CreatedAt <= current && p.CreatedAt >= weekago).Count();
-                                    int dayCount = details.Where(p => p.CreatedAt <= current && p.CreatedAt >= dayago).Count();
+                                    int dayCount = details.Where(p => p.CreatedAt <= current && p.CreatedAt >= dayago).Count();*/
 
-                                    var week_info = details.Where(p => p.CreatedAt <= current && p.CreatedAt >= weekago);
+                                    DateTime today = DateTime.Now;
+                                    DateTime firstDayOfWeek = DateTimeExtensions.FirstDayOfWeek(today);
+                                    DateTime lastDayOfWeek = DateTimeExtensions.LastDayOfWeek(today);
+                                    DateTime firstDayOfMonth = DateTimeExtensions.FirstDayOfMonth(today);
+                                    DateTime lastDayOfMonth = DateTimeExtensions.LastDayOfMonth(today);
+                                    int mCnt = details.Where(p => p.CreatedAt <= lastDayOfMonth && p.CreatedAt >= firstDayOfMonth).Count();
+                                    int wCnt = details.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).Count();
+                                    int dCnt = details.Where(p => p.CreatedAt.Date == today.Date).Count();
+                                    double time = (lastDayOfMonth - firstDayOfMonth).TotalHours;
+
+                                    var week_info = details.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek);
                                     var act = (from info in week_info
-                                                  group info by info.ChannelId into k
-                                                  select new
-                                                  {
-                                                      Count = k.Count(),
-                                                      ChannelName = k.Select(y => y.ChannelName).First()
-                                                  });
-                                    foreach(var a in act)
+                                               group info by info.ChannelId into k
+                                               select new
+                                               {
+                                                   Count = k.Count(),
+                                                   ChannelName = k.Select(y => y.ChannelName).First()
+                                               });
+                                    foreach (var a in act)
                                     {
-                                        if(a.Count > i)
+                                        if (a.Count > i)
                                         {
                                             i = a.Count;
                                             str = a.ChannelName;
@@ -155,20 +182,20 @@ namespace Siotrix.Discord.Statistics
 
                                     var day_info = week_info.Where(p => p.ChannelName == str);
                                     var act_day = (from h in day_info
-                                                    group h by h.CreatedAt.Day into yy
-                                                    select new
-                                                    {
-                                                        Day_Count = yy.Count(),
-                                                        ActiveDay = yy.Select(uu => uu.CreatedAt).First()
-                                                    });
+                                                   group h by h.CreatedAt.Day into yy
+                                                   select new
+                                                   {
+                                                       Day_Count = yy.Count(),
+                                                       ActiveDay = yy.Select(uu => uu.CreatedAt).First()
+                                                   });
                                     int d_count = 0;
                                     var init_day = DateTime.Today.Day;
                                     var init_month = DateTime.Today.Month;
                                     var init_year = DateTime.Today.Year;
                                     var init_dayofweek = DateTime.Today.DayOfWeek;
-                                    foreach(var bb in act_day)
+                                    foreach (var bb in act_day)
                                     {
-                                        if(bb.Day_Count > d_count)
+                                        if (bb.Day_Count > d_count)
                                         {
                                             d_count = bb.Day_Count;
                                             init_day = bb.ActiveDay.Day;
@@ -189,9 +216,9 @@ namespace Siotrix.Discord.Statistics
                                     var init_hour = DateTime.Today.Hour;
                                     var init_minute = DateTime.Today.Minute;
                                     string kind = null;
-                                    foreach(var q in act_time)
+                                    foreach (var q in act_time)
                                     {
-                                        if(q.Time_Count > t_count)
+                                        if (q.Time_Count > t_count)
                                         {
                                             t_count = q.Time_Count;
                                             init_hour = q.ActiveTime.Hour;
@@ -199,22 +226,23 @@ namespace Siotrix.Discord.Statistics
                                             kind = q.ActiveTime.ToString("tt");
                                         }
                                     }
-                                    x.Value += 
+                                    System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>> {0}", Math.Round((mCnt / time), 2));
+                                    x.Value +=
                                     $"\t\t{"+"}\t{Format.Underline(user.Name)}{" "}{Format.Italics("user information :")}\n" +
-                                    $"\t\t\t{"-"}\t{Math.Round((monthCount / 720.0), 2)}\t{"messages/hour"}{" "}{Format.Italics("(this Month)")}\n" +
-                                    $"\t\t\t{"-"}\t{monthCount}\t{"messages"}{" "}{Format.Italics("(this Month)")}\n" +
-                                    $"\t\t\t{"-"}\t{weekCount}\t{"messages"}{" "}{Format.Italics("(this Week)")}\n" +
-                                    $"\t\t\t{"-"}\t{dayCount}\t{"messages"}{" "}{Format.Italics("(Today)")}\n" +
+                                    /*$"\t\t\t{"-"}\t{Math.Round((mCnt / time), 2)}\t{"messages/hour"}{" "}{Format.Italics("(this Month)")}\n" +*/
+                                    $"\t\t\t{"-"}\t{mCnt}\t{"messages"}{" "}{Format.Italics("(this Month)")}\n" +
+                                    $"\t\t\t{"-"}\t{wCnt}\t{"messages"}{" "}{Format.Italics("(this Week)")}\n" +
+                                    $"\t\t\t{"-"}\t{dCnt}\t{"messages"}{" "}{Format.Italics("(Today)")}\n" +
                                     $"\t\t\t{"-"}\t{"#"}{str}{" "}{Format.Italics("(Most Active Channel)")}\n" +
                                     $"\t\t\t{"-"}\t{init_dayofweek}{" ["}{init_day}-{init_month}-{init_year}{"] "}{Format.Italics("(Most Active Day on this week)")}\n" +
-                                    $"\t\t\t{"-"}\t{init_hour}:{init_minute}{kind}{" "}{Format.Italics("(Most Active Hour on")}{" "}{Format.Underline(init_dayofweek.ToString())}{Format.Italics(")")}\n"; 
+                                    $"\t\t\t{"-"}\t{init_hour}:{init_minute}{kind}{" "}{Format.Italics("(Most Active Hour on")}{" "}{Format.Underline(init_dayofweek.ToString())}{Format.Italics(")")}\n";
                                 }
                             }
-                            
+
                         };
-                    }); 
-                    
-                
+                    });
+
+
                 return Context.ReplyAsync("", embed: builder);
             }
         }
