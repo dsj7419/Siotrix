@@ -242,7 +242,6 @@ namespace Siotrix.Discord.Statistics
                         };
                     });
 
-
                 return Context.ReplyAsync("", embed: builder);
             }
         }

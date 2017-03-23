@@ -92,10 +92,10 @@ namespace Siotrix.Discord.Admin
         public async Task ColorAsync()
         {
             string colorName = null;
+            var guild_id = Context.Guild.Id;
+            CheckGuilds();
             using (var db = new LogDatabase())
             {
-
-                var guild_id = Context.Guild.Id;
                 var col = (from t1 in db.Infos
                                    join t2 in db.Colors on t1.ColorId equals t2.Id
                                    where t1.GuildId == guild_id.ToLong()
@@ -173,6 +173,7 @@ namespace Siotrix.Discord.Admin
         {
             string colors = null;
             var guild_id = Context.Guild.Id;
+            CheckGuilds();
             using (var db = new LogDatabase())
             {
                 var list = db.Colors.ToList();
@@ -416,6 +417,7 @@ namespace Siotrix.Discord.Admin
                     break;
             }
             var guild_id = Context.Guild.Id;
+            CheckGuilds();
             using (var db = new LogDatabase())
             {
                 var arr = db.Infos.Where(x => x.GuildId == guild_id.ToLong()).First();
@@ -430,6 +432,39 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await Context.ReplyAsync("👍");
+        }
+
+        private void CheckGuilds()
+        {
+            var id = Context.Guild.Id.ToLong();
+            bool isFounded = false;
+            using (var db = new LogDatabase())
+            {
+                var list = db.Infos.ToList();
+                foreach(var item in list)
+                {
+                    if(id == item.GuildId)
+                    {
+                        isFounded = true;
+                        break;
+                    }
+                }
+                if (!isFounded)
+                {
+                    try
+                    {
+                        var instance = new DiscordInfo();
+                        instance.ColorId = 15;
+                        instance.GuildId = id;
+                        db.Infos.Add(instance);
+                        db.SaveChanges();
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+            }
         }
     }
 }
