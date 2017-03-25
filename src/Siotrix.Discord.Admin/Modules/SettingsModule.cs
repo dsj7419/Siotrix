@@ -11,13 +11,33 @@ namespace Siotrix.Discord.Admin
     [Group("settings"), Alias("set")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
-        [Command("avatar")]
+        [Command("gavatar")]
         public Task AvatarAsync()
             => Context.ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
-        [Command("avatar"), RequireOwner]
+        [Command("gavatar"), RequireOwner]
         public async Task AvatarAsync(Uri url)
         {
+            var request = new HttpRequestMessage(new HttpMethod("GET"), url);
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.SendAsync(request);
+                var stream = await response.Content.ReadAsStreamAsync();
+
+                var self = Context.Client.CurrentUser;
+                await self.ModifyAsync(x =>
+                {
+                    x.Avatar = new Image(stream);
+                });
+                await Context.ReplyAsync("👍");
+            }
+        }
+
+        [Command("gavatar reset"), RequireOwner]
+        public async Task AvatarResetAsync()
+        {
+            Uri url = new Uri("https://s27.postimg.org/hgn3yw4gz/Siotrix_Logo_Side_Alt1_No_Text.png");
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             using (var client = new HttpClient())
@@ -367,49 +387,49 @@ namespace Siotrix.Discord.Admin
             int id = 0;
             switch (name)
             {
-                case "(Red)":
+                case "Red":
                     id = 1;
                     break;
-                case "(Rose)":
+                case "Rose":
                     id = 2;
                     break;
-                case "(Magenta)":
+                case "Magenta":
                     id = 3;
                     break;
-                case "(Violet)":
+                case "Violet":
                     id = 4;
                     break;
-                case "(Blue)":
+                case "Blue":
                     id = 5;
                     break;
-                case "(Azure)":
+                case "Azure":
                     id = 6;
                     break;
-                case "(Cyan)":
+                case "Cyan":
                     id = 7;
                     break;
-                case "(Aquamarine)":
+                case "Aquamarine":
                     id = 8;
                     break;
-                case "(Green)":
+                case "Green":
                     id = 9;
                     break;
-                case "(Chartreuse)":
+                case "Chartreuse":
                     id = 10;
                     break;
-                case "(Yellow)":
+                case "Yellow":
                     id = 11;
                     break;
-                case "(Orange)":
+                case "Orange":
                     id = 12;
                     break;
-                case "(Black)":
+                case "Black":
                     id = 13;
                     break;
-                case "(Dark-Gray)":
+                case "Dark-Gray":
                     id = 14;
                     break;
-                case "(None)":
+                case "None":
                     id = 16;
                     break;
                 default :
