@@ -15,6 +15,7 @@ namespace Siotrix.Discord.Admin
         public Task AvatarAsync()
             => Context.ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
+        [Name("no-help")]
         [Command("gavatar"), RequireOwner]
         public async Task AvatarAsync(Uri url)
         {
@@ -34,6 +35,7 @@ namespace Siotrix.Discord.Admin
             }
         }
 
+        [Name("no-help")]
         [Command("gavatar reset"), RequireOwner]
         public async Task AvatarResetAsync()
         {
@@ -58,6 +60,7 @@ namespace Siotrix.Discord.Admin
         public Task UsernameAsync()
             => Context.ReplyAsync(Context.Client.CurrentUser.ToString());
 
+        [Name("no-help")]
         [Command("username"), RequireOwner]
         public async Task UsernameAsync([Remainder]string name)
         {
@@ -73,6 +76,7 @@ namespace Siotrix.Discord.Admin
         public Task NicknameAsync()
             => Context.ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
 
+        [Name("no-help")]
         [Command("nickname"), RequireOwner]
         public async Task NicknameAsync([Remainder]string name)
         {
@@ -88,6 +92,7 @@ namespace Siotrix.Discord.Admin
         public Task ActivityAsync()
             => Context.ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
 
+        [Name("no-help")]
         [Command("activity"), RequireOwner]
         public async Task ActivityAsync([Remainder]string activity)
         {
@@ -100,6 +105,7 @@ namespace Siotrix.Discord.Admin
         public Task StatusAsync()
             => Context.ReplyAsync(Context.Client.CurrentUser.Status.ToString());
 
+        [Name("no-help")]
         [Command("status"), RequireOwner]
         public async Task UsernameAsync(UserStatus status)
         {
@@ -188,6 +194,7 @@ namespace Siotrix.Discord.Admin
             await Context.ReplyAsync(colorName);
         }
 
+        [Name("no-help")]
         [Command("color list")]
         public async Task ColorListAsync()
         {
@@ -381,6 +388,7 @@ namespace Siotrix.Discord.Admin
             await Context.ReplyAsync(colors);
         }
 
+        [Name("no-help")]
         [Command("color")]
         public async Task ColorAsync(string name)
         {

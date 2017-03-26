@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 
 namespace Siotrix.Discord.General
-{
-    [Group("help"), Alias("guide")]
+{    
+    [Name("default")]
     [Summary("Shows info about commands")]
     [Remarks("help [module] [command]")]
     public class HelpModule : ModuleBase<SocketCommandContext>
@@ -25,7 +25,7 @@ namespace Siotrix.Discord.General
             _map = map;
         }
 
-        [Command]
+        [Command("help")]
         public async Task Help()
         {            
             var sender = Context.Message.Author as SocketGuildUser;
@@ -103,7 +103,7 @@ namespace Siotrix.Discord.General
         }
 
         [Name("no-help")]
-        [Command("help"), Alias("guide")]
+        [Command("help")]
         public async Task Help(string predicate)
         {
             predicate = predicate.RemoveWhitespace().ToLower();
@@ -201,7 +201,7 @@ namespace Siotrix.Discord.General
         }
 
         [Name("no-help")]
-        [Command("help"), Alias("guide")]
+        [Command("help")]
         public async Task Help(string module, [Remainder] string predicate)
         {
             var sender = Context.Message.Author as SocketGuildUser;

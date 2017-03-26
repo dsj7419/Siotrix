@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
-    [Group("performance")]
+    [Name("default")]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;
@@ -17,7 +17,7 @@ namespace Siotrix.Discord.Admin
             _process = Process.GetCurrentProcess();
         }
 
-        [Command]
+        [Command("performance")]
         public Task PerformanceAsync()
         {
             var builder = new EmbedBuilder();
@@ -37,26 +37,32 @@ namespace Siotrix.Discord.Admin
             return Context.ReplyAsync("", embed: builder);
         }
 
+        [Name("no-help")]
         [Command("uptime")]
         public Task UptimeAsync()
             => Context.ReplyAsync(GetUptime());
 
+        [Name("no-help")]
         [Command("library"), Alias("lib")]
         public Task LibraryAsync()
             => Context.ReplyAsync(GetLibrary());
 
+        [Name("no-help")]
         [Command("operatingsystem"), Alias("os")]
         public Task OperatingSystemAsync()
             => Context.ReplyAsync(GetOperatingSystem());
 
+        [Name("no-help")]
         [Command("framework")]
         public Task FrameworkAsync()
             => Context.ReplyAsync(GetFramework());
 
+        [Name("no-help")]
         [Command("memoryusage"), Alias("memory", "mem")]
         public Task MemoryUsageAsync()
             => Context.ReplyAsync(GetMemoryUsage());
 
+        [Name("no-help")]
         [Command("latency"), Alias("lag", "ping")]
         public Task LatencyAsync()
             => Context.ReplyAsync(GetLatency());

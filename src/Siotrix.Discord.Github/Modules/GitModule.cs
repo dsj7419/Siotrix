@@ -9,6 +9,7 @@ namespace Siotrix.Discord.Github
     [Remarks("Manage repositories configured to be used in the source and issue commands")]
     public class GitModule : ModuleBase<SocketCommandContext>
     {
+        [Name("no-help")]
         [Command]
         [Remarks("View a list of all github repositories configured for this guild or channel")]
         public async Task GitAsync()
