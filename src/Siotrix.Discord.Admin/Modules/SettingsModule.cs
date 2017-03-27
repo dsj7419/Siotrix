@@ -84,6 +84,17 @@ namespace Siotrix.Discord.Admin
             await Context.ReplyAsync("👍");
         }
 
+        [Command("nickname reset"), RequireOwner]
+        public async Task NicknameResetAsync()
+        {
+            var self = Context.Guild.CurrentUser;
+            await self.ModifyAsync(x =>
+            {
+                x.Nickname = "Siotrix";
+            });
+            await Context.ReplyAsync("👍");
+        }
+
         [Command("activity")]
         public Task ActivityAsync()
             => Context.ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
