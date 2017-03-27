@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
+    [Group("stats"), Alias("statistics")]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
-        [Command("stats"), Alias("statistics")]
+        [Name("no-help")]
         public Task GlobalDataAsync()
         {
             System.Console.WriteLine("\nSuccessfully in database table!!!!");

@@ -6,7 +6,6 @@ using Siotrix.Discord.Events;
 using Siotrix.Discord.General;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Roslyn;
-using Siotrix.Discord.Github;
 using Siotrix.Discord.Statistics;
 using System;
 using System.Linq;
@@ -52,8 +51,6 @@ namespace Siotrix.Discord
                 await _service.LoadModerationAsync();
             if (config.Modules.Roslyn)
                 await _service.LoadRoslynAsync();
-            if (config.Modules.Github)
-                await _service.LoadGithubAsync();
             if (config.Modules.Statistics)
                 await _service.LoadStatisticsAsync();
 

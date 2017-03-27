@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Siotrix.Commands;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.General
 {    
-    [Name("default")]
+    [Name("help")]
     [Summary("Shows info about commands")]
     [Remarks("help [module] [command]")]
     public class HelpModule : ModuleBase<SocketCommandContext>
