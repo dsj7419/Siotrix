@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Utility
 {    
-    [Name("help")]
+    [Name("utility")]
     [Summary("Shows info about commands")]
     [Remarks("help [module] [command]")]
     public class HelpModule : ModuleBase<SocketCommandContext>
