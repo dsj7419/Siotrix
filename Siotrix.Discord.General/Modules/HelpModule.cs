@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace Siotrix.Discord.General
+namespace Siotrix.Discord.Utility
 {    
     [Name("help")]
     [Summary("Shows info about commands")]

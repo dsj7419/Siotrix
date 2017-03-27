@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Commands", "..\Siot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Core", "..\SiotrixCore\src\Siotrix.Core\Siotrix.Core.csproj", "{7D9BAF6F-8F7E-4924-99A6-0DCC9D16D2C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siotrix.Discord.General", "Siotrix.Discord.General\Siotrix.Discord.General.csproj", "{432F8459-131F-4118-A795-65806C042E18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Siotrix.Discord.Utility", "Siotrix.Discord.General\Siotrix.Discord.Utility.csproj", "{432F8459-131F-4118-A795-65806C042E18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

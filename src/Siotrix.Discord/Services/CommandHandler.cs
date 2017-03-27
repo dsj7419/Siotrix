@@ -3,7 +3,7 @@ using Siotrix.Commands;
 using Siotrix.Discord.Admin;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Events;
-using Siotrix.Discord.General;
+using Siotrix.Discord.Utility;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Roslyn;
 using Siotrix.Discord.Statistics;

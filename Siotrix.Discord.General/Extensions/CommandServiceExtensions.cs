@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.General
+namespace Siotrix.Discord.Utility
 {
     public static class CommandServiceExtensions
     {

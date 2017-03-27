@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Siotrix.Discord.General\Siotrix.Discord.General.csproj" />
+    <ProjectReference Include="..\..\Siotrix.Discord.General\Siotrix.Discord.Utility.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Admin\Siotrix.Discord.Admin.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Audio\Siotrix.Discord.Audio.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Events\Siotrix.Discord.Events.csproj" />
