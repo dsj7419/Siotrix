@@ -13,8 +13,9 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Roslyn
 {
+    [Name("evaluate")]
     [RequireOwner]
-    [Group("evaluate"), Alias("eval", "e")]
+    [Group("evaluate"), Alias("eval")]
     public class EvalModule : ModuleBase<SocketCommandContext>
     {
         private Stopwatch _timer = new Stopwatch();
@@ -24,6 +25,7 @@ namespace Siotrix.Discord.Roslyn
             _timer.Start();
         }
 
+        [Name("no-help")]
         [Command(RunMode = RunMode.Async)]
         public async Task EvalAsync([Remainder]string code)
         {

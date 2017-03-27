@@ -38,6 +38,5 @@ namespace Siotrix.Discord
     public class AuthTokens
     {
         public string Discord { get; set; } = "";
-        public string Github { get; set; } = "";
     }
 }

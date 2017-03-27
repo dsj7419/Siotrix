@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
-    [Name("default")]
+    [Name("utility")]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;

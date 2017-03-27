@@ -23,8 +23,7 @@ namespace Siotrix.Discord
             if (endPos == -1) return false;
             if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return false; //Must end in "> "
 
-            ulong userId;
-            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out userId)) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return false;
             if (userId == user.Id)
             {
                 argPos = endPos + 2;
