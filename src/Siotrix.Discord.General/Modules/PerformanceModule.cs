@@ -1,13 +1,15 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Siotrix.Commands;
+using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Admin
+namespace Siotrix.Discord.Utility
 {
-    [Name("default")]
+    [Name("utility")]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;
@@ -16,6 +18,8 @@ namespace Siotrix.Discord.Admin
         {
             _process = Process.GetCurrentProcess();
         }
+
+
 
         [Command("performance")]
         public Task PerformanceAsync()

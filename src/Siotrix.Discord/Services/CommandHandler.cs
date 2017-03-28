@@ -4,6 +4,7 @@ using Siotrix.Discord.Admin;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Events;
 using Siotrix.Discord.Utility;
+using Siotrix.Discord.Developer;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Roslyn;
 using Siotrix.Discord.Statistics;
@@ -45,8 +46,10 @@ namespace Siotrix.Discord
                 await _service.LoadAudioAsync();
             if (config.Modules.Events)
                 await _service.LoadEventsAsync();
-            if (config.Modules.General)
-                await _service.LoadGeneralAsync();
+            if (config.Modules.Utility)
+                await _service.LoadUtilityAsync();
+            if (config.Modules.Developer)
+                await _service.LoadDeveloperAsync();
             if (config.Modules.Moderation)
                 await _service.LoadModerationAsync();
             if (config.Modules.Roslyn)

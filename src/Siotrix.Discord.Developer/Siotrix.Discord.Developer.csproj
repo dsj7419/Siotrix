@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Siotrix.Discord.Core\Siotrix.Discord.Core.csproj" />
+    <ProjectReference Include="..\Siotrix.Discord.Core\Siotrix.Discord.Core.csproj" />
   </ItemGroup>
 
 </Project>
