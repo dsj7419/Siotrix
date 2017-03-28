@@ -10,7 +10,7 @@ namespace Siotrix.Discord.Statistics
     [Group("stats"), Alias("statistics")]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
-        [Name("no-help")]
+        [Command("info")]
         public Task GlobalDataAsync()
         {
             System.Console.WriteLine("\nSuccessfully in database table!!!!");
@@ -53,6 +53,7 @@ namespace Siotrix.Discord.Statistics
                 byte rColor = Convert.ToByte(color_query.r);
                 byte gColor = Convert.ToByte(color_query.g);
                 byte bColor = Convert.ToByte(color_query.b);
+                var footer_query = db.footers.First();
 
                 /* var builder = new EmbedBuilder()
                      .WithTitle("Statistics Data")
@@ -393,7 +394,8 @@ namespace Siotrix.Discord.Statistics
                          }
 
                      };
-                 }); 
+                 });
+                builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText));
                 return Context.ReplyAsync("", embed: builder);
             }
         }

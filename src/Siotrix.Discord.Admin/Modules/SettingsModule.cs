@@ -56,6 +56,176 @@ namespace Siotrix.Discord.Admin
             }
         }
 
+        [Command("gfootericon"), RequireOwner]
+        public async Task FooterIconAsync()
+        {
+            string url = null;
+            using(var db = new LogDatabase())
+            {
+                try
+                {
+                    if (db.footers.ToList().Count <= 0)
+                    {
+                        url = "No url";
+                    }
+                    else
+                    {
+                        url = db.footers.First().FooterIcon;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync(url);
+        }
+
+        [Command("gfootericon reset"),RequireOwner]
+        public async Task FooterIconResetAsync()
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordFooter();
+                val.FooterIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                try
+                {
+                    if (db.footers.ToList().Count <= 0)
+                    {
+                        db.footers.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.footers.First();
+                        data.FooterIcon = val.FooterIcon;
+                        db.footers.Update(data);
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync("👍");
+        }
+
+        [Command("gfootericon"), RequireOwner]
+        public async Task FooterIconAsync(Uri url)
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordFooter();
+                val.FooterIcon = url.ToString();
+                try
+                {
+                    if(db.footers.ToList().Count <= 0)
+                    {
+                        db.footers.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.footers.First();
+                        data.FooterIcon = val.FooterIcon;
+                        db.footers.Update(data);
+                    }
+                    
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync("👍");
+        }
+
+        [Command("gfootertext"), RequireOwner]
+        public async Task FooterTextAsync(string txt)
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordFooter();
+                val.FooterText = txt;
+                try
+                {
+                    if (db.footers.ToList().Count <= 0)
+                    {
+                        db.footers.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.footers.First();
+                        data.FooterText = val.FooterText;
+                        db.footers.Update(data);
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync("👍");
+        }
+
+        [Command("gfootertext"), RequireOwner]
+        public async Task FooterTextAsync()
+        {
+            string txt = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    if (db.footers.ToList().Count <= 0)
+                    {
+                        txt = DateTime.Now.ToString();
+                    }
+                    else
+                    {
+                        txt = db.footers.First().FooterText;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync(txt);
+        }
+
+        [Command("gfootertext reset"), RequireOwner]
+        public async Task FooterTextResetAsync()
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordFooter();
+                val.FooterText = DateTime.Now.ToString();
+                try
+                {
+                    if (db.footers.ToList().Count <= 0)
+                    {
+                        db.footers.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.footers.First();
+                        data.FooterText = val.FooterText;
+                        db.footers.Update(data);
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await Context.ReplyAsync("👍");
+        }
+
         [Command("username")]
         public Task UsernameAsync()
             => Context.ReplyAsync(Context.Client.CurrentUser.ToString());
