@@ -24,10 +24,11 @@ namespace Siotrix.Discord
             if (_config.Instance.ToString() != instance.ToLower())
                 return Task.CompletedTask;
 
-            var builder = new EmbedBuilder();
-            builder.Title = $"Module configuration for {_config.Instance}";
-            builder.Description = _config.Modules.ToString();
-
+            var builder = new EmbedBuilder()
+            {
+                Title = $"Module configuration for {_config.Instance}",
+                Description = _config.Modules.ToString()
+            };
             return Context.ReplyAsync("", builder);
         }
     }

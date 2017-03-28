@@ -6,7 +6,7 @@ namespace Siotrix.Discord.Utility
 {
     public static class CommandServiceExtensions
     {
-        public static Task LoadGeneralAsync(this CommandService service)
+        public static Task LoadUtilityAsync(this CommandService service)
             => service.AddModulesAsync(typeof(HelpModule).GetTypeInfo().Assembly);
     }
 }

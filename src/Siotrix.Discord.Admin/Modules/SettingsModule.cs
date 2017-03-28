@@ -88,6 +88,7 @@ namespace Siotrix.Discord.Admin
             await Context.ReplyAsync("👍");
         }
 
+        [Name("no-help")]
         [Command("nickname reset"), RequireOwner]
         public async Task NicknameResetAsync()
         {
