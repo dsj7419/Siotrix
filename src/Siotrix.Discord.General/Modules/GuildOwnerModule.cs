@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Utility.Modules
 {
     [Name("Guild Owner Commands")]
-    class GuildOwnerModule : ModuleBase<SocketCommandContext>
+    public class GuildOwnerModule : ModuleBase<SocketCommandContext>
     {
 
         [Command("leave")]
@@ -22,7 +22,7 @@ namespace Siotrix.Discord.Utility.Modules
             await Context.Guild.LeaveAsync();
         }
 
-        [Command("echo"), Alias("say")]
+        [Command("echo")]
         [Summary("Echo's input into a specified channel.")]
         [Remarks("say #general I am alive!")]
         [MinPermissions(AccessLevel.GuildOwner)]
