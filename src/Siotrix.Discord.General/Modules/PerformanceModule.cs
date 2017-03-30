@@ -19,8 +19,6 @@ namespace Siotrix.Discord.Utility
             _process = Process.GetCurrentProcess();
         }
 
-
-
         [Command("performance")]
         public Task PerformanceAsync()
         {

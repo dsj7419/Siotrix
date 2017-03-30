@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
+    [Name("Admin")]
     [Group("settings"), Alias("set")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
