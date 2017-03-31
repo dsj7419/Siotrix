@@ -1,5 +1,4 @@
 ﻿using Siotrix.Commands;
-using Siotrix.Discord.Developer.Modules;
 using System.Reflection;
 using System.Threading.Tasks;
 

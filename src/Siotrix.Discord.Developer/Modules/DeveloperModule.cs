@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Developer.Modules
+namespace Siotrix.Discord.Developer
 {
     [Name("Bot Owner Commands")]
     public class DeveloperModule : ModuleBase<SocketCommandContext>

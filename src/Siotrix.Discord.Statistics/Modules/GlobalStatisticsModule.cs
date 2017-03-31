@@ -48,12 +48,15 @@ namespace Siotrix.Discord.Statistics
                                         ChannelName = x.Select(y => y.ChannelName).First()
                                     });
                 var guild_id = Context.Guild.Id;
-                var color_query = (from t1 in db.Infos join t2 in db.Colors on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
+                var color_query = (from t1 in db.Gcolors join t2 in db.Colorinfos on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
                                    select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam }).First();
                 byte rColor = Convert.ToByte(color_query.r);
                 byte gColor = Convert.ToByte(color_query.g);
                 byte bColor = Convert.ToByte(color_query.b);
-                var footer_query = db.footers.First();
+                var footer_query = db.Gfooters.First();
+                var author_query = db.Authors.First();
+                var thumbnail_query = db.Gthumbnails.First();
+                var desc_query = db.Gdescriptions.First();
 
                 /* var builder = new EmbedBuilder()
                      .WithTitle("Statistics Data")
@@ -231,8 +234,8 @@ namespace Siotrix.Discord.Statistics
                 var builder = new EmbedBuilder()
                     .WithTitle("Statistics Data")
                     .WithColor(new Color(rColor, gColor, bColor))
-                    .WithDescription($"Siotrix Bot")
-                    .WithThumbnailUrl("http://img04.imgland.net/WyZ5FoM.png")
+                    .WithDescription(desc_query.Description)
+                    .WithThumbnailUrl(thumbnail_query.ThumbNail)
                      .AddField(x =>
                      {
                          x.Name = $"-   Number of messages done in all channels of all guilds:";
@@ -243,6 +246,10 @@ namespace Siotrix.Discord.Statistics
                          x.Name = $"-   Number of messages deleted in all channels of all guilds:";
                          x.Value = $"\t{deleteMessages}\t{"messages"}";
                      });
+                builder.WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(author_query.AuthorIcon)
+                .WithName(author_query.AuthorName)
+                .WithUrl("https://discord.gg/RMUPGSf"));
                 // per guild
                 foreach (var t in guild_query)
                 {
@@ -288,7 +295,7 @@ namespace Siotrix.Discord.Statistics
                     }
                 };
                 //per guild per user
-                builder.AddField(x =>
+               /* builder.AddField(x =>
                  {
                      x.Name = $"Per Guild Per Users:";
                      int guild_index = 0;
@@ -394,8 +401,8 @@ namespace Siotrix.Discord.Statistics
                          }
 
                      };
-                 });
-                builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText));
+                 });*/
+                builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText)).WithTimestamp(DateTime.UtcNow);
                 return Context.ReplyAsync("", embed: builder);
             }
         }
