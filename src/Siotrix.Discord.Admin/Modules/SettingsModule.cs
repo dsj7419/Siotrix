@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Siotrix;
 using Siotrix.Commands;
 using System;
 using System.Linq;

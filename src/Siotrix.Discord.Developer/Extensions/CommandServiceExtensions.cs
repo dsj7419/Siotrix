@@ -7,6 +7,6 @@ namespace Siotrix.Discord.Developer
     public static class CommandServiceExtensions
     {
         public static Task LoadDeveloperAsync(this CommandService service)
-            => service.AddModulesAsync(Assembly.GetEntryAssembly());
+            => service.AddModulesAsync(typeof(GetInviteModule).GetTypeInfo().Assembly);
     }
 }
