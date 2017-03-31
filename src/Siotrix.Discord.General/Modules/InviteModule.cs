@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Utility.Modules
+namespace Siotrix.Discord.Utility
 {
-    [Name("Basic Commands")]
+    [Name("Basic")]
     public class UtilitiesModule : ModuleBase<SocketCommandContext>
     {
 

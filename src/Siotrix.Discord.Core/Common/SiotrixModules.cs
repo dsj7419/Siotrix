@@ -19,7 +19,7 @@ namespace Siotrix.Discord
             builder.AppendLine($"Admin: {Admin}");
             builder.AppendLine($"Audio: {Audio}");
             builder.AppendLine($"Events: {Events}");
-            builder.AppendLine($"General: {Utility}");
+            builder.AppendLine($"Utility: {Utility}");
             builder.AppendLine($"Developer: {Developer}");
             builder.AppendLine($"Moderation: {Moderation}");
             builder.AppendLine($"Roslyn: {Roslyn}");

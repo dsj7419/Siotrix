@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Siotrix;
 using Siotrix.Commands;
 using System;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
+    [Name("Admin")]
     [Group("settings"), Alias("set")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {

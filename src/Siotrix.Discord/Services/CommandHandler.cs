@@ -34,7 +34,7 @@ namespace Siotrix.Discord
                 CaseSensitiveCommands = false,
                 DefaultRunMode = RunMode.Async
             });
-
+           
             _service.AddTypeReader(typeof(Uri), new UriTypeReader());
             _service.AddTypeReader(typeof(TimeSpan), new TimeSpanTypeReader());
             await _service.AddModulesAsync(Assembly.GetEntryAssembly());
