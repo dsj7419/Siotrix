@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Developer
 {
-    class BroadcastModule : ModuleBase<SocketCommandContext>
+    public class BroadcastModule : ModuleBase<SocketCommandContext>
     {
         [Command("broadcast")]
         [Summary("Broadcasts a message to the default channel of all servers the bot is connected to.")]

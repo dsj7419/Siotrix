@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Developer
 {
-    class GetInviteModule : ModuleBase<SocketCommandContext>
+    public class GetInviteModule : ModuleBase<SocketCommandContext>
     {
         [Command("getinvite")]
         [Summary("Makes an invite to the specified guild")]

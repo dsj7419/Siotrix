@@ -12,10 +12,10 @@
     <ProjectReference Include="..\Siotrix.Discord.Audio\Siotrix.Discord.Audio.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Developer\Siotrix.Discord.Developer.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Events\Siotrix.Discord.Events.csproj" />
-    <ProjectReference Include="..\Siotrix.Discord.General\Siotrix.Discord.Utility.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Moderation\Siotrix.Discord.Moderation.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Roslyn\Siotrix.Discord.Roslyn.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Statistics\Siotrix.Discord.Statistics.csproj" />
+    <ProjectReference Include="..\Siotrix.Discord.Utility\Siotrix.Discord.Utility.csproj" />
   </ItemGroup>
 
 </Project>

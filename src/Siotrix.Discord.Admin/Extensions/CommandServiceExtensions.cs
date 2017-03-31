@@ -7,6 +7,6 @@ namespace Siotrix.Discord.Admin
     public static class CommandServiceExtensions
     {
         public static Task LoadAdminAsync(this CommandService service)
-            => service.AddModulesAsync(typeof(EchoModule).GetTypeInfo().Assembly);
+            => service.AddModulesAsync(typeof(SiotrixModule).GetTypeInfo().Assembly);
     }
 }

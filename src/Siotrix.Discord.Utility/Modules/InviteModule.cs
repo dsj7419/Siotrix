@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Utility
 {
     [Name("Basic")]
-    public class UtilitiesModule : ModuleBase<SocketCommandContext>
+    public class InviteModule : ModuleBase<SocketCommandContext>
     {
 
         [Command("invite"), Alias("join")]

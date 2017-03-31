@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Developer
 {
     [Name("Bot Owner")]
-    class PowerDownModule : ModuleBase<SocketCommandContext>
+    public class PowerDownModule : ModuleBase<SocketCommandContext>
     {
         [Command("powerdown"), Alias("pd")]
         [Summary("Terminates the bot application")]
