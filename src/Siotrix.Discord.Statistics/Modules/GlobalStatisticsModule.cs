@@ -2,7 +2,7 @@
 using Discord.Commands;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
+using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
@@ -11,6 +11,7 @@ namespace Siotrix.Discord.Statistics
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
         [Command("info")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public Task GlobalDataAsync()
         {
             System.Console.WriteLine("\nSuccessfully in database table!!!!");
@@ -249,7 +250,7 @@ namespace Siotrix.Discord.Statistics
                 builder.WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(author_query.AuthorIcon)
                 .WithName(author_query.AuthorName)
-                .WithUrl("https://discord.gg/RMUPGSf"));
+                .WithUrl(author_query.AuthorUrl));
                 // per guild
                 foreach (var t in guild_query)
                 {

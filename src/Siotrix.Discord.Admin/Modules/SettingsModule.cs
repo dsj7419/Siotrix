@@ -14,13 +14,18 @@ namespace Siotrix.Discord.Admin
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
         [Command("gavatar")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public Task AvatarAsync()
             => ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
-        [Name("no-help")]
-        [Command("gavatar"), RequireOwner]
+        [Command("gavatar")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task AvatarAsync(Uri url)
         {
+            if (url.ToString().Equals("reset"))
+            {
+                url = new Uri("https://s27.postimg.org/hgn3yw4gz/Siotrix_Logo_Side_Alt1_No_Text.png");
+            }
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             using (var client = new HttpClient())
@@ -37,8 +42,8 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        [Name("no-help")]
-        [Command("gavatar reset"), RequireOwner]
+        /*[Command("gavatar reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task AvatarResetAsync()
         {
             Uri url = new Uri("https://s27.postimg.org/hgn3yw4gz/Siotrix_Logo_Side_Alt1_No_Text.png");
@@ -56,9 +61,10 @@ namespace Siotrix.Discord.Admin
                 });
                 await ReplyAsync("👍");
             }
-        }
+        }*/
 
-        [Command("gfootericon"), RequireOwner]
+        [Command("gfootericon")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync()
         {
             string url = null;
@@ -83,7 +89,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gfootericon reset"),RequireOwner]
+       /* [Command("gfootericon reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconResetAsync()
         {
             using (var db = new LogDatabase())
@@ -111,15 +118,23 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gfootericon"), RequireOwner]
+        [Command("gfootericon")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync(Uri url)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordGuildFooter();
-                val.FooterIcon = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.FooterIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                }
+                else
+                {
+                    val.FooterIcon = url.ToString();
+                }
                 try
                 {
                     if(db.Gfooters == null || db.Gfooters.ToList().Count <= 0)
@@ -132,7 +147,6 @@ namespace Siotrix.Discord.Admin
                         data.FooterIcon = val.FooterIcon;
                         db.Gfooters.Update(data);
                     }
-                    
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -143,13 +157,21 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gfootertext"), RequireOwner]
+        [Command("gfootertext")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextAsync([Remainder] string txt)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordGuildFooter();
-                val.FooterText = txt;
+                if (txt.Equals("reset"))
+                {
+                    val.FooterText = "Siotrix Footer";
+                }
+                else
+                {
+                    val.FooterText = txt;
+                }
                 try
                 {
                     if (db.Gfooters == null || db.Gfooters.ToList().Count <= 0)
@@ -173,7 +195,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gfootertext"), RequireOwner]
+        [Command("gfootertext")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextAsync()
         {
             string txt = null;
@@ -198,7 +221,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(txt);
         }
 
-        [Command("gfootertext reset"), RequireOwner]
+        /*[Command("gfootertext reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextResetAsync()
         {
             using (var db = new LogDatabase())
@@ -226,9 +250,10 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gauthoricon"), RequireOwner]
+        [Command("gauthoricon")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync()
         {
             string url = null;
@@ -261,7 +286,7 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gauthoricon reset"), RequireOwner]
+        /*[Command("gauthoricon reset"), RequireOwner]
         public async Task AuthorIconResetAsync()
         {
             using (var db = new LogDatabase())
@@ -288,15 +313,23 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gauthoricon"), RequireOwner]
+        [Command("gauthoricon")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync(Uri url)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordAuthor();
-                val.AuthorIcon = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.AuthorIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                }
+                else
+                {
+                    val.AuthorIcon = url.ToString();
+                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -319,7 +352,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gauthorurl"), RequireOwner]
+        [Command("gauthorurl")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync()
         {
             string url = null;
@@ -334,7 +368,7 @@ namespace Siotrix.Discord.Admin
                     else
                     {
                         url = db.Authors.First().AuthorUrl;
-                        if (url == null || url == "")
+                        if (url == null || url.ToString() == "")
                         {
                             url = "No Url";
                             var data = db.Authors.First();
@@ -352,7 +386,7 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gauthorurl reset"), RequireOwner]
+        /*[Command("gauthorurl reset"), RequireOwner]
         public async Task AuthorUrlResetAsync()
         {
             using (var db = new LogDatabase())
@@ -379,15 +413,23 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gauthorurl"), RequireOwner]
+        [Command("gauthorurl")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync(Uri url)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordAuthor();
-                val.AuthorUrl = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.AuthorUrl = "";
+                }
+                else
+                {
+                    val.AuthorUrl = url.ToString();
+                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -410,13 +452,21 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gauthorname"), RequireOwner]
+        [Command("gauthorname")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync([Remainder] string txt)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordAuthor();
-                val.AuthorName = txt;
+                if (txt.Equals("reset"))
+                {
+                    val.AuthorName = Context.Guild.Name;
+                }
+                else
+                {
+                    val.AuthorName = txt;
+                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -439,7 +489,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gauthorname"), RequireOwner]
+        [Command("gauthorname")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync()
         {
             string txt = null;
@@ -472,7 +523,7 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(txt);
         }
 
-        [Command("gauthorname reset"), RequireOwner]
+        /*[Command("gauthorname reset"), RequireOwner]
         public async Task AuthorNameResetAsync()
         {
             using (var db = new LogDatabase())
@@ -499,9 +550,10 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gthumbnail"), RequireOwner]
+        [Command("gthumbnail")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task ThumbNailAsync()
         {
             string url = null;
@@ -526,7 +578,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gthumbnail reset"), RequireOwner]
+        /*[Command("gthumbnail reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task ThumbNailResetAsync()
         {
             using (var db = new LogDatabase())
@@ -553,15 +606,23 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gthumbnail"), RequireOwner]
+        [Command("gthumbnail")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task ThumbNailAsync(Uri url)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordThumbNail();
-                val.ThumbNail = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.ThumbNail = "http://img04.imgland.net/WyZ5FoM.png";
+                }
+                else
+                {
+                    val.ThumbNail = url.ToString();
+                }
                 try
                 {
                     if (db.Gthumbnails == null || db.Gthumbnails.ToList().Count <= 0)
@@ -584,7 +645,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gwebsite"), Alias("gweb"), RequireOwner]
+        [Command("gwebsite"), Alias("gweb")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task WebSiteAsync()
         {
             string url = null;
@@ -609,7 +671,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gwebsite reset"), Alias("gweb"), RequireOwner]
+        /*[Command("gwebsite reset"), Alias("gweb")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task WebSiteResetAsync()
         {
             using (var db = new LogDatabase())
@@ -636,15 +699,23 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
-        [Command("gwebsite"), Alias("gweb"), RequireOwner]
+        [Command("gwebsite"), Alias("gweb")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task WebSiteAsync(Uri url)
         {
             using (var db = new LogDatabase())
             {
                 var val = new DiscordGuildSiteUrl();
-                val.SiteUrl = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.SiteUrl = "https://dsj7419.github.io/Siotrix/";
+                }
+                else
+                {
+                    val.SiteUrl = url.ToString();
+                }
                 try
                 {
                     if (db.Gwebsiteurls == null || db.Gwebsiteurls.ToList().Count <= 0)
@@ -667,7 +738,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gdescription"), Alias("gdesc"), RequireOwner]
+        [Command("gdescription"), Alias("gdesc")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task DescriptionAsync()
         {
             string url = null;
@@ -692,7 +764,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(url);
         }
 
-        [Command("gdescription"), Alias("gdesc"), RequireOwner]
+        [Command("gdescription"), Alias("gdesc")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task DescriptionAsync([Remainder] string str)
         {
             using (var db = new LogDatabase())
@@ -726,7 +799,8 @@ namespace Siotrix.Discord.Admin
             => ReplyAsync(Context.Client.CurrentUser.ToString());
 
         [Name("no-help")]
-        [Command("username"), RequireOwner]
+        [Command("username")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task UsernameAsync([Remainder]string name)
         {
             var self = Context.Client.CurrentUser;
@@ -738,15 +812,20 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("nickname")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameAsync()
                => await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
 
         [Name("no-help")]
         [Command("nickname")]
-        [MinPermissions(AccessLevel.GuildAdmin)]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameAsync([Remainder]string name)
         {
             var self = Context.Guild.CurrentUser;
+            if (name.Equals("reset"))
+            {
+                name = "Siotrix";
+            }
             await self.ModifyAsync(x =>
             {
                 x.Nickname = name;
@@ -755,8 +834,9 @@ namespace Siotrix.Discord.Admin
 
         }
 
-        [Name("no-help")]
-        [Command("nickname reset"), RequireOwner]
+        /*[Name("no-help")]
+        [Command("nickname reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameResetAsync()
         {
             var self = Context.Guild.CurrentUser;
@@ -765,7 +845,7 @@ namespace Siotrix.Discord.Admin
                 x.Nickname = "Siotrix";
             });
             await ReplyAsync("👍");
-        }
+        }*/
 
         [Command("activity")]
         public Task ActivityAsync()
@@ -793,7 +873,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-       [Command("color")]
+        [Command("color")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task ColorAsync()
         {
             string colorName = null;
@@ -873,8 +954,6 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(colorName);
         }
 
-        [Name("no-help")]
-        [Command("color list")]
         public async Task ColorListAsync()
         {
             string colors = null;
@@ -1067,13 +1146,16 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync(colors);
         }
 
-        [Name("no-help")]
         [Command("color")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task ColorAsync(string name)
         {
             int id = 0;
             switch (name)
             {
+                case "list":
+                    id = -1;
+                    break;
                 case "Red":
                     id = 1;
                     break;
@@ -1123,22 +1205,29 @@ namespace Siotrix.Discord.Admin
                     id = 15;
                     break;
             }
-            var guild_id = Context.Guild.Id;
-            CheckColorGuilds();
-            using (var db = new LogDatabase())
+            if(id < 0)
             {
-                var arr = db.Gcolors.Where(x => x.GuildId == guild_id.ToLong()).First();
-                arr.ColorId = id;
-                try
-                {
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await ColorListAsync();
             }
-            await ReplyAsync("👍");
+            else
+            {
+                var guild_id = Context.Guild.Id;
+                CheckColorGuilds();
+                using (var db = new LogDatabase())
+                {
+                    var arr = db.Gcolors.Where(x => x.GuildId == guild_id.ToLong()).First();
+                    arr.ColorId = id;
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+                await ReplyAsync("👍");
+            }
         }
 
         private void CheckColorGuilds()
@@ -1174,11 +1263,16 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        [Command("gname"), RequireOwner]
+        [Command("gname")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync([Remainder] string txt)
         {
             CheckGuildNames();
             var guild_id = Context.Guild.Id;
+            if (txt.Equals("reset"))
+            {
+                txt = Context.Guild.Name;
+            }
             using (var db = new LogDatabase())
             {
                 var arr = db.Gnames.Where(x => x.GuildId == guild_id.ToLong()).First();
@@ -1195,7 +1289,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("👍");
         }
 
-        [Command("gname"), RequireOwner]
+        [Command("gname")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync()
         {
             CheckGuildNames();
@@ -1207,7 +1302,8 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        [Command("gname reset"), RequireOwner]
+        /*[Command("gname reset")]
+        [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameResetAsync()
         {
             CheckGuildNames();
@@ -1227,7 +1323,7 @@ namespace Siotrix.Discord.Admin
                 }
             }
             await ReplyAsync("👍");
-        }
+        }*/
 
         private void CheckGuildNames()
         {
