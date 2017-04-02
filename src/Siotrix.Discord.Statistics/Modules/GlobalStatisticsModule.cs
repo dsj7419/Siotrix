@@ -50,10 +50,22 @@ namespace Siotrix.Discord.Statistics
                                     });
                 var guild_id = Context.Guild.Id;
                 var color_query = (from t1 in db.Gcolors join t2 in db.Colorinfos on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
-                                   select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam }).First();
-                byte rColor = Convert.ToByte(color_query.r);
-                byte gColor = Convert.ToByte(color_query.g);
-                byte bColor = Convert.ToByte(color_query.b);
+                                   select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam });
+                byte rColor = 0;
+                byte gColor = 0;
+                byte bColor = 0;
+                if (color_query == null || color_query.ToList().Count <= 0)
+                {
+                    rColor = Convert.ToByte(127);
+                    gColor = Convert.ToByte(127);
+                    bColor = Convert.ToByte(127);
+                }
+                else
+                {
+                    rColor = Convert.ToByte(color_query.First().r);
+                    gColor = Convert.ToByte(color_query.First().g);
+                    bColor = Convert.ToByte(color_query.First().b);
+                }
                 var footer_query = db.Gfooters.First();
                 var author_query = db.Authors.First();
                 var thumbnail_query = db.Gthumbnails.First();
