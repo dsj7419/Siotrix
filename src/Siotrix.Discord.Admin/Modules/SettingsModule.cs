@@ -1,5 +1,7 @@
 ﻿using Discord;
-using Siotrix.Commands;
+using Discord.Commands;
+using Discord.WebSocket;
+using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -13,7 +15,7 @@ namespace Siotrix.Discord.Admin
     {
         [Command("gavatar")]
         public Task AvatarAsync()
-            => Context.ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
+            => ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
         [Name("no-help")]
         [Command("gavatar"), RequireOwner]
@@ -31,7 +33,7 @@ namespace Siotrix.Discord.Admin
                 {
                     x.Avatar = new Image(stream);
                 });
-                await Context.ReplyAsync("👍");
+                await ReplyAsync("👍");
             }
         }
 
@@ -52,7 +54,7 @@ namespace Siotrix.Discord.Admin
                 {
                     x.Avatar = new Image(stream);
                 });
-                await Context.ReplyAsync("👍");
+                await ReplyAsync("👍");
             }
         }
 
@@ -78,7 +80,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gfootericon reset"),RequireOwner]
@@ -108,7 +110,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gfootericon"), RequireOwner]
@@ -138,7 +140,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gfootertext"), RequireOwner]
@@ -168,7 +170,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gfootertext"), RequireOwner]
@@ -193,7 +195,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(txt);
+            await ReplyAsync(txt);
         }
 
         [Command("gfootertext reset"), RequireOwner]
@@ -223,7 +225,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthoricon"), RequireOwner]
@@ -256,7 +258,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gauthoricon reset"), RequireOwner]
@@ -285,7 +287,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthoricon"), RequireOwner]
@@ -314,7 +316,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthorurl"), RequireOwner]
@@ -347,7 +349,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gauthorurl reset"), RequireOwner]
@@ -376,7 +378,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthorurl"), RequireOwner]
@@ -405,7 +407,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthorname"), RequireOwner]
@@ -434,7 +436,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gauthorname"), RequireOwner]
@@ -467,7 +469,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(txt);
+            await ReplyAsync(txt);
         }
 
         [Command("gauthorname reset"), RequireOwner]
@@ -496,7 +498,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gthumbnail"), RequireOwner]
@@ -521,7 +523,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gthumbnail reset"), RequireOwner]
@@ -550,7 +552,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gthumbnail"), RequireOwner]
@@ -579,7 +581,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gwebsite"), Alias("gweb"), RequireOwner]
@@ -604,7 +606,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gwebsite reset"), Alias("gweb"), RequireOwner]
@@ -633,7 +635,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gwebsite"), Alias("gweb"), RequireOwner]
@@ -662,7 +664,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gdescription"), Alias("gdesc"), RequireOwner]
@@ -687,7 +689,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("gdescription"), Alias("gdesc"), RequireOwner]
@@ -716,12 +718,12 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("username")]
         public Task UsernameAsync()
-            => Context.ReplyAsync(Context.Client.CurrentUser.ToString());
+            => ReplyAsync(Context.Client.CurrentUser.ToString());
 
         [Name("no-help")]
         [Command("username"), RequireOwner]
@@ -732,15 +734,16 @@ namespace Siotrix.Discord.Admin
             {
                 x.Username = name;
             });
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("nickname")]
-        public Task NicknameAsync()
-            => Context.ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
+        public async Task NicknameAsync()
+               => await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
 
         [Name("no-help")]
-        [Command("nickname"), RequireOwner]
+        [Command("nickname")]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task NicknameAsync([Remainder]string name)
         {
             var self = Context.Guild.CurrentUser;
@@ -748,7 +751,8 @@ namespace Siotrix.Discord.Admin
             {
                 x.Nickname = name;
             });
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
+
         }
 
         [Name("no-help")]
@@ -760,25 +764,25 @@ namespace Siotrix.Discord.Admin
             {
                 x.Nickname = "Siotrix";
             });
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("activity")]
         public Task ActivityAsync()
-            => Context.ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
+            => ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
 
         [Name("no-help")]
-        [Command("activity"), RequireOwner]
+        [Command("activity")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task ActivityAsync([Remainder]string activity)
         {
-            var self = Context.Client.CurrentUser;
-            await Context.Client.SetGameAsync(activity);
-            await Context.ReplyAsync("👍");
+            await (Context.Client as DiscordSocketClient).SetGameAsync(activity);
+            await ReplyAsync("👍");
         }
 
         [Command("status")]
         public Task StatusAsync()
-            => Context.ReplyAsync(Context.Client.CurrentUser.Status.ToString());
+            => ReplyAsync(Context.Client.CurrentUser.Status.ToString());
 
         [Name("no-help")]
         [Command("status"), RequireOwner]
@@ -786,7 +790,7 @@ namespace Siotrix.Discord.Admin
         {
             var self = Context.Client.CurrentUser;
             await Context.Client.SetStatusAsync(status);
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
        [Command("color")]
@@ -866,7 +870,7 @@ namespace Siotrix.Discord.Admin
                     colorName = "None";
                 }
             }
-            await Context.ReplyAsync(colorName);
+            await ReplyAsync(colorName);
         }
 
         [Name("no-help")]
@@ -1060,7 +1064,7 @@ namespace Siotrix.Discord.Admin
                     }
                 }
             }
-            await Context.ReplyAsync(colors);
+            await ReplyAsync(colors);
         }
 
         [Name("no-help")]
@@ -1134,7 +1138,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         private void CheckColorGuilds()
@@ -1188,7 +1192,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("gname"), RequireOwner]
@@ -1199,7 +1203,7 @@ namespace Siotrix.Discord.Admin
             using (var db = new LogDatabase())
             {
                 var val = db.Gnames.Where(p => p.GuildId == guild_id.ToLong()).First();
-                await Context.ReplyAsync(val.GuildName);
+                await ReplyAsync(val.GuildName);
             }
         }
 
@@ -1222,7 +1226,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         private void CheckGuildNames()

@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ namespace Siotrix.Discord.Utility
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
-            await Context.ReplyAsync($"Invite me to your server at:{Environment.NewLine}<https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
+            await ReplyAsync($"Invite me to your server at:{Environment.NewLine}<https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>");
         }
     }
 }

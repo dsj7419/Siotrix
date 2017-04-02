@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
@@ -69,7 +69,7 @@ namespace Siotrix.Discord.Roslyn
             }
 
             var embed = GetEmbed(cleancode, reply, type);
-            await Context.ReplyAsync("", embed: embed);
+            await ReplyAsync("", embed: embed);
         }
 
         private string GetCode(string rawmsg)

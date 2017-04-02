@@ -1,9 +1,10 @@
-﻿using Siotrix.Commands;
+﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Moderation
 {
+    [Name("Moderator")]
     [Group("warning")]
     public class WarningModule : ModuleBase<SocketCommandContext>
     {

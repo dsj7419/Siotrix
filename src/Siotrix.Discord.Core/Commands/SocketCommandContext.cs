@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    public class SocketCommandContext : ICommandContext
+   /* public class SocketCommandContext
     {
         public DiscordSocketClient Client { get; }
         public SocketGuild Guild { get; }
@@ -27,5 +27,5 @@ namespace Siotrix.Discord
             User = msg.Author;
             Message = msg;
         }
-    }
+    } */
 }

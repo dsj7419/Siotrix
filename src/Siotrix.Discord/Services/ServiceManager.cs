@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Statistics;

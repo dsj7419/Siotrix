@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Admin
+namespace Siotrix.Discord.Developer
 {
+    [Name("Developer")]
     [Group("siotrix"), Alias("sio")]
     public class SiotrixModule : ModuleBase<SocketCommandContext>
     {
@@ -36,7 +37,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(str);
+            await ReplyAsync(str);
         }
 
         [Command("info")]
@@ -66,7 +67,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("website")]
@@ -92,7 +93,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("website")]
@@ -122,7 +123,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("footericon")]
@@ -148,7 +149,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(url);
+            await ReplyAsync(url);
         }
 
         [Command("footericon")]
@@ -178,7 +179,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("footertext")]
@@ -208,7 +209,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync("👍");
+            await ReplyAsync("👍");
         }
 
         [Command("footertext")]
@@ -234,7 +235,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await Context.ReplyAsync(txt);
+            await ReplyAsync(txt);
         }
     }
 }

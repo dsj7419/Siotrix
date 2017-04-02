@@ -1,4 +1,4 @@
-﻿using Siotrix.Commands;
+﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
 

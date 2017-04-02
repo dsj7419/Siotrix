@@ -1,4 +1,4 @@
-﻿using Siotrix.Commands;
+﻿using Discord.Commands;
 using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
@@ -11,11 +11,12 @@ namespace Siotrix.Discord.Admin
         [Command("leave")]
         [Summary("Instructs the bot to leave this Guild.")]
         [Remarks("leave")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task Leave()
         {
-            if (Context.Guild == null) { await Context.ReplyAsync("This command can only be ran in your guild."); return; }
-            await Context.ReplyAsync("Leaving~");
+            if (Context.Guild == null) { await ReplyAsync("This command can only be ran in your guild."); return; }
+            await ReplyAsync("Leaving~");
             await Context.Guild.LeaveAsync();
         }
     }

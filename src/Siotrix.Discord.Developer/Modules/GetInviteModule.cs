@@ -1,10 +1,12 @@
 ﻿using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
+using Discord;
 
 namespace Siotrix.Discord.Developer
 {
+    [Name("Developer")]
     public class GetInviteModule : ModuleBase<SocketCommandContext>
     {
         [Command("getinvite")]
@@ -15,7 +17,8 @@ namespace Siotrix.Discord.Developer
         {
             var channel = Context.Client.GetChannel((Context.Client.GetGuild(guild)).DefaultChannel.Id);
             var invite = await (channel as SocketGuildChannel).CreateInviteAsync();
-            await Context.ReplyAsync(invite.Url);
+            await ReplyAsync(invite.Url);
+
         }
     }
 }

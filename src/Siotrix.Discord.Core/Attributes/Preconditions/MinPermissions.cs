@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

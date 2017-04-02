@@ -7,11 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net.WebSocket" Version="1.0.0-rc-00652" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc-00666" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SiotrixCommands\src\Siotrix.Commands\Siotrix.Commands.csproj" />
     <ProjectReference Include="..\..\..\SiotrixCore\src\Siotrix.Core\Siotrix.Core.csproj" />
   </ItemGroup>
 

@@ -1,12 +1,12 @@
 ﻿using Discord;
-using Siotrix.Commands;
+using Discord.Commands;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
     [Name("no-help")]
     [Group("services"), RequireOwner]
-    public class ServiceModule : ModuleBase<SocketCommandContext>
+    public class ServiceModule : ModuleBase
     {
         private ServiceManager _manager;
         private Configuration _config;
@@ -29,7 +29,7 @@ namespace Siotrix.Discord
                 Title = $"Module configuration for {_config.Instance}",
                 Description = _config.Modules.ToString()
             };
-            return Context.ReplyAsync("", builder);
+            return ReplyAsync("", true, builder);
         }
     }
 }

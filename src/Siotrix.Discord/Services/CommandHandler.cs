@@ -1,5 +1,6 @@
-﻿using Discord.WebSocket;
-using Siotrix.Commands;
+﻿using Discord;
+using Discord.WebSocket;
+using Discord.Commands;
 using Siotrix.Discord.Admin;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Events;
@@ -12,6 +13,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Siotrix.Discord.Readers;
 
 namespace Siotrix.Discord
 {
@@ -71,12 +73,17 @@ namespace Siotrix.Discord
         private async Task HandleCommandAsync(SocketMessage s)
         {
             var msg = s as SocketUserMessage;
-            if (msg == null)
+            var context = new SocketCommandContext(_client, msg);
+            int argPos = 0;
+
+            if (s.Author.IsBot
+                || msg == null
+                || !msg.Content.Except("?").Any()
+                || msg.Content.Trim().Length <= 1
+                || msg.Content.Trim()[1] == '?'
+                || (!(msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
                 return;
 
-            var context = new SocketCommandContext(_client, msg);
-
-            int argPos = 0;
             if (msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _service.ExecuteAsync(context, argPos, _map);
@@ -85,14 +92,16 @@ namespace Siotrix.Discord
                 {
                     if (result.Error == CommandError.UnknownCommand)
                     {
-                        await context.ReplyAsync("Command not recognized");
+                        await context.Channel.SendMessageAsync("Command not recognized");
                         return;
                     }
 
                     if (result is ExecuteResult r)
                         PrettyConsole.NewLine(r.Exception.ToString());
-                    else
-                        await context.ReplyAsync(result.ToString());
+                    else {
+                    var embed = new EmbedBuilder().WithColor(new Color(255, 0, 0)).WithTitle("**Error:**").WithDescription(result.ErrorReason);
+                    await context.Channel.SendMessageAsync("", false, embed.Build());
+                    }
                 }
             }
         }

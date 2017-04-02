@@ -1,8 +1,9 @@
-﻿using Siotrix.Commands;
+﻿using Discord.Commands;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Moderation
 {
+    [Name("Moderator")]
     [Group("spam")]
     public class SpamModule : ModuleBase<SocketCommandContext>
     {

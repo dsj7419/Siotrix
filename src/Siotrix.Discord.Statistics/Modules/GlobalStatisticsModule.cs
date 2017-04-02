@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Siotrix.Commands;
+using Discord.Commands;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -403,7 +403,7 @@ namespace Siotrix.Discord.Statistics
                      };
                  });*/
                 builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText)).WithTimestamp(DateTime.UtcNow);
-                return Context.ReplyAsync("", embed: builder);
+                return ReplyAsync("", embed: builder);
             }
         }
     }

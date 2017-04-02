@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +11,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Utility
 {    
-    [Name("utility")]
-    [Summary("Shows info about commands")]
-    [Remarks("help [module] [command]")]
+    [Name("Utility")]    
     public class HelpModule : ModuleBase<SocketCommandContext>
     {
 
@@ -27,6 +25,8 @@ namespace Siotrix.Discord.Utility
         }
 
         [Command("help")]
+        [Summary("Shows info about commands")]
+        [Remarks("help [module] [command]")]
         public async Task Help()
         {            
             var sender = Context.Message.Author as SocketGuildUser;
@@ -91,11 +91,11 @@ namespace Siotrix.Discord.Utility
 
             if (string.IsNullOrEmpty(commandTxt + modulesTxt))
             {
-                await Context.ReplyAsync($"No commands found.");
+                await ReplyAsync($"No commands found.");
                 return;
             }
 
-            await Context.ReplyAsync($"{headerTxt}\n" +
+            await ReplyAsync($"{headerTxt}\n" +
                             $"{commandTxt}\n" +
                             $"\n" +
                             $"**Modules**" +
@@ -124,7 +124,7 @@ namespace Siotrix.Discord.Utility
 
                 if (module == null)
                 {
-                    await Context.ReplyAsync($"Module `{predicate}` not found".Cap(2000));
+                    await ReplyAsync($"Module `{predicate}` not found".Cap(2000));
                     return;
                 }
 
@@ -142,7 +142,7 @@ namespace Siotrix.Discord.Utility
                         usableCommands.Add(x);
                 });
 
-                await Context.ReplyAsync(usableCommands.Any() ?
+                await ReplyAsync(usableCommands.Any() ?
                             ($"{headerTxt}\n" +
                             usableCommands.Select(x => $"{x.Name}").PrettyPrint()).Cap(2000)
                             : $"No usable commands found.");
@@ -162,7 +162,7 @@ namespace Siotrix.Discord.Utility
 
                 if (command == null)
                 {
-                    await Context.ReplyAsync($"Command `{predicate}` not found".Cap(2000));
+                    await ReplyAsync($"Command `{predicate}` not found".Cap(2000));
                     return;
                 }
 
@@ -187,7 +187,7 @@ namespace Siotrix.Discord.Utility
                             : $"`{command.Remarks}`";
 
                     await
-                        Context.ReplyAsync(
+                        ReplyAsync(
                             $"**Module **: `{command.Module.Name}`\n" +
                             $"**Command**: `{command.Aliases.First()}`" +
                             $"{(aliases.Any() ? $"\n**Aliases**: {aliases.PrettyPrint()}" : "")}\n" +
@@ -196,7 +196,7 @@ namespace Siotrix.Discord.Utility
                             $"**Usable by {sender?.Username}**: `{(result.IsSuccess ? "yes" : "no")}`");
                 }
                 else
-                    await Context.ReplyAsync($"No command found");
+                    await ReplyAsync($"No command found");
             }
 
         }
@@ -260,7 +260,7 @@ namespace Siotrix.Discord.Utility
                         : $"`{command.Remarks}`";
 
                 await
-                    Context.ReplyAsync(
+                    ReplyAsync(
                         $"**Module **: `{command.Module.Name}`\n" +
                         $"**Command**: `{command.Name}`" +
                         $"{(aliases.Any() ? $"\n**Aliases**: {aliases.PrettyPrint()}" : "")}\n" +
@@ -269,7 +269,7 @@ namespace Siotrix.Discord.Utility
                         $"**Usable by {sender?.Username}**: `{(result.IsSuccess ? "yes" : "no")}`");
             }
             else
-                await Context.ReplyAsync($"Command `{predicate}` in module `{module}` not found");
+                await ReplyAsync($"Command `{predicate}` in module `{module}` not found");
         }
     }
 }

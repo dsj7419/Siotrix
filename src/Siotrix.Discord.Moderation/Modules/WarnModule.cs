@@ -1,9 +1,10 @@
 ﻿using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Moderation
 {
+    [Name("Moderator")]
     [Group("warn")]
     public class WarnModule : ModuleBase<SocketCommandContext>
     {

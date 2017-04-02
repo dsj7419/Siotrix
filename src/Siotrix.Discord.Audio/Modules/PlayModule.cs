@@ -1,11 +1,11 @@
 ﻿using Discord.WebSocket;
-using Siotrix.Commands;
+using Discord.Commands;
 using System;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Audio
 {
-    public class PlayModule : ModuleBase<SocketCommandContext>
+    public class PlayModule : ModuleBase
     {
         private AudioService _audio;
 
@@ -21,7 +21,7 @@ namespace Siotrix.Discord.Audio
             var user = Context.User as SocketGuildUser;
 
             if (user.VoiceChannel == null)
-                return Context.ReplyAsync("You must be in a voice channel to play music.");
+                return ReplyAsync("You must be in a voice channel to play music.");
 
             return _audio.PlayAsync(user.VoiceChannel, "surf.mp3");
         }
@@ -30,7 +30,7 @@ namespace Siotrix.Discord.Audio
         [Remarks("Search for and then play a song")]
         public Task PlayAsync(string query)
         {
-            return Context.ReplyAsync("Search is not supported at this time.");
+            return ReplyAsync("Search is not supported at this time.");
         }
 
         [Command("play", RunMode = RunMode.Async), Priority(0)]
@@ -40,7 +40,7 @@ namespace Siotrix.Discord.Audio
             var user = Context.User as SocketGuildUser;
 
             if (user.VoiceChannel == null)
-                return Context.ReplyAsync("You must be in a voice channel to play music.");
+                return ReplyAsync("You must be in a voice channel to play music.");
             
             return _audio.PlayAsync(user.VoiceChannel, url);
         }
@@ -52,9 +52,9 @@ namespace Siotrix.Discord.Audio
             var playing = _audio.GetCurrentlyPlaying(Context.Guild.Id);
 
             if (playing == null)
-                return Context.ReplyAsync("There aren't any songs playing right now.");
+                return ReplyAsync("There aren't any songs playing right now.");
             else
-                return Context.ReplyAsync("Song Info");
+                return ReplyAsync("Song Info");
         }
     }
 }
