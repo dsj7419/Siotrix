@@ -11,7 +11,8 @@ namespace Siotrix.Discord.Admin
     public class RequestHelpModule : ModuleBase<SocketCommandContext>
     {
         [Command("requesthelp"), Alias("reportbug")]
-        [Summary("Gives bot developer an alert that something is wrong, and an invite to the guild to provide assitance. Please use this only as emergency"), Remarks("summonowner")]
+        [Summary("Gives bot developer an alert that something is wrong, and an invite to the guild to provide assistance. Please use this only as emergency.")]
+        [Remarks("<text> - include a brief report")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task RequestOwnerAsync([Remainder] string report)
@@ -25,7 +26,7 @@ namespace Siotrix.Discord.Admin
 
             await ReplyAsync("Notifying a Siotrix Developer...An invite has been sent in case they need to speak with you.");
 
-            var summonMsg = $"{devRole.Mention} :eye: {Context.User} from {Context.Guild.Name} submitted a report.\n\nReport: {report} \n\n{invite.Url}";
+            var summonMsg = $"{devRole.Mention} :eye: {Context.User} from {Context.Guild.Name} submitted a report.\n\nReport: {report.Cap(2000)} \n\n{invite.Url}";
             await devChannel.SendMessageAsync(summonMsg);
         }
     }

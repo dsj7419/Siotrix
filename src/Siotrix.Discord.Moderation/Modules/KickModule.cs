@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Discord.Commands;
 using System.Threading.Tasks;
+using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {
@@ -8,6 +9,8 @@ namespace Siotrix.Discord.Moderation
     {
         [Name("Moderator")]
         [Command("kick")]
+        [RequireContext(ContextType.Guild)]
+        [MinPermissions(AccessLevel.GuildMod)]
         public async Task KickAsync(SocketGuildUser user)
         {
             await user.KickAsync();
@@ -15,6 +18,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("kick")]
+        [RequireContext(ContextType.Guild)]
+        [MinPermissions(AccessLevel.GuildMod)]
         public async Task KickAsync(SocketUser user, int prunedays = -1)
         {
             int prune = prunedays == -1 ? 0 : prunedays;

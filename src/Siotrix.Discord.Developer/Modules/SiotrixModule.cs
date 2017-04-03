@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Developer
 {
     [Name("Developer")]
+    [Summary("Various Siotrix property Settings.")]
     [Group("siotrix"), Alias("sio")]
     public class SiotrixModule : ModuleBase<SocketCommandContext>
     {

@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("warning")]
+    [RequireContext(ContextType.Guild)]
+    [MinPermissions(AccessLevel.GuildMod)]
     public class WarningModule : ModuleBase<SocketCommandContext>
     {
         [Command]

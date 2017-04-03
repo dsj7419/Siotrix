@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]
+    [Summary("Various settings for guilds to customize Siotrix with.")]
     [Group("settings"), Alias("set")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {

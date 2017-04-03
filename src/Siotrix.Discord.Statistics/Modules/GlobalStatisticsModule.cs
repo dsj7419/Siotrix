@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
+    [Name("Info")]
     [Group("stats"), Alias("statistics")]
+    [RequireContext(ContextType.Guild)]
+    [MinPermissions(AccessLevel.User)]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
         [Command("info")]

@@ -10,6 +10,7 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("cleanup"), Alias("clean")]
+    [Summary("Delete various messages.")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.ManageMessages)]
     [MinPermissions(AccessLevel.GuildMod)]
