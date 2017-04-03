@@ -1,10 +1,13 @@
 ﻿using Discord.Commands;
+using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("spam")]
+    [RequireContext(ContextType.Guild)]
+    [MinPermissions(AccessLevel.GuildMod)]
     public class SpamModule : ModuleBase<SocketCommandContext>
     {
         [Command]

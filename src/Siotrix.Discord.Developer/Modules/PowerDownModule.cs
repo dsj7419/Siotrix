@@ -9,7 +9,6 @@ namespace Siotrix.Discord.Developer
     {
         [Command("powerdown"), Alias("pd")]
         [Summary("Terminates the bot application")]
-        [Remarks("powerdown")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task PowerdownAsync()
         {

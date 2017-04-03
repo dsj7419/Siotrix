@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Utility
 {
     [Name("Basic")]
+    [MinPermissions(AccessLevel.User)]
     public class InviteModule : ModuleBase<SocketCommandContext>
     {
 

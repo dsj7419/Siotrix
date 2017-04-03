@@ -1,11 +1,14 @@
 ﻿using Discord.WebSocket;
 using Discord.Commands;
 using System.Threading.Tasks;
+using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("warn")]
+    [RequireContext(ContextType.Guild)]
+    [MinPermissions(AccessLevel.GuildMod)]
     public class WarnModule : ModuleBase<SocketCommandContext>
     {
         [Command]
