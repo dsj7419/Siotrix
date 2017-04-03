@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Audio
 {
-    public class PlayModule : ModuleBase
+    public class PlayModule : ModuleBase<SocketCommandContext>
     {
         private AudioService _audio;
 
@@ -33,7 +33,7 @@ namespace Siotrix.Discord.Audio
             return ReplyAsync("Search is not supported at this time.");
         }
 
-        [Command("play", RunMode = RunMode.Async), Priority(0)]
+        [Command("play", RunMode = RunMode.Async), Priority(20)]
         [Remarks("Play a song from a specific url")]
         public Task PlayAsync(Uri url)
         {
