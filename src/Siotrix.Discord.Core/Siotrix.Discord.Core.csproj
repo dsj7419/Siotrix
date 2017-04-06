@@ -7,12 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
     <PackageReference Include="Discord.Addons.EmojiTools" Version="1.1.0-ci-00017" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc-00668" />
-=======
     <PackageReference Include="Discord.Net" Version="1.0.0-rc2-00679" />
->>>>>>> 51fb6f378d54eee617041636366f902aebaba898
   </ItemGroup>
 
   <ItemGroup>

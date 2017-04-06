@@ -789,7 +789,7 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Day : "), Value = b_stats_count[2] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Channels : "), Value = Context.Guild.Channels.Count * Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Users : "), Value = b_user_count })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = b_active_guild })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = "#" + b_active_guild })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Uptime : "), Value = GetUptime() });
             }
 
