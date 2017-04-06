@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using Siotrix.Discord.Attributes.Preconditions;
+using Discord.Addons.EmojiTools;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -42,7 +43,220 @@ namespace Siotrix.Discord.Admin
                 await ReplyAsync("👍");
             }
         }
-        
+
+        [Command("authoricon")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorIconAsync()
+        {
+            string url = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        url = "http://img04.imgland.net/WyZ5FoM.png";
+                    }
+                    else
+                    {
+                        url = db.Authors.First().AuthorIcon;
+                        if (url == null || url == "")
+                        {
+                            url = "http://img04.imgland.net/WyZ5FoM.png";
+                            var data = db.Authors.First();
+                            data.AuthorIcon = url;
+                            db.Authors.Update(data);
+                        }
+                        db.SaveChanges();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(url);
+        }
+
+        [Command("authoricon")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorIconAsync(Uri url)
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordAuthor();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.AuthorIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                }
+                else
+                {
+                    val.AuthorIcon = url.ToString();
+                }
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        db.Authors.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.Authors.First();
+                        data.AuthorIcon = val.AuthorIcon;
+                        db.Authors.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync("👍");
+        }
+
+        [Command("authorurl")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorUrlAsync()
+        {
+            string url = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        url = "No Url";
+                    }
+                    else
+                    {
+                        url = db.Authors.First().AuthorUrl;
+                        if (url == null || url.ToString() == "")
+                        {
+                            url = "No Url";
+                            var data = db.Authors.First();
+                            data.AuthorUrl = "";
+                            db.Authors.Update(data);
+                            db.SaveChanges();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(url);
+        }
+
+        [Command("authorurl")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorUrlAsync(Uri url)
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordAuthor();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.AuthorUrl = "";
+                }
+                else
+                {
+                    val.AuthorUrl = url.ToString();
+                }
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        db.Authors.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.Authors.First();
+                        data.AuthorUrl = val.AuthorUrl;
+                        db.Authors.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync("👍");
+        }
+
+        [Command("authorname")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorNameAsync([Remainder] string txt)
+        {
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordAuthor();
+                if (txt.Equals("reset"))
+                {
+                    val.AuthorName = Context.Guild.Name;
+                }
+                else
+                {
+                    val.AuthorName = txt;
+                }
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        db.Authors.Add(val);
+                    }
+                    else
+                    {
+                        var data = db.Authors.First();
+                        data.AuthorName = val.AuthorName;
+                        db.Authors.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync("👍");
+        }
+
+        [Command("authorname")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorNameAsync()
+        {
+            string txt = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
+                    {
+                        txt = Context.Guild.Name;
+                    }
+                    else
+                    {
+                        txt = db.Authors.First().AuthorName;
+                        if (txt == null || txt == "")
+                        {
+                            txt = Context.Guild.Name;
+                            var data = db.Authors.First();
+                            data.AuthorName = txt;
+                            db.Authors.Update(data);
+                            db.SaveChanges();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(txt);
+        }
+
         [Command("gfootericon")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync()
@@ -205,219 +419,6 @@ namespace Siotrix.Discord.Admin
                     else
                     {
                         txt = val.First().FooterText;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(txt);
-        }
-
-        [Command("gauthoricon")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorIconAsync()
-        {
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        url = "http://img04.imgland.net/WyZ5FoM.png";
-                    }
-                    else
-                    {
-                        url = db.Authors.First().AuthorIcon;
-                        if(url == null || url == "")
-                        {
-                            url = "http://img04.imgland.net/WyZ5FoM.png";
-                            var data = db.Authors.First();
-                            data.AuthorIcon = url;
-                            db.Authors.Update(data);
-                        }
-                        db.SaveChanges();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(url);
-        }
-
-        [Command("gauthoricon")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorIconAsync(Uri url)
-        {
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordAuthor();
-                if (url.ToString().Equals("reset"))
-                {
-                    val.AuthorIcon = "http://img04.imgland.net/WyZ5FoM.png";
-                }
-                else
-                {
-                    val.AuthorIcon = url.ToString();
-                }
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorIcon = val.AuthorIcon;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync("👍");
-        }
-
-        [Command("gauthorurl")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorUrlAsync()
-        {
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        url = "No Url";
-                    }
-                    else
-                    {
-                        url = db.Authors.First().AuthorUrl;
-                        if (url == null || url.ToString() == "")
-                        {
-                            url = "No Url";
-                            var data = db.Authors.First();
-                            data.AuthorUrl = "";
-                            db.Authors.Update(data);
-                            db.SaveChanges();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(url);
-        }
-
-        [Command("gauthorurl")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorUrlAsync(Uri url)
-        {
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordAuthor();
-                if (url.ToString().Equals("reset"))
-                {
-                    val.AuthorUrl = "";
-                }
-                else
-                {
-                    val.AuthorUrl = url.ToString();
-                }
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorUrl = val.AuthorUrl;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync("👍");
-        }
-
-        [Command("gauthorname")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorNameAsync([Remainder] string txt)
-        {
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordAuthor();
-                if (txt.Equals("reset"))
-                {
-                    val.AuthorName = Context.Guild.Name;
-                }
-                else
-                {
-                    val.AuthorName = txt;
-                }
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorName = val.AuthorName;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync("👍");
-        }
-
-        [Command("gauthorname")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorNameAsync()
-        {
-            string txt = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        txt = Context.Guild.Name;
-                    }
-                    else
-                    {
-                        txt = db.Authors.First().AuthorName;
-                        if(txt == null || txt == "")
-                        {
-                            txt = Context.Guild.Name;
-                            var data = db.Authors.First();
-                            data.AuthorName = txt;
-                            db.Authors.Update(data);
-                            db.SaveChanges();
-                        }
                     }
                 }
                 catch (Exception e)
@@ -1379,6 +1380,256 @@ namespace Siotrix.Discord.Admin
                         instance.GuildId = id;
                         instance.Avatar = "http://www.clipartkid.com/images/47/clipart-information-image-information-gif-anim-information-2noIRl-clipart.png";
                         db.Gavatars.Add(instance);
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+            }
+        }
+
+        [Command("prefix")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task PrefixAsync([Remainder] string txt)
+        {
+           // string str = CheckEmojiText(txt);
+            CheckPrefixs();
+            var guild_id = Context.Guild.Id;
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordGuildPrefix();
+                if (txt.Equals("reset"))
+                {
+                    val.Prefix = "!";
+                }
+                else
+                {
+                    val.Prefix = txt;
+                }
+                try
+                {
+                    var arr = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
+                    if (arr == null || arr.ToList().Count <= 0)
+                    {
+                        db.Gprefixs.Add(val);
+                    }
+                    else
+                    {
+                        var data = arr.First();
+                        data.Prefix = val.Prefix;
+                        db.Gprefixs.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync("👍");
+        }
+
+        [Command("prefix")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task PrefixAsync()
+        {
+            CheckPrefixs();
+            var guild_id = Context.Guild.Id;
+            string txt = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        txt = "!";
+                    }
+                    else
+                    {
+                        txt = val.First().Prefix;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(txt);
+        }
+
+        private bool CheckString(string str)
+        {
+            bool isFounded = false;
+            string[] spec = new string[] {"!", "~", "#", "$", "%", "&", "*", ":", "/", "|", "+", "=", "-", "_", ">", "<", "reset"};
+            foreach(var element in spec)
+            {
+                if (str.Equals(element))
+                {
+                    isFounded = true;
+                    break;
+                }
+            }
+            return isFounded;
+        }
+
+        private void CheckPrefixs()
+        {
+            var id = Context.Guild.Id.ToLong();
+            bool isFounded = false;
+            using (var db = new LogDatabase())
+            {
+                var list = db.Gprefixs.ToList();
+                foreach (var item in list)
+                {
+                    if (id == item.GuildId)
+                    {
+                        isFounded = true;
+                        break;
+                    }
+                }
+                if (!isFounded)
+                {
+                    try
+                    {
+                        var instance = new DiscordGuildPrefix();
+                        instance.GuildId = id;
+                        instance.Prefix = "!";
+                        db.Gprefixs.Add(instance);
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+            }
+        }
+
+        public static string FromText(string text)
+        {
+            text = text.Trim(':');
+
+            var unicode = default(string);
+            if (EmojiMap.Map.TryGetValue(text, out unicode))
+                return unicode;
+            throw new ArgumentException("The given alias could not be matched to a Unicode Emoji.", nameof(text));
+        }
+
+        public string CheckEmojiText(string str)
+        {
+            string new_str = str.Trim(':');
+            if (new_str.Equals(str))
+            {
+                Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>{0}", new_str);
+                return new_str;
+            }
+            else
+            {
+                
+                var unicode = default(string);
+                if (EmojiMap.Map.TryGetValue(new_str, out unicode))
+                {
+                    Console.WriteLine("==========================={0}", unicode);
+                }
+                return unicode;
+            }
+        }
+
+        [Command("gmotd")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task GuildMotdAsync()
+        {
+            CheckGuildMotds();
+            var guild_id = Context.Guild.Id;
+            string str = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gmotds.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        str = "Welcome to .";
+                    }
+                    else
+                    {
+                        str = val.First().Message;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(str);
+        }
+
+        [Command("gmotd")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task GuildMotdAsync([Remainder] string str)
+        {
+            CheckGuildMotds();
+            var guild_id = Context.Guild.Id;
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordGuildMotd();
+                if (str.Equals("reset"))
+                {
+                    val.Message = "Welcome to .";
+                }
+                else
+                {
+                    val.Message = str;
+                }
+                var arr = db.Gmotds.Where(p => p.GuildId == guild_id.ToLong());
+                try
+                {
+                    if (arr == null || arr.ToList().Count <= 0)
+                    {
+                        db.Gmotds.Add(val);
+                    }
+                    else
+                    {
+                        var data = arr.First();
+                        data.Message = val.Message;
+                        db.Gmotds.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync("👍");
+        }
+
+        private void CheckGuildMotds()
+        {
+            var id = Context.Guild.Id.ToLong();
+            bool isFounded = false;
+            using (var db = new LogDatabase())
+            {
+                var list = db.Gmotds.ToList();
+                foreach (var item in list)
+                {
+                    if (id == item.GuildId)
+                    {
+                        isFounded = true;
+                        break;
+                    }
+                }
+                if (!isFounded)
+                {
+                    try
+                    {
+                        var instance = new DiscordGuildMotd();
+                        instance.GuildId = id;
+                        instance.Message = "Welcome to .";
+                        db.Gmotds.Add(instance);
                         db.SaveChanges();
                     }
                     catch (Exception e)

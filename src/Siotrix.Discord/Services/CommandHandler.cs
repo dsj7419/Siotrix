@@ -75,16 +75,37 @@ namespace Siotrix.Discord
             var msg = s as SocketUserMessage;
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
+            string spec = null;
+            using (var db = new LogDatabase())
+            {
+                var guild_id = context.Guild.Id;
+                try
+                {
+                    var arr = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
+                    if (arr == null || arr.ToList().Count <= 0)
+                    {
+                        spec = "!"; 
+                    }
+                    else
+                    {
+                        spec = arr.First().Prefix;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
 
             if (s.Author.IsBot
                 || msg == null
                 || !msg.Content.Except("?").Any()
                 || msg.Content.Trim().Length <= 1
                 || msg.Content.Trim()[1] == '?'
-                || (!(msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
+                || (!(msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
                 return;
 
-            if (msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _service.ExecuteAsync(context, argPos, _map);
 

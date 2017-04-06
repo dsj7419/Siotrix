@@ -311,7 +311,7 @@ namespace Siotrix.Discord.Statistics
                     }
                 };
                 //per guild per user
-               /* builder.AddField(x =>
+                builder.AddField(x =>
                  {
                      x.Name = $"Per Guild Per Users:";
                      int guild_index = 0;
@@ -417,7 +417,7 @@ namespace Siotrix.Discord.Statistics
                          }
 
                      };
-                 });*/
+                 });
                 builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText)).WithTimestamp(DateTime.UtcNow);
                 return ReplyAsync("", embed: builder);
             }
