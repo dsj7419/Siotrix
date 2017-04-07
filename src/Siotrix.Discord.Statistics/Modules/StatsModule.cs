@@ -804,11 +804,13 @@ namespace Siotrix.Discord.Statistics
                  .WithTimestamp(DateTime.UtcNow);
             if (id == 1)
             {
+                double joined = (DateTime.Now - person.JoinedAt)?.TotalDays ?? 0;
+                string join_date = String.Format("{0:dddd, MMMM d, yyyy}", person.JoinedAt?.DateTime ?? DateTime.Now);
                 builder
                     .WithTitle("Statistical Information sheet for " + Context.Guild.GetUser(user.Id).Username)
                     .WithDescription($"for general guild information information please use {g_prefix}stats")
                     .WithThumbnailUrl(person.GetAvatarUrl().ToString())
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = person.JoinedAt })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = join_date })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] + " messages/hour" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages this D/W/M : "), Value = m_stats_count[2] + "/" + m_stats_count[1] + "/" + m_stats_count[0] + "messages" })
