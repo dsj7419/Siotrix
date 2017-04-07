@@ -313,19 +313,23 @@ namespace Siotrix.Discord.Statistics
 
         private string GetLastMessageTime(SocketUser user)
         {
-            DateTime last = DateTime.Now;
+            string last = "-";
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    last = db.Messages.Where(p => !p.IsBot && p.AuthorId == user.Id.ToLong()).Last().CreatedAt;
+                    if(db.Messages.Where(p => !p.IsBot && p.AuthorId == user.Id.ToLong()).ToList().Count > 0)
+                    {
+                        DateTime date = db.Messages.Where(p => !p.IsBot && p.AuthorId == user.Id.ToLong()).Last().CreatedAt;
+                        last = String.Format("{0:dddd, MMMM d, yyyy}", date);
+                    }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return last.ToString();
+            return last;
         }
 
         private string GetActiveGuildName()
@@ -367,9 +371,10 @@ namespace Siotrix.Discord.Statistics
             string g_description = GetGuildDescription(0);
             string[] g_footer = GetGuildFooter(0);
             string g_prefix = GetGuildPrefix();
+
+            DateTime dt = new DateTime(Context.Guild.CreatedAt.Year, Context.Guild.CreatedAt.Month, Context.Guild.CreatedAt.Day, 0, 0, 0, 0);
+            string established_date = String.Format("{0:dddd, MMMM d, yyyy}", dt) + "-" + Math.Round((DateTime.Now - Context.Guild.CreatedAt.DateTime).TotalDays, 0) + " Days Old!";
             
-            string established_date = Context.Guild.CreatedAt.Day.ToString() + "/" + Context.Guild.CreatedAt.Month.ToString() + "/" + Context.Guild.CreatedAt.Year.ToString()
-                + "-" + Math.Round((DateTime.Now - Context.Guild.CreatedAt.DateTime).TotalDays, 0) + " Days Old!";
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -386,7 +391,7 @@ namespace Siotrix.Discord.Statistics
                 .WithTimestamp(DateTime.UtcNow);
             builder
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Server Owner"), Value = Context.Guild.Owner })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Guild Established"), Value = Format.Bold(established_date)})
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Guild Established"), Value = established_date})
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Roles"), Value = Context.Guild.Roles.Count() })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Member Count"), Value = Context.Guild.Users.Count() })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Bot Count"), Value = Context.Guild.Users.Where(b => b.IsBot).Count() })
@@ -442,6 +447,8 @@ namespace Siotrix.Discord.Statistics
                 .WithTimestamp(DateTime.UtcNow);
             if(id == 1)
             {
+                double joined = (DateTime.Now - person.JoinedAt)?.TotalDays ?? 0;
+                string join_date = String.Format("{0:dddd, MMMM d, yyyy}", person.JoinedAt?.DateTime ?? DateTime.Now);
                 string last_seen = GetLastMessageTime(user);
                 builder
                     .WithTitle("General Information sheet for " + Context.Guild.GetUser(user.Id).Username)
@@ -452,10 +459,10 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Avatar : "), Value = person.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Playing : "), Value = (person.Game.ToString() != "") ? "Activity" : "Inactivity" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Status : "), Value = person.Status.ToString() })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = person.JoinedAt })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = join_date })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = (DateTime.Now - person.JoinedAt)?.TotalDays.ToString() })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = Math.Round(joined, 0) - 1 })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Last Seen : "), Value = last_seen })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Last Spoke : "), Value = last_seen })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Roles : "), Value = person.Guild.Roles.Count });
@@ -476,7 +483,7 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Icon : "), Value = Context.Client.CurrentUser.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = GetActiveGuildName() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Uptime : "), Value = GetUptime() })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Contrubutors : "), Value = Format.Bold("Dan Johnson and Frank Thomas") });
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Contributors : "), Value = Format.Bold("Dan Johnson and Frank Thomas") });
             }
             return ReplyAsync("", embed: builder);
         }

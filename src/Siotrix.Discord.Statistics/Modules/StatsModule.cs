@@ -293,7 +293,14 @@ namespace Siotrix.Discord.Statistics
                     Console.WriteLine(e);
                 }
             }
-            return active_channel;
+            if(active_channel == null || active_channel == "")
+            {
+                return "None";
+            }
+            else
+            {
+                return "#" + active_channel;
+            }
         }
 
         private int GetDeleteMessagesPerGuild()
@@ -390,8 +397,14 @@ namespace Siotrix.Discord.Statistics
                             active_hour = ii.First().CreatedAt.Hour;
                         }
                     }
-
-                    active_data[0] = active_channel_of_week;
+                    if(active_channel_of_week == null || active_channel_of_week == "")
+                    {
+                        active_data[0] = "None";
+                    }
+                    else
+                    {
+                        active_data[0] = "#" + active_channel_of_week;
+                    }
                     if (active_hour <= 12)
                     {
                         active_data[1] = active_hour.ToString() + " : 00 AM";
@@ -497,7 +510,14 @@ namespace Siotrix.Discord.Statistics
                     Console.WriteLine(e);
                 }
             }
-            return active_channel + " in " + guild_name;
+            if(active_channel == "" || guild_name == "" || active_channel == null || guild_name == null)
+            {
+                return "None";
+            }
+            else
+            {
+                return "#" + active_channel + " in " + guild_name;
+            }
         }
 
         private string[] GetActiveDataOfWeekPerUser(IGuildUser user)
@@ -545,28 +565,47 @@ namespace Siotrix.Discord.Statistics
                                 active_day = i.First().CreatedAt.Day;
                             }
                         }
-
-                        var data3 = data1.Where(p => p.CreatedAt.Day == active_day).ToList();
-                        var data4 = data3.GroupBy(p => p.CreatedAt.Hour);
-                        foreach (var ii in data4)
+                        if(active_day != 0)
                         {
-                            if (ii.ToList().Count > hour_cnt)
+                            var data3 = data1.Where(p => p.CreatedAt.Day == active_day).ToList();
+                            var data4 = data3.GroupBy(p => p.CreatedAt.Hour);
+                            foreach (var ii in data4)
                             {
-                                hour_cnt = ii.ToList().Count;
-                                active_hour = ii.First().CreatedAt.Hour;
+                                if (ii.ToList().Count > hour_cnt)
+                                {
+                                    hour_cnt = ii.ToList().Count;
+                                    active_hour = ii.First().CreatedAt.Hour;
+                                }
                             }
                         }
                     }
 
-                    active_data[0] = active_channel_of_week + " in " + guild_name;
-                    active_data[1] = active_day.ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString();
-                    if (active_hour <= 12)
+                    if(active_channel_of_week == null || active_channel_of_week == "" || guild_name == null || guild_name == "")
                     {
-                        active_data[2] = active_hour.ToString() + " : 00 AM";
+                        active_data[0] = "None";
                     }
                     else
                     {
-                        active_data[2] = (active_hour - 12).ToString() + " : 00 PM";
+                        active_data[0] = "#" + active_channel_of_week + " in " + guild_name;
+                    }
+                    if(active_day == 0)
+                    {
+                        active_data[1] = "-";
+                        active_data[2] = "-";
+                    }
+                    else
+                    {
+                        //active_data[1] = active_day.ToString() + "/" + DateTime.Now.Month.ToString() + "/" + DateTime.Now.Year.ToString();
+                        DateTime dt = new DateTime(DateTime.Now.Year, DateTime.Now.Month, active_day, 0, 0, 0, 0);
+                        active_data[1] = String.Format("{0:dddd, MMMM d, yyyy}", dt);
+                        if (active_hour <= 12)
+                        {
+                            active_data[2] = active_hour.ToString() + " : 00 AM";
+                        }
+                        else
+                        {
+                            active_data[2] = (active_hour - 12).ToString() + " : 00 PM";
+                        }
                     }
                 }
                 catch (Exception e)
@@ -666,7 +705,14 @@ namespace Siotrix.Discord.Statistics
                     Console.WriteLine(e);
                 }
             }
-            return guild_name;
+            if(guild_name == null || guild_name == "")
+            {
+                return "None";
+            }
+            else
+            {
+                return guild_name;
+            }
         }
 
         [Command("stats"), Alias("statistics")]
@@ -703,14 +749,12 @@ namespace Siotrix.Discord.Statistics
             builder
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Members"), Value = Context.Guild.Users.Count() })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] })
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] + " messages/hour" })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of channels : "), Value = Context.Guild.Channels.Count })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel : "), Value = "#" + active_channel })
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel : "), Value = active_channel })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Lifetime message deletes : "), Value = delete_msg_per_guild })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Month : "), Value = m_stats_count[0] })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Week : "), Value = m_stats_count[1] })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Day : "), Value = m_stats_count[2] })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = "#" + active_data_of_week[0] })
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages this D/W/M : "), Value = m_stats_count[2] + "/" + m_stats_count[1] + "/" + m_stats_count[0] + "messages" })
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = active_data_of_week[0] })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Time most active on that day : "), Value = active_data_of_week[1] });
 
             return ReplyAsync("", embed: builder);
@@ -766,12 +810,10 @@ namespace Siotrix.Discord.Statistics
                     .WithThumbnailUrl(person.GetAvatarUrl().ToString())
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = person.JoinedAt })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Month : "), Value = m_stats_count[0] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Week : "), Value = m_stats_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Day : "), Value = m_stats_count[2] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel : "), Value = "#" + active_channel })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = "#" + active_data_of_week[0] })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] + " messages/hour" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages this D/W/M : "), Value = m_stats_count[2] + "/" + m_stats_count[1] + "/" + m_stats_count[0] + "messages" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel : "), Value = active_channel })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = active_data_of_week[0] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Day this week : "), Value = active_data_of_week[1] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Time most active on that day : "), Value = active_data_of_week[2] });
             }
@@ -783,13 +825,11 @@ namespace Siotrix.Discord.Statistics
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Guilds : "), Value = Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = b_count[0] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = b_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Month : "), Value = b_stats_count[0] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Week : "), Value = b_stats_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages Day : "), Value = b_stats_count[2] })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = b_count[1] + " messages/hour" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages this D/W/M : "), Value = b_stats_count[2] + "/" + b_stats_count[1] + "/" + b_stats_count[0] + "messages" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Channels : "), Value = Context.Guild.Channels.Count * Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Number of Users : "), Value = b_user_count })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = "#" + b_active_guild })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = b_active_guild })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Uptime : "), Value = GetUptime() });
             }
 
