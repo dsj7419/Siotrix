@@ -13,6 +13,7 @@ namespace Siotrix.Discord.Admin
 
         [Command]
         [Summary("Instructs the bot to leave this Guild.")]
+        [Remarks(" - no additional arguments needed")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task Leave()

@@ -10,6 +10,7 @@ namespace Siotrix.Discord.Admin
     {
         [Command("RoleIDs")]
         [Summary("Gets the ID of all roles in the guild.")]
+        [Remarks(" - no additional arguments needed")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task RoleIDs()

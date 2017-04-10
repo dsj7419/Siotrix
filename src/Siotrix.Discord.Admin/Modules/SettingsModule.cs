@@ -11,16 +11,20 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]
-    [Summary("Various settings for guilds to customize Siotrix with.")]
+    [Summary("Various settings for guild to customize Siotrix with.")]
     [Group("settings"), Alias("set")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
         [Command("avatar")]
+        [Summary("Will list bots current avatar.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public Task AvatarAsync()
             => ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
         [Command("avatar")]
+        [Summary("Will set bots avatar.")]
+        [Remarks("<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix avatar.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AvatarAsync(Uri url)
         {
@@ -45,6 +49,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("authoricon")]
+        [Summary("Will list bots current author icon.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync()
         {
@@ -79,6 +85,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("authoricon")]
+        [Summary("Will set bots author icon.")]
+        [Remarks("<url> - url of picture to assign as bot author icon **note** using keyword reset will reset to Siotrix icon.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync(Uri url)
         {
@@ -116,6 +124,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("authorurl")]
+        [Summary("Will list bots current author url.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync()
         {
@@ -148,8 +158,10 @@ namespace Siotrix.Discord.Admin
             }
             await ReplyAsync(url);
         }
-
+        
         [Command("authorurl")]
+        [Summary("Will set bots author url.")]
+        [Remarks("<url> - This links author name as a hyperlink. **note** using keyword reset will reset to Siotrix url.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync(Uri url)
         {
@@ -187,6 +199,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("authorname")]
+        [Summary("Will set bots current author name.")]
+        [Remarks("<name> - This defaults to your guild name. **note** You can use reset as the parameter to reset back to your guild name.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync([Remainder] string txt)
         {
@@ -224,6 +238,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("authorname")]
+        [Summary("Will list bots current author name.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync()
         {
@@ -258,6 +274,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gfootericon")]
+        [Summary("Will list bots current footer icon.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync()
         {
@@ -287,6 +305,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gfootericon")]
+        [Summary("Will set bots footer icon.")]
+        [Remarks("<url> - url of picture to assign as bot footer icon **note** using keyword reset will reset to Siotrix icon.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync(Uri url)
         {
@@ -361,6 +381,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gfootertext")]
+        [Summary("Will set bots footer text.")]
+        [Remarks("<text> - text you would like to use on embed footers. **note** using keyword reset will reset to Siotrix footer text.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextAsync([Remainder] string txt)
         {
@@ -401,6 +423,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gfootertext")]
+        [Summary("Will list bots current footer text.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextAsync()
         {
@@ -430,6 +454,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gthumbnail")]
+        [Summary("Will list bots current thumbnail image link.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildThumbNailAsync()
         {
@@ -459,6 +485,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gthumbnail")]
+        [Summary("Will set bots thumbnail image.")]
+        [Remarks("<url> - url of picture to assign as bot thumbnail **note** using keyword reset will reset to Siotrix image.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildThumbNailAsync(Uri url)
         {
@@ -532,6 +560,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gwebsite"), Alias("gweb")]
+        [Summary("Will list bots current website.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildWebSiteAsync()
         {
@@ -561,6 +591,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gwebsite"), Alias("gweb")]
+        [Summary("Will set bots website.")]
+        [Remarks("<url> - url of bots website (guild website maybe?) **note** using keyword reset will reset to Siotrix website.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildWebSiteAsync(Uri url)
         {
@@ -634,12 +666,14 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gdescription"), Alias("gdesc")]
+        [Summary("Will list bots current description.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildDescriptionAsync()
         {
             CheckGuildDescriptions();
             var guild_id = Context.Guild.Id;
-            string url = null;
+            string desc = null;
             using (var db = new LogDatabase())
             {
                 try
@@ -647,11 +681,11 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gdescriptions.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "Siotrix Bot";
+                        desc = "Siotrix Bot";
                     }
                     else
                     {
-                        url = val.First().Description;
+                        desc = val.First().Description;
                     }
                 }
                 catch (Exception e)
@@ -659,10 +693,12 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(url);
+            await ReplyAsync(desc);
         }
 
         [Command("gdescription"), Alias("gdesc")]
+        [Summary("Will set bots description for your guild.")]
+        [Remarks("<text> - text you would like to use as a guild description.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildDescriptionAsync([Remainder] string str)
         {
@@ -729,12 +765,17 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("username")]
+        [Summary("Lists Siotrix's username.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public Task UsernameAsync()
             => ReplyAsync(Context.Client.CurrentUser.ToString());
 
         [Name("no-help")]
         [Command("username")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [Summary("Sets Siotrix's username.")]
+        [Remarks("<name> - new name to change Siotrix too, but why??.")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task UsernameAsync([Remainder]string name)
         {
             var self = Context.Client.CurrentUser;
@@ -746,12 +787,16 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("nickname")]
+        [Summary("Lists Siotrix's nickname.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameAsync()
                => await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
 
         [Name("no-help")]
         [Command("nickname")]
+        [Summary("Sets Siotrix's nickname.")]
+        [Remarks("<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameAsync([Remainder]string name)
         {
@@ -769,11 +814,16 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("activity")]
+        [Summary("Lists Siotrix's current activity.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public Task ActivityAsync()
             => ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
 
         [Name("no-help")]
         [Command("activity")]
+        [Summary("Sets Siotrix's activity.")]
+        [Remarks("<activity> - Whatever activity you want to set Siotrix as playing.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task ActivityAsync([Remainder]string activity)
         {
@@ -782,11 +832,17 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("status")]
+        [Summary("Lists Siotrix's current status.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public Task StatusAsync()
             => ReplyAsync(Context.Client.CurrentUser.Status.ToString());
 
         [Name("no-help")]
-        [Command("status"), RequireOwner]
+        [Command("status")]
+        [Summary("Sets Siotrix's status.")]
+        [Remarks("<status> - Sets status of Siotrix(Offline, Online, Idle, Afk, etc, etc..).")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task UsernameAsync(UserStatus status)
         {
             var self = Context.Client.CurrentUser;
@@ -795,6 +851,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("color")]
+        [Summary("Lists your guilds current embed color choice.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildColorAsync()
         {
@@ -1068,6 +1126,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("color")]
+        [Summary("Sets guild embed color.")]
+        [Remarks("<color> - Sets your guilds embet color. **note** using list instead of color will list all possibilities.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildColorAsync(string name)
         {
@@ -1187,6 +1247,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gname")]
+        [Summary("Sets guild name.")]
+        [Remarks("<name> - Name of guild you want to use in embeds. **note** reset will reset to your actual guild name.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync([Remainder] string txt)
         {
@@ -1227,6 +1289,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gname")]
+        [Summary("Lists your guilds current name thats been set for embeds.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync()
         {
@@ -1289,6 +1353,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gavatar")]
+        [Summary("Will list bots current guild avatar for embeds.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildAvatarAsync()
         {
@@ -1318,6 +1384,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gavatar")]
+        [Summary("Will set bots guild avatar for embeds.")]
+        [Remarks("<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix embed avatar.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildAvatarAsync(Uri url)
         {
@@ -1391,6 +1459,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("prefix")]
+        [Summary("Will set bot prefix for your guild.")]
+        [Remarks("<prefix> - Any prefix you'd like, up to 10 characters for your guild. **note** reset will change prefix to !.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task PrefixAsync([Remainder] string txt)
         {
@@ -1432,6 +1502,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("prefix")]
+        [Summary("Will list bots current guild prefix.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task PrefixAsync()
         {
@@ -1539,6 +1611,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gmotd")]
+        [Summary("Lists guild current motd.")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildMotdAsync()
         {
@@ -1568,6 +1642,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("gmotd")]
+        [Summary("Sets guild motd.")]
+        [Remarks("<motd> - Motd text for guild. **note** reset will revert back to default motd.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildMotdAsync([Remainder] string str)
         {
