@@ -2,9 +2,13 @@
 using Discord.Commands;
 using System;
 using System.Threading.Tasks;
+using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Audio
 {
+
+    [Name("Audio")]
+    [Summary("Audio commands.")]
     public class PlayModule : ModuleBase<SocketCommandContext>
     {
         private AudioService _audio;
@@ -15,7 +19,9 @@ namespace Siotrix.Discord.Audio
         }
 
         [Command("play", RunMode = RunMode.Async)]
-        [Remarks("Resume playback of a paused song")]
+        [Summary("Resume playback of a paused song")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.User)]
         public Task PlayAsync()
         {
             var user = Context.User as SocketGuildUser;
@@ -27,14 +33,18 @@ namespace Siotrix.Discord.Audio
         }
 
         [Command("play", RunMode = RunMode.Async), Priority(10)]
-        [Remarks("Search for and then play a song")]
+        [Summary("Search for and then play a song")]
+        [Remarks("<song> - name of song you would like to play.")]
+        [MinPermissions(AccessLevel.User)]
         public Task PlayAsync(string query)
         {
             return ReplyAsync("Search is not supported at this time.");
         }
 
         [Command("play", RunMode = RunMode.Async), Priority(20)]
-        [Remarks("Play a song from a specific url")]
+        [Summary("Play a song from a specific url")]
+        [Remarks("<url> - Play song from specific URL.")]
+        [MinPermissions(AccessLevel.User)]
         public Task PlayAsync(Uri url)
         {
             var user = Context.User as SocketGuildUser;
@@ -46,7 +56,9 @@ namespace Siotrix.Discord.Audio
         }
 
         [Command("playing")]
-        [Remarks("View information on the currently playing song")]
+        [Summary("View information on the currently playing song")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.User)]
         public Task PlayingAsync()
         {
             var playing = _audio.GetCurrentlyPlaying(Context.Guild.Id);

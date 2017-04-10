@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Addons.EmojiTools" Version="1.1.0-ci-00017" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc2-00681" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc2-00698" />
   </ItemGroup>
 
   <ItemGroup>

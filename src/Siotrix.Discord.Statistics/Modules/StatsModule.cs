@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
+    [Name("Information")]
     public class StatsModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;
@@ -716,7 +717,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("stats"), Alias("statistics")]
-        [Summary("Statistical command to display guild information and user information on message and channel data.")]
+        [Summary("Statistical command to display guild information data.")]
+        [Remarks(" - No additional arguments needed.")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync()
         {
@@ -761,7 +764,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("stats"), Alias("statistics")]
-        [Summary("Statistical command to display guild information and user information on message and channel data.")]
+        [Summary("Statistical command to display user or bot information data.")]
+        [Remarks("<@username> - any @user or bot.")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync(SocketUser user)
         {

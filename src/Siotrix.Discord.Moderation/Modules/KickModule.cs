@@ -5,10 +5,13 @@ using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {
+    [Name("Moderator")]
+    [Group("kick")]
     public class KickModule : ModuleBase<SocketCommandContext>
-    {
-        [Name("Moderator")]
-        [Command("kick")]
+    {        
+        [Command]
+        [Summary("Will instantly kick user from guild.")]
+        [Remarks("<@username> - @mention user name of user you want to kick.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task KickAsync(SocketGuildUser user)
@@ -17,7 +20,9 @@ namespace Siotrix.Discord.Moderation
             await ReplyAsync("👍");
         }
 
-        [Command("kick")]
+        [Command]
+        [Summary("Will kick user for specified amount of time/days.")]
+        [Remarks("<@username> <time> - can specify any time fram 1d, 2d, 1w, 1m, etc. **note** default is normal kick")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task KickAsync(SocketUser user, int prunedays = -1)

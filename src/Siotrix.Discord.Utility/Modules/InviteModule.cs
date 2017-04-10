@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Utility
 {
-    [Name("Basic")]
+    [Name("Utility")]
     [MinPermissions(AccessLevel.User)]
     public class InviteModule : ModuleBase<SocketCommandContext>
     {
 
         [Command("invite"), Alias("join")]
         [Summary("Returns the OAuth2 Invite URL of the bot")]
+        [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.User)]
         public async Task Invite()
         {

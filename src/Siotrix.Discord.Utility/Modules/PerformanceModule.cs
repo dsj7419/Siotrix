@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Utility
 {
-    [Name("Utility")]
+    [Name("Information")]
     [MinPermissions(AccessLevel.User)]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
     {

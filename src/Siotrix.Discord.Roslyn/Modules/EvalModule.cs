@@ -10,12 +10,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Roslyn
 {
-    [Name("evaluate")]
-    [RequireOwner]
-    [Group("evaluate"), Alias("eval")]
+    [Name("Developer")]  
     public class EvalModule : ModuleBase<SocketCommandContext>
     {
         private Stopwatch _timer = new Stopwatch();
@@ -25,8 +24,11 @@ namespace Siotrix.Discord.Roslyn
             _timer.Start();
         }
 
-        [Name("no-help")]
-        [Command(RunMode = RunMode.Async)]
+        [Command("evaluate", RunMode = RunMode.Async)]
+        [Alias("eval")]
+        [Summary("Evaluate a c# expression.")]
+        [Remarks("<code> - Any simple c# expressions and discord.net code.")]
+        [MinPermissions(AccessLevel.BotOwner)]
         public async Task EvalAsync([Remainder]string code)
         {
             var options = ScriptOptions.Default

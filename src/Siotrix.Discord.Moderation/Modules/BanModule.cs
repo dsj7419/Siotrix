@@ -11,6 +11,7 @@ namespace Siotrix.Discord.Moderation
     {
         [Command("ban")]
         [Summary("Ban a user")]
+        [Remarks(" - no additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task BanAsync(SocketUser user, int prunedays = -1)

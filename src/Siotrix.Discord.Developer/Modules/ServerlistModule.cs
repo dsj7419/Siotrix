@@ -11,6 +11,7 @@ namespace Siotrix.Discord.Developer
     {
         [Command("serverlist")]
         [Summary("Lists all guilds Siotrix is servicing")]
+        [Remarks(" - no additional arguments needed")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task ServerlistAsync()
         {

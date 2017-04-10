@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
+    [Name("Information")]
     public class InfoModule : ModuleBase<SocketCommandContext>
-    {
+    {        
         private Process _process;
 
         protected override void BeforeExecute()
@@ -359,7 +360,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("info"), Alias("information")]
-        [Summary("General information command to display guild, user info, and bot info")]
+        [Summary("Retrieves general information about guild")]
+        [Remarks(" - no additional arguments needed.")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task InfoAsync()
         {
@@ -411,7 +414,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("info"), Alias("information")]
-        [Summary("General information command to display guild, user info, and bot info")]
+        [Summary("Retrieves general information about a specific user or bot in the guild")]
+        [Remarks("<@username> - any @user in guild. May also user it for the bot as well!")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task InfoAsync(SocketUser user)
         {

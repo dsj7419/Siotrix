@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
+    [Name("Information")]
     public class LeaderBoardModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;
@@ -324,7 +325,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("leaderboard"), Alias("lb")]
-        [Summary("Guild leaderboard based on message count for the last 30 days, and for ALL TIME")]
+        [Summary("Lists top message leaders in guild for the last 30 days.")]
+        [Remarks(" - no additional arguments needed.")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync()
         {
@@ -362,7 +365,9 @@ namespace Siotrix.Discord.Statistics
         }
 
         [Command("leaderboard"), Alias("lb")]
-        [Summary("Guild leaderboard based on message count for the last 30 days, and for ALL TIME")]
+        [Summary("Lists top message leaders in guild for all time.")]
+        [Remarks("alltime - Keyword to activate all time leaderboard.")]
+        [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync(string alltime)
         {

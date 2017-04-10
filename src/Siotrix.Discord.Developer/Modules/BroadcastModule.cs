@@ -12,7 +12,7 @@ namespace Siotrix.Discord.Developer
     {
         [Command("broadcast")]
         [Summary("Broadcasts a message to the default channel of all servers the bot is connected to.")]
-        [Remarks("<IMPORTANT MESSAGE>")]
+        [Remarks("<text> - Whatever important information you need to say goes here.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task Broadcast([Remainder] string broadcast)
         {
