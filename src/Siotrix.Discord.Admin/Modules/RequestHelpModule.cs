@@ -1,7 +1,6 @@
 ﻿using System;
 using Discord;
 using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -11,7 +10,7 @@ namespace Siotrix.Discord.Admin
     public class RequestHelpModule : ModuleBase<SocketCommandContext>
     {
         [Command("requesthelp"), Alias("reportbug")]
-        [Summary("Gives bot developer an alert that something is wrong, and an invite to the guild to provide assistance. Please use this only as emergency.")]
+        [Summary("Gives bot developer an alert that something is wrong. Please use this only as emergency.")]
         [Remarks("<text> - include a brief report")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildOwner)]

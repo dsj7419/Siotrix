@@ -1,19 +1,16 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 
 namespace Siotrix.Discord.Developer
 {
-    [Name("Developer")]
-    [Summary("Various Siotrix property Settings.")]
+    [Name("Developer")]    
     [Group("siotrix"), Alias("sio")]
+    [Summary("Various Siotrix property Settings.")]
     public class SiotrixModule : ModuleBase<SocketCommandContext>
     {
         [Command("avatar")]

@@ -1,8 +1,6 @@
 ﻿using Discord.WebSocket;
 using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
-using Discord;
 
 namespace Siotrix.Discord.Developer
 {

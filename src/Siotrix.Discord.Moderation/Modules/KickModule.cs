@@ -1,12 +1,12 @@
 ﻿using Discord.WebSocket;
 using Discord.Commands;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("kick")]
+    [Summary("Kicks user from guild. May add a time amount before they are allowed back.")]
     public class KickModule : ModuleBase<SocketCommandContext>
     {        
         [Command]

@@ -6,12 +6,12 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
     [Name("Information")]
+    [Summary("Message leaderboard system.")]
     public class LeaderBoardModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;

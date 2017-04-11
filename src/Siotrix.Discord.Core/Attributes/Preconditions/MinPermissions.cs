@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Attributes.Preconditions
+namespace Siotrix.Discord
 {
 
     public enum AccessLevel

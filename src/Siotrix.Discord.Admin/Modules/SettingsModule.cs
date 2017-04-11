@@ -1,18 +1,15 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
-using Siotrix.Discord.Attributes.Preconditions;
 using Discord.Addons.EmojiTools;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
-    [Name("Admin")]
-    [Summary("Various settings for guild to customize Siotrix with.")]
+    [Name("Admin")]    
     [Group("settings"), Alias("set")]
+    [Summary("Various settings for guild to customize Siotrix with.")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {        
         [Command("gfootericon")]
@@ -539,7 +536,7 @@ namespace Siotrix.Discord.Admin
         public async Task GuildColorAsync()
         {
             //TODO: Color needs rework to include custom colors - also can do pre-set colors to static out of this module.
-            //TODO: Add Hex color ability with converter algorithm
+
             string colorName = null;
             var guild_id = Context.Guild.Id;
             CheckGuildColorGuilds();
@@ -613,6 +610,14 @@ namespace Siotrix.Discord.Admin
                 {
                     colorName = "None";
                 }
+ 
+                /*     else
+                {
+                    RGBtoHex.RGB data = new RGBtoHex.RGB((byte)col.r, (byte)col.g, (byte)col.b);
+                    var cName = RGBtoHex.RGBToHexadecimal(data);
+                    colorName = "Your custom color hex is: " + cName;
+                } */
+
             }
             await ReplyAsync(colorName);
         }
@@ -804,6 +809,13 @@ namespace Siotrix.Discord.Admin
                             colors += "None" + "\n";
                         }
                     }
+               /*     else
+                    {
+
+                        RGBtoHex.RGB data = new RGBtoHex.RGB((byte)col.RedParam, (byte)col.GreenParam, (byte)col.BlueParam);
+                        var cName = RGBtoHex.RGBToHexadecimal(data);
+                        colors += Format.Bold(cName) + " is custom Hex color of this guild \n";
+                    } */
                 }
             }
             await ReplyAsync(colors);
@@ -935,7 +947,7 @@ namespace Siotrix.Discord.Admin
         [Remarks("<name> - Name of guild you want to use in embeds. **note** reset will reset to your actual guild name.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync([Remainder] string txt)
-        {
+        {                       
             CheckGuildNames();
             var guild_id = Context.Guild.Id;
             using (var db = new LogDatabase())

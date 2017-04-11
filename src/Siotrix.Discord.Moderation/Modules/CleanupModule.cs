@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {

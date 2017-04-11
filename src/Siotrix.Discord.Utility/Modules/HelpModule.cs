@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Utility
 {    

@@ -5,6 +5,7 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("filter")]
+    [Summary("A special guild-specific word and phrase filter.")]
     public class FilterModule : ModuleBase<SocketCommandContext>
     {
         [Command]

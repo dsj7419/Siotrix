@@ -1,10 +1,5 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
+﻿using Discord.Commands;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Utility

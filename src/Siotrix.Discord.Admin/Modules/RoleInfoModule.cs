@@ -4,7 +4,6 @@ using Discord;
 using System;
 using Discord.WebSocket;
 using System.Collections.Generic;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Admin.Modules
 {

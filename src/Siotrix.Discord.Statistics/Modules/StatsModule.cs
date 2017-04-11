@@ -4,12 +4,12 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Diagnostics;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
     [Name("Information")]
+    [Summary("Statistical information for users, bot, and guild.")]
     public class StatsModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;

@@ -2,7 +2,6 @@
 using Discord.Commands;
 using System;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Audio
 {

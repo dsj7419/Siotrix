@@ -1,5 +1,4 @@
 ﻿using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Developer
