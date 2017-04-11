@@ -18,6 +18,7 @@ namespace Siotrix.Discord.Moderation
             await Task.Delay(1);
         }
 
+        [Name("no-help")]
         [Command]
         [Remarks("Check warnings you received between two dates")]
         public async Task WarningAsync(DateTime from, DateTime to)
@@ -25,6 +26,7 @@ namespace Siotrix.Discord.Moderation
             await Task.Delay(1);
         }
 
+        [Name("no-help")]
         [Command]
         [Remarks("View information about a specific warning")]
         public async Task WarningAsync(int id)

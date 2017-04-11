@@ -763,6 +763,7 @@ namespace Siotrix.Discord.Statistics
             return ReplyAsync("", embed: builder);
         }
 
+        [Name("no-help")]
         [Command("stats"), Alias("statistics")]
         [Summary("Statistical command to display user or bot information data.")]
         [Remarks("<@username> - any @user or bot.")]

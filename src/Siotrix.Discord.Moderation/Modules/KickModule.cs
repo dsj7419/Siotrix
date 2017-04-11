@@ -8,7 +8,7 @@ namespace Siotrix.Discord.Moderation
     [Group("kick")]
     [Summary("Kicks user from guild. May add a time amount before they are allowed back.")]
     public class KickModule : ModuleBase<SocketCommandContext>
-    {        
+    {
         [Command]
         [Summary("Will instantly kick user from guild.")]
         [Remarks("<@username> - @mention user name of user you want to kick.")]
@@ -20,6 +20,7 @@ namespace Siotrix.Discord.Moderation
             await ReplyAsync("👍");
         }
 
+        [Name("no-help")]
         [Command]
         [Summary("Will kick user for specified amount of time/days.")]
         [Remarks("<@username> <time> - can specify any time fram 1d, 2d, 1w, 1m, etc. **note** default is normal kick")]

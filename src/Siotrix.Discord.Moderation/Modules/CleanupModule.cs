@@ -15,6 +15,7 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class CleanupModule : ModuleBase<SocketCommandContext>
     {
+        [Name("no-help")]
         [Command]
         [Summary("Instantly cleanup past 10 messages in channel.")]
         [Remarks(" - no additional arguments needed.")]
