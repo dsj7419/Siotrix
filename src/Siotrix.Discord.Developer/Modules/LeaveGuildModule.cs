@@ -9,7 +9,7 @@ namespace Siotrix.Discord.Developer
     [Group("leaveguild")]
     [Summary("Instructs the bot to leave a Guild specified by a developer. This could could be temporary or permanent.")]
     [MinPermissions(AccessLevel.BotOwner)]
-    class LeaveGuildModule : ModuleBase<SocketCommandContext>
+    public class LeaveGuildModule : ModuleBase<SocketCommandContext>
     {
         [Command("kick")]
         [Summary("Instructs the bot to leave a Guild specified by a developer.")]

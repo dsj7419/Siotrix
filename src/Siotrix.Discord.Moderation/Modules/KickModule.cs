@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
-    [Group("kick")]
+    [Group("kick"), Alias("ki")]
     [Summary("Kicks user from guild. May add a time amount before they are allowed back.")]
     public class KickModule : ModuleBase<SocketCommandContext>
     {
