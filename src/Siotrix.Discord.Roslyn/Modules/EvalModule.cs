@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Roslyn
 {

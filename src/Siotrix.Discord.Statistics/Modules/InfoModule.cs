@@ -4,12 +4,12 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Diagnostics;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
     [Name("Information")]
+    [Summary("General information command with detailed reporting.")]
     public class InfoModule : ModuleBase<SocketCommandContext>
     {        
         private Process _process;
@@ -359,6 +359,7 @@ namespace Siotrix.Discord.Statistics
             return name;
         }
 
+        [Name("no-help")]
         [Command("info"), Alias("information")]
         [Summary("Retrieves general information about guild")]
         [Remarks(" - no additional arguments needed.")]

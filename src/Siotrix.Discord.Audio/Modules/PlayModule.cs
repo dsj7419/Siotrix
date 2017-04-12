@@ -2,7 +2,6 @@
 using Discord.Commands;
 using System;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Audio
 {
@@ -32,6 +31,7 @@ namespace Siotrix.Discord.Audio
             return _audio.PlayAsync(user.VoiceChannel, "surf.mp3");
         }
 
+        [Name("no-help")]
         [Command("play", RunMode = RunMode.Async), Priority(10)]
         [Summary("Search for and then play a song")]
         [Remarks("<song> - name of song you would like to play.")]
@@ -41,6 +41,7 @@ namespace Siotrix.Discord.Audio
             return ReplyAsync("Search is not supported at this time.");
         }
 
+        [Name("no-help")]
         [Command("play", RunMode = RunMode.Async), Priority(20)]
         [Summary("Play a song from a specific url")]
         [Remarks("<url> - Play song from specific URL.")]

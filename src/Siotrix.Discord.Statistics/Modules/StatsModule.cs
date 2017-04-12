@@ -4,12 +4,12 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Diagnostics;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
     [Name("Information")]
+    [Summary("Statistical information for users, bot, and guild.")]
     public class StatsModule : ModuleBase<SocketCommandContext>
     {
         private Process _process;
@@ -763,6 +763,7 @@ namespace Siotrix.Discord.Statistics
             return ReplyAsync("", embed: builder);
         }
 
+        [Name("no-help")]
         [Command("stats"), Alias("statistics")]
         [Summary("Statistical command to display user or bot information data.")]
         [Remarks("<@username> - any @user or bot.")]

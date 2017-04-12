@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Developer
 {

@@ -1,5 +1,4 @@
 ﻿using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Threading.Tasks;
 
@@ -7,6 +6,7 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("warning")]
+    [Summary("A custom automated warning system that can be controlled by guilds.")]
     [RequireContext(ContextType.Guild)]
     [MinPermissions(AccessLevel.GuildMod)]
     public class WarningModule : ModuleBase<SocketCommandContext>
@@ -18,6 +18,7 @@ namespace Siotrix.Discord.Moderation
             await Task.Delay(1);
         }
 
+        [Name("no-help")]
         [Command]
         [Remarks("Check warnings you received between two dates")]
         public async Task WarningAsync(DateTime from, DateTime to)
@@ -25,6 +26,7 @@ namespace Siotrix.Discord.Moderation
             await Task.Delay(1);
         }
 
+        [Name("no-help")]
         [Command]
         [Remarks("View information about a specific warning")]
         public async Task WarningAsync(int id)

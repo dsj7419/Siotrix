@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
-using Siotrix.Discord.Attributes.Preconditions;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Utility
 {
     [Name("Information")]
+    [Summary("General performance information and specs for Siotrix.")]
     [MinPermissions(AccessLevel.User)]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
     {

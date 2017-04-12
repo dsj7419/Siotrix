@@ -2,7 +2,6 @@
 using Discord.Commands;
 using System;
 using System.Linq;
-using Siotrix.Discord.Attributes.Preconditions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics

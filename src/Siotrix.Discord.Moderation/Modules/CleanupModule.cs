@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Siotrix.Discord.Attributes.Preconditions;
 
 namespace Siotrix.Discord.Moderation
 {
@@ -16,6 +15,7 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class CleanupModule : ModuleBase<SocketCommandContext>
     {
+        [Name("no-help")]
         [Command]
         [Summary("Instantly cleanup past 10 messages in channel.")]
         [Remarks(" - no additional arguments needed.")]
