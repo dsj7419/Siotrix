@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
-    [Name("Info")]
+    [Name("TestInfo")]
     [Group("stats"), Alias("statistics")]
     [RequireContext(ContextType.Guild)]
     [MinPermissions(AccessLevel.User)]

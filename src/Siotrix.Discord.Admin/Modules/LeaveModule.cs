@@ -11,7 +11,7 @@ namespace Siotrix.Discord.Admin
     public class LeaveModule : ModuleBase<SocketCommandContext>
     {
 
-        [Command]
+        [Command("local")]
         [Summary("Instructs the bot to leave this Guild.")]
         [Remarks(" - no additional arguments needed")]
         [RequireContext(ContextType.Guild)]
