@@ -25,252 +25,393 @@ namespace Siotrix.Discord.Utility
             _map = map;
         }
 
-        [Command("help")]
-        [Summary("Shows info about commands")]
-        [Remarks("help [module] [command]")]
-        public async Task Help()
-        {            
-            var sender = Context.Message.Author as SocketGuildUser;
-            var headerTxt = $"**Usable commands for {sender?.Username} in {Context.Guild.Name}**";
-            var commandTxt = "";
-            var modulesTxt = "";
-
-            var defModule =
-                _service.Modules.FirstOrDefault(x =>
-                   string.Equals(x.Name, "default", StringComparison.CurrentCultureIgnoreCase));
-
-            if (defModule != null)
-            {
-                foreach (var command in defModule.Commands.Where(x => !x.Name.ICEquals("no-help")))
-                {
-                    var result =
-                        await command.CheckPreconditionsAsync(Context, _map);
-                    if (result.IsSuccess)
-                        commandTxt += $"{command.Name}, ";
-
-                }
-            }
-
-            if (string.IsNullOrEmpty(commandTxt))
-                commandTxt =
-                    $"No default commands found.";
-
-            else if (commandTxt.TrimEnd().EndsWith(","))
-                commandTxt =
-                    commandTxt.Truncate(2);
-
-            var modules = _service.Modules.Where(x =>
-                !x.Name.ICEquals("default")).ToArray();
-
+        private string GetModuleNames()
+        {
+            var modules_text = "";
+            var modules = _service.Modules.Where(x => !x.Name.ICEquals("default") && !x.Name.ICEquals("no-help")).GroupBy(p => p.Name).ToList();
             if (modules.Any())
             {
                 foreach (var module in modules)
                 {
-                    var modAlias = module.Aliases.First();
-                    if (!string.IsNullOrEmpty(modAlias)
-                        && !module.Name.ICEquals("no-help")
-                        && module.Commands.Any()
-                        )
-                    {
-                        string tmptxt = $"\n``{module.Name}``: ";
-                        foreach (var command in module.Commands.Where(x => !x.Name.ICEquals("no-help")))
-                        {
-                            var result =
-                                await command.CheckPreconditionsAsync(Context, _map);
-                            if (result.IsSuccess)
-                                tmptxt += $"{command.Name}, ";
-                        }
-                        if (!string.IsNullOrEmpty(tmptxt.Split(':')[1].Trim()))
-                            modulesTxt += tmptxt;
-                    }
-
-                    if (modulesTxt.TrimEnd().EndsWith(","))
-                        modulesTxt =
-                            modulesTxt.Truncate(2);
+                    string tmptxt = $"`` {module.First().Name} `` , ";
+                    modules_text += tmptxt;
                 }
-            }
 
-            if (string.IsNullOrEmpty(commandTxt + modulesTxt))
-            {
-                await ReplyAsync($"No commands found.");
-                return;
+                if (modules_text.TrimEnd().EndsWith(","))
+                    modules_text = modules_text.Truncate(2);
             }
-
-            await ReplyAsync($"{headerTxt}\n" +
-                            $"{commandTxt}\n" +
-                            $"\n" +
-                            $"**Modules**" +
-                            $"{modulesTxt}\n\n" +
-                            $"Get command specific help: `(prefixNEEDSTOBEIMPLEMENTED)help <module> <command>`");
+            return modules_text;
         }
 
-        [Name("no-help")]
+        private string GetGuildIconUrl()
+        {
+            var guild_id = Context.Guild.Id;
+            string iconurl = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        iconurl = db.Authors.First().AuthorIcon;
+                    }
+                    else
+                    {
+                        iconurl = val.First().Avatar;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return iconurl;
+        }
+
+        private string GetGuildName()
+        {
+            var guild_id = Context.Guild.Id;
+            string name = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gnames.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        name = Context.Guild.Name;
+                    }
+                    else
+                    {
+                        name = val.First().GuildName;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return name;
+        }
+
+        private string GetGuildUrl()
+        {
+            var guild_id = Context.Guild.Id;
+            string url = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gwebsiteurls.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        url = db.Authors.First().AuthorUrl;
+                    }
+                    else
+                    {
+                        url = val.First().SiteUrl;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return url;
+        }
+
+        private Color GetGuildColor()
+        {
+            var guild_id = Context.Guild.Id;
+            int id = 0;
+            byte rColor = 0;
+            byte gColor = 0;
+            byte bColor = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        id = 15;
+                    }
+                    else
+                    {
+                        id = val.First().ColorId;
+                    }
+                    var col_value = db.Colorinfos.Where(y => y.Id == id).First();
+                    rColor = Convert.ToByte(col_value.RedParam);
+                    gColor = Convert.ToByte(col_value.GreenParam);
+                    bColor = Convert.ToByte(col_value.BlueParam);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return new Color(rColor, gColor, bColor);
+        }
+
+        private string GetGuildThumbNail()
+        {
+            var guild_id = Context.Guild.Id;
+            string thumbnail_url = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        thumbnail_url = "http://img04.imgland.net/WyZ5FoM.png";
+                    }
+                    else
+                    {
+                        thumbnail_url = val.First().ThumbNail;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return thumbnail_url;
+        }
+
+        private string[] GetGuildFooter()
+        {
+            var guild_id = Context.Guild.Id;
+            string[] footer = new string[2];
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        footer[0] = db.Bfooters.First().FooterIcon;
+                        footer[1] = db.Bfooters.First().FooterText;
+                    }
+                    else
+                    {
+                        footer[0] = val.First().FooterIcon;
+                        footer[1] = val.First().FooterText;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return footer;
+        }
+
+        private string GetGuildPrefix()
+        {
+            var guild_id = Context.Guild.Id;
+            string prefix = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        prefix = "!";
+                    }
+                    else
+                    {
+                        prefix = val.First().Prefix;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return prefix;
+        }
+
+        [Command("help")]
+        [Summary("Shows info about commands")]
+        [Remarks("help [module] [command]")]
+        public async Task Help()
+        {
+            string g_icon_url = GetGuildIconUrl();
+            string g_name = GetGuildName();
+            string g_url = GetGuildUrl();
+            Color g_color = GetGuildColor();
+            string g_thumbnail = GetGuildThumbNail();
+            string module_list = GetModuleNames();
+            string[] g_footer = GetGuildFooter();
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(g_color)
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+
+            builder
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Modules"), Value = module_list });
+            await ReplyAsync("", embed: builder);
+        }
+
         [Command("help")]
         public async Task Help(string predicate)
         {
-            predicate = predicate.RemoveWhitespace().ToLower();
-            var sender = Context.Message.Author as SocketGuildUser ?? Context.Message.Author;
-            var headerTxt = $"**Usable commands for {sender.Username}**";
-            var modPrefix = "module:";
-            var startsWithModPrefix = predicate.StartsWith(modPrefix);
+            string g_icon_url = GetGuildIconUrl();
+            string g_name = GetGuildName();
+            string g_url = GetGuildUrl();
+            Color g_color = GetGuildColor();
+            string g_thumbnail = GetGuildThumbNail();
+            string module_list = GetModuleNames();
+            string[] g_footer = GetGuildFooter();
+            string group_commands = null;
+            string commands = null;
+            string g_prefix = GetGuildPrefix();
+            string sub_commands = null;
+            string summary = null;
+            string remark = null;
+            bool has_group = false;
+            string summary_remark_list = null;
+            int index = 0;
+            string buffer_data = "";
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(g_color)
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+
             var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
             var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
-            if (startsWithModPrefix || (isMod && !isCommand))
+            if(isMod && !isCommand)
             {
-                if (startsWithModPrefix)
-                    predicate = predicate.Substring(modPrefix.Length);
-                headerTxt += $" **in module {predicate}**";
-                var module = _service.Modules.FirstOrDefault(x =>
-                    x.Aliases.First().ICEquals(predicate));
-
-                if (module == null)
+                System.Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
+                var modules = _service.Modules.Where(x => x.Name.ICEquals(predicate));
+                foreach (var module in modules)
                 {
-                    await ReplyAsync($"Module `{predicate}` not found".Cap(2000));
-                    return;
+                    bool is_group = module.Aliases.First().Any();
+                    if (is_group)
+                    {
+                        group_commands += $"**• {module.Aliases.First()}**" + $" - {module.Summary}\n";
+                    }
+                    else
+                    {
+                        var cmds = module.Commands.Where(x => !x.Name.ICEquals("no-help"));
+                        foreach (var cmd in cmds)
+                        {
+                            commands += $"**• {cmd.Name}**" + $" - {cmd.Summary}\n";
+                        }
+                    }
                 }
 
-                var commands =
-                    module.Commands
-                        .Where(x =>
-                            !x.Name.ICEquals("no-help"));
-
-                var usableCommands = new List<CommandInfo>();
-                var commandInfos = commands as CommandInfo[] ?? commands.ToArray();
-                commandInfos.ToList().ForEach(async x =>
+                if (group_commands != null)
                 {
-                    var b = await x.CheckPreconditionsAsync(Context, _map);
-                    if (b.IsSuccess)
-                        usableCommands.Add(x);
-                });
-
-                await ReplyAsync(usableCommands.Any() ?
-                            ($"{headerTxt}\n" +
-                            usableCommands.Select(x => $"{x.Name}").PrettyPrint()).Cap(2000)
-                            : $"No usable commands found.");
-
+                    builder
+                    .AddField(x =>
+                    {
+                        x.Name = Format.Underline("- Group Commands :");
+                        x.Value = $"{group_commands}";
+                    });
+                }
+                builder
+                    .AddField(x =>
+                    {
+                        x.Name = Format.Underline("- Commands :");
+                        x.Value = $"{commands}";
+                    });
             }
-            else
+            else if (!isMod && isCommand)
             {
-                modPrefix = "command:";
-                if (predicate.StartsWith(modPrefix))
-                    predicate = predicate.Substring(modPrefix.Length);
-
-                var command =
-                    _service.Commands
-                        .FirstOrDefault(x =>
-                            x.Aliases.Contains(predicate)
-                            && !x.Name.ICEquals("no-help"));
-
-                if (command == null)
+                System.Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
+                var command = _service.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
+                has_group = command.Module.Aliases.First().Any();
+                if (!has_group)
                 {
-                    await ReplyAsync($"Command `{predicate}` not found".Cap(2000));
-                    return;
-                }
-
-                var checkPreconditionsAsync =
-                    command.CheckPreconditionsAsync(Context, _map);
-
-                if (checkPreconditionsAsync != null)
-                {
-                    var result =
-                        await checkPreconditionsAsync;
-
-                    var aliases =
-                        command.Aliases
-                            .Skip(1)
-                            .ToArray();
-
-                    var split = command.Remarks.Split('\n') ?? new string[0];
-
-                    var usage =
-                        split.Length > 1
-                            ? $"`{split[0]}`\n**Example**: `{split[1]}`"
-                            : $"`{command.Remarks}`";
-
-                    await
-                        ReplyAsync(
-                            $"**Module **: `{command.Module.Name}`\n" +
-                            $"**Command**: `{command.Aliases.First()}`" +
-                            $"{(aliases.Any() ? $"\n**Aliases**: {aliases.PrettyPrint()}" : "")}\n" +
-                            $"{(command.Summary?.Length > 0 ? $"**Summary**: `{command.Summary}`\n" : "")}" +
-                            $"{(command.Remarks?.Length > 0 ? $"**Usage**: {usage}\n" : "")}" +
-                            $"**Usable by {sender?.Username}**: `{(result.IsSuccess ? "yes" : "no")}`");
+                    summary = $"**{command.Summary}**";
+                    remark = $"```Usage : {g_prefix}{command.Name}{command.Remarks}```";
                 }
                 else
-                    await ReplyAsync($"No command found");
+                {
+                    string group_name = command.Module.Aliases.First() + " ";
+                    foreach (var i in command.Module.Commands)
+                    {
+                        if (predicate.ICEquals(i.Name))
+                        {
+                            index++;
+                            string command_name = command.Name + " ";
+                            summary_remark_list += $"[Option - {index}] " + $"**{i.Summary}**\n" + $"```Usage : {g_prefix}{group_name}{command_name}{i.Remarks}```\n";
+                        }
+                    }
+                }
+                if (!has_group)
+                {
+                    builder
+                        .AddField(x =>
+                        {
+                            x.Name = Format.Underline($"{command.Name}");
+                            x.Value = $"{summary}\n" + $"{remark}";
+                        });
+                }
+                else
+                {
+                    builder
+                    .AddField(x =>
+                    {
+                        x.Name = Format.Underline($"{command.Name}");
+                        x.Value = $"{summary_remark_list}";
+                    });
+                }
             }
-
-        }
-
-        [Name("no-help")]
-        [Command("help")]
-        public async Task Help(string module, [Remainder] string predicate)
-        {
-            var sender = Context.Message.Author as SocketGuildUser;
-            const string modPrefix = "module:";
-            const string cmdPrefix = "command:";
-
-            module = module.ToLower();
-            predicate = predicate.RemoveWhitespace().ToLower();
-
-            if (module.StartsWith(cmdPrefix))
+            else // isMod = false && isCommand = false
             {
-                var tmp = module;
-                module = predicate;
-                predicate = tmp;
+                foreach(var item in _service.Modules)
+                {
+                    bool exist_group = item.Aliases.First().Any();
+                    if (!exist_group)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (predicate.ICEquals(item.Aliases.First()))
+                        {
+                            foreach (var sub_cmd in item.Commands)
+                            {
+                                if (!buffer_data.Equals(sub_cmd.Name))
+                                {
+                                    buffer_data = sub_cmd.Name;
+                                    sub_commands += $"``{buffer_data}``" + " , ";
+                                }
+                            }
+                        }
+                    }
+                }
+                if (sub_commands.TrimEnd().EndsWith(","))
+                    sub_commands =  sub_commands.Truncate(2);
+                builder
+                  .AddField(x =>
+                  {
+                      x.Name = Format.Underline($"{predicate}");
+                      x.Value = $"{sub_commands}";
+                  });
             }
-            else if (predicate.StartsWith(modPrefix))
-            {
-                var tmp = predicate;
-                predicate = module;
-                module = tmp;
-            }
-
-            var split = module.Split(':');
-            if (split.Length > 1)
-                module = split[1];
-            split = predicate.Split(':');
-            if (split.Length > 1)
-                predicate = split[1];
-
-            var command =
-                _service.Modules
-                    .FirstOrDefault(x =>
-                        x.Name.ICEquals(module))
-                    ?.Commands
-                    .FirstOrDefault(x =>
-                        x.Aliases.Contains($"{module} {predicate}")
-                        && !x.Name.ICEquals("no-help"));
-
-            if (command != null)
-            {
-                var result =
-                    await command.CheckPreconditionsAsync(Context, _map);
-
-                var aliases =
-                    command.Aliases
-                        .Skip(1)
-                        .ToArray();
-
-                split =
-                    command.Remarks?.Split('\n') ?? new string[0];
-
-                var usage =
-                    split.Length > 1
-                        ? $"`{split[0]}`\n**Example**: `{split[1]}`"
-                        : $"`{command.Remarks}`";
-
-                await
-                    ReplyAsync(
-                        $"**Module **: `{command.Module.Name}`\n" +
-                        $"**Command**: `{command.Name}`" +
-                        $"{(aliases.Any() ? $"\n**Aliases**: {aliases.PrettyPrint()}" : "")}\n" +
-                        $"{(command.Summary?.Length > 0 ? $"**Summary**: `{command.Summary}`\n" : "")}" +
-                        $"{(command.Remarks?.Length > 0 ? $"**Usage**: {usage}\n" : "")}" +
-                        $"**Usable by {sender?.Username}**: `{(result.IsSuccess ? "yes" : "no")}`");
-            }
-            else
-                await ReplyAsync($"Command `{predicate}` in module `{module}` not found");
+            await ReplyAsync("", embed: builder);
         }
     }
 }
