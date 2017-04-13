@@ -359,7 +359,6 @@ namespace Siotrix.Discord.Statistics
             return name;
         }
 
-        [Name("no-help")]
         [Command("info"), Alias("information")]
         [Summary("Retrieves general information about guild")]
         [Remarks(" - no additional arguments needed.")]

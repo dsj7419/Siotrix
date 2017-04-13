@@ -20,7 +20,6 @@ namespace Siotrix.Discord.Developer
         public Task AvatarAsync()
             => ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
 
-        [Name("no-help")]
         [Command("avatar")]
         [Summary("Will set bots avatar.")]
         [Remarks("<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix avatar.")]
@@ -83,7 +82,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(url);
         }
 
-        [Name("no-help")]
         [Command("authoricon")]
         [Summary("Will set bots author icon.")]
         [Remarks("<url> - url of picture to assign as bot author icon **note** using keyword reset will reset to Siotrix icon.")]
@@ -159,7 +157,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(url);
         }
 
-        [Name("no-help")]
         [Command("authorurl")]
         [Summary("Will set bots author url.")]
         [Remarks("<url> - This links author name as a hyperlink. **note** using keyword reset will reset to Siotrix url.")]
@@ -238,7 +235,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync("👍");
         }
 
-        [Name("no-help")]
         [Command("authorname")]
         [Summary("Will list bots current author name.")]
         [Remarks(" - no additional arguments needed.")]
@@ -303,7 +299,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(str);
         }
 
-        [Name("no-help")]
         [Command("info")]
         [Summary("Will set Siotrix info description.")]
         [Remarks("<text> - Add text for Siotrix information.")]
@@ -364,7 +359,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(url);
         }
 
-        [Name("no-help")]
         [Command("website")]
         [Summary("Will set Siotrix website.")]
         [Remarks("<url> - Update main website URL for Siotrix.")]
@@ -425,7 +419,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(url);
         }
 
-        [Name("no-help")]
         [Command("footericon")]
         [Summary("Will set Siotrix footer icon.")]
         [Remarks("<url> - Update main footer icon for Siotrix.")]
@@ -490,7 +483,6 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync("👍");
         }
 
-        [Name("no-help")]
         [Command("footertext")]
         [Summary("Will list Siotrix current footer text.")]
         [Remarks(" - no additional arguments needed.")]
@@ -526,7 +518,6 @@ namespace Siotrix.Discord.Developer
         public Task UsernameAsync()
             => ReplyAsync(Context.Client.CurrentUser.ToString());
 
-        [Name("no-help")]
         [Command("username")]
         [Summary("Sets Siotrix's username.")]
         [Remarks("<name> - new name to change Siotrix too, but why??.")]
@@ -548,7 +539,6 @@ namespace Siotrix.Discord.Developer
         public Task ActivityAsync()
             => ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
 
-        [Name("no-help")]
         [Command("activity")]
         [Summary("Sets Siotrix's activity.")]
         [Remarks("<activity> - Whatever activity you want to set Siotrix as playing.")]
@@ -566,7 +556,6 @@ namespace Siotrix.Discord.Developer
         public Task StatusAsync()
             => ReplyAsync(Context.Client.CurrentUser.Status.ToString());
 
-        [Name("no-help")]
         [Command("status")]
         [Summary("Sets Siotrix's status.")]
         [Remarks("<status> - Sets status of Siotrix(Offline, Online, Idle, Afk, etc, etc..).")]

@@ -40,32 +40,26 @@ namespace Siotrix.Discord.Utility
             return ReplyAsync("", embed: builder);
         }
 
-        [Name("no-help")]
         [Command("uptime")]
         public Task UptimeAsync()
             => ReplyAsync(GetUptime());
 
-        [Name("no-help")]
         [Command("library"), Alias("lib")]
         public Task LibraryAsync()
             => ReplyAsync(GetLibrary());
 
-        [Name("no-help")]
         [Command("operatingsystem"), Alias("os")]
         public Task OperatingSystemAsync()
             => ReplyAsync(GetOperatingSystem());
 
-        [Name("no-help")]
         [Command("framework")]
         public Task FrameworkAsync()
             => ReplyAsync(GetFramework());
 
-        [Name("no-help")]
         [Command("memoryusage"), Alias("memory", "mem")]
         public Task MemoryUsageAsync()
             => ReplyAsync(GetMemoryUsage());
 
-        [Name("no-help")]
         [Command("latency"), Alias("lag", "ping")]
         public Task LatencyAsync()
             => ReplyAsync(GetLatency());
