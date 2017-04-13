@@ -20,7 +20,6 @@ namespace Siotrix.Discord.Moderation
             await ReplyAsync("👍");
         }
 
-        [Name("no-help")]
         [Command]
         [Summary("Will kick user for specified amount of time/days.")]
         [Remarks("<@username> <time> - can specify any time fram 1d, 2d, 1w, 1m, etc. **note** default is normal kick")]

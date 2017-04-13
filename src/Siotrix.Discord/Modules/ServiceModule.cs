@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    [Name("no-help")]
     [Group("services"), RequireOwner]
     public class ServiceModule : ModuleBase
     {
@@ -17,7 +16,6 @@ namespace Siotrix.Discord
             _config = Configuration.Load();
         }
 
-        [Name("no-help")]
         [Command, Priority(0)]
         public Task ServicesAsync(string instance)
         {

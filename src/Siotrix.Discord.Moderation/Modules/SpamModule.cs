@@ -10,7 +10,7 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class SpamModule : ModuleBase<SocketCommandContext>
     {
-        [Name("no-help")]
+
         [Command]
         [Remarks("Receive a private message with information about this channel's spam filter.")]
         public async Task SpamAsync()
