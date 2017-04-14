@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Siotrix.Discord.Utility
 {
     [Name("Information")]
+    [Group("performance")]
     [Summary("General performance information and specs for Siotrix.")]
     [MinPermissions(AccessLevel.User)]
     public class PerformanceModule : ModuleBase<SocketCommandContext>
@@ -20,7 +21,8 @@ namespace Siotrix.Discord.Utility
             _process = Process.GetCurrentProcess();
         }
 
-        [Command("performance")]
+        [Command]
+        [Summary("General performance information and specs for Siotrix.")]
         public Task PerformanceAsync()
         {
             var builder = new EmbedBuilder();

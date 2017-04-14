@@ -4,6 +4,7 @@ using Siotrix.Discord.Audio;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Statistics;
 using System.Threading.Tasks;
+using Discord.Addons.InteractiveCommands;
 
 namespace Siotrix.Discord
 {
@@ -19,6 +20,7 @@ namespace Siotrix.Discord
         // General
         private GlobalErrorHandler _handler;
         private CommandHandler _commands;
+        private InteractiveService Interactive;
 
         // Audio
         private AudioService _audio;
