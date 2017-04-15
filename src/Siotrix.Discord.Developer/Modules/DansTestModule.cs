@@ -8,61 +8,74 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using Discord;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Siotrix.Discord.Developer
 {
     public class DansTestModule : ModuleBase<SocketCommandContext>
     {
-        /*  private InteractiveService Interactive;
+          private InteractiveService Interactive;
 
           public DansTestModule(InteractiveService Inter)
           {
               Interactive = Inter;
-          } */
+          }
 
         private Stopwatch _timer = new Stopwatch();
 
-        protected override void BeforeExecute()
+      /* protected override void BeforeExecute()
         {
             _timer.Start();
-        }
+        } */
 
         [Command("dantest")]
-        public async Task Danstest([Remainder]string colorchoice)
+        public async Task Danstest()
         {
             var regexColorCode = new Regex("^#[a-fA-F0-9]{6}$");
             var regexRGBCode = new Regex("^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
 
-            /*     await ReplyAsync("Give me any value of color (Hex, RGB, or a name) and i'll return the others.");
+            await ReplyAsync("Give me any value of color (Hex, RGB, or a name) and i'll return the others.");
                  var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
-                 if (response.Content == "cancel") return;
+                 if (response.Content == "cancel") return;            
 
-                 string colorchoice = response.Content; */
+                 string colorchoice = response.Content;           
+        
+                 _timer.Start();
+        
 
             if (regexColorCode.IsMatch(colorchoice.Trim()))
             {
-                string cleanHex = colorchoice.Replace("#", "0x"); //strip # and add 0x for dictionary search
-                var colorname = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+                string cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+                var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+
+                if (colornamelower == null)
+                    colornamelower = "no name found";
+
+                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var colorname = text.ToTitleCase(colornamelower);
+
+                var hexcolor = colorchoice.ToUpper();
+
                 HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convery hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
                 var blue = Convert.ToString(rgbvalue.B); // Blue property                
 
-                var embed = GetEmbed(colorchoice, colorname, colorchoice, rgbvalue);
-                await ReplyAsync("", embed: embed);
-
-                //  await ReplyAsync($"You input {Format.Bold(colorchoice)} as a Hex, and that color name is: {Format.Bold(colorname)}.\nThe RGB code for that color is: RED:  {Format.Bold(red)} GREEN: {Format.Bold(green)} BLUE: {Format.Bold(blue)}");
+                var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
+                await ReplyAsync("", embed: embed);                
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
             {               
-                var colorHex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
-                string cleanHex = colorHex.Replace("0x", "#"); // convert the hex back to #FFFFFF format
-                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanHex); // convery hex to RGB value
+                var colorHex = HexColorDict.ColorHex(colorchoice).ToLower(); // look up hex in color name Dictionary
+                string cleanHex = colorHex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
 
-                var embed = GetEmbed(colorchoice, colorchoice, cleanHex, rgbvalue);
+                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var colorname = text.ToTitleCase(colorchoice);
+
+                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanHex); // convert hex to RGB value
+
+                var embed = GetEmbed(colorname, colorname, cleanHex, rgbvalue);
                 await ReplyAsync("", embed: embed);
-
-                //   await ReplyAsync($"You input {Format.Bold(colorchoice)} as a color name, and that color hex is: {Format.Bold(cleanHex)}.\nThe RGB code for that color is: RED: {Format.Bold(red)} GREEN: {Format.Bold(green)} BLUE: {Format.Bold(blue)}");
             }
             else if (regexRGBCode.IsMatch(colorchoice))
             {
@@ -70,17 +83,44 @@ namespace Siotrix.Discord.Developer
                 int red = int.Parse(str[0]); //convert to red int
                 int green = int.Parse(str[1]); //convert to green int
                 int blue = int.Parse(str[2]); // convery to blue int
-
                 RGBtoHex.RGB data = new RGBtoHex.RGB((byte)red, (byte)green, (byte)blue); // convert broken out ints into a data struct - prep for conversion
-                var colorhex = RGBtoHex.RGBToHexadecimal(data); // convert RGB input into hex
-                string cleanHex = colorhex.Replace("#", "0x"); // replace # with 0x for dictionary lookup
-                var colorname = HexColorDict.ColorName(cleanHex); // get color name
-                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
 
-                var embed = GetEmbed(colorchoice, colorname, colorhex, rgbvalue);
-                await ReplyAsync("", embed: embed);
+                var colorhex = RGBtoHex.RGBToHexadecimal(data); // convert RGB input into hex           
 
-                // await ReplyAsync($"You input R:{Format.Bold(str[0])}, G:{Format.Bold(str[1])}, B:{Format.Bold(str[2])} as an RGB value, and the color name for that is: {Format.Bold(colorname)}.\nThe color hex is: {Format.Bold(colorhex)}.");
+                if (!regexColorCode.IsMatch(colorhex))
+                {
+                    /*  var username = Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.Username;
+                      await ReplyAsync($"The color hex did not process correctly {username}, try a different RGB value.");
+                      return; */
+                    var colorname = "No Name Found";
+                    var hexcolorcaps = "Hex Not Available";
+                    byte r = (byte)red;
+                    byte g = (byte)green;
+                    byte b = (byte)blue;
+                    var rgbvalue = new HextoRGB.RGB(r, g, b);
+                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    await ReplyAsync("", embed: embed);
+                }
+                else
+                {
+
+                    string cleanHex = colorhex.Replace("#", "0x"); // replace # with 0x for dictionary lookup
+                    var hexcolorcaps = colorhex.ToUpper();
+
+                    var cleanHexLower = cleanHex.ToLower();
+                    var colornamelower = HexColorDict.ColorName(cleanHexLower); // get color name
+
+                    if (colornamelower == null)
+                        colornamelower = "no name found";
+
+                    TextInfo text = new CultureInfo("en-US").TextInfo;
+                    var colorname = text.ToTitleCase(colornamelower);
+
+                    HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
+
+                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    await ReplyAsync("", embed: embed);
+                }
             }
             else
             {
@@ -97,8 +137,13 @@ namespace Siotrix.Discord.Developer
             var blue = Convert.ToString(rgbvalue.B); // Blue property
 
             if (colorname == null)
-            colorname = "No Name Found";
+                colorname = "No Name Found";
 
+            if (colorchoice == null)
+                colorchoice = "Colorchoice is empty";
+
+            if (colorhex == null)
+                colorhex = "No hex equivalent found.";
 
             var builder = new EmbedBuilder();
             builder.Title = $"Color Information for your inputted text of: {colorchoice}";
