@@ -23,11 +23,6 @@ namespace Siotrix.Discord.Developer
 
         private Stopwatch _timer = new Stopwatch();
 
-      /* protected override void BeforeExecute()
-        {
-            _timer.Start();
-        } */
-
         [Command("dantest")]
         public async Task Danstest()
         {
@@ -56,25 +51,43 @@ namespace Siotrix.Discord.Developer
 
                 var hexcolor = colorchoice.ToUpper();
 
-                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convery hex to an RGB value
+                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
-                var blue = Convert.ToString(rgbvalue.B); // Blue property                
+                var blue = Convert.ToString(rgbvalue.B); // Blue property  
+                
+                if(colorname == "Black")
+                {
+                    colorname = "Black (For Discord)";
+                    hexcolor = "#010101";
+                    rgbvalue.R = 1;
+                    rgbvalue.G = 1;
+                    rgbvalue.B = 1;
+                }
 
                 var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);                
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
             {               
-                var colorHex = HexColorDict.ColorHex(colorchoice).ToLower(); // look up hex in color name Dictionary
-                string cleanHex = colorHex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
+                var colorhex = HexColorDict.ColorHex(colorchoice).ToLower(); // look up hex in color name Dictionary
+                string cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
 
                 TextInfo text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colorchoice);
 
-                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanHex); // convert hex to RGB value
+                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanhex); // convert hex to RGB value
 
-                var embed = GetEmbed(colorname, colorname, cleanHex, rgbvalue);
+                if (colorname == "Black")
+                {
+                    colorname = "Black (For Discord)";
+                    cleanhex = "#010101";
+                    rgbvalue.R = 1;
+                    rgbvalue.G = 1;
+                    rgbvalue.B = 1;
+                }
+
+                var embed = GetEmbed(colorname, colorname, cleanhex, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
             else if (regexRGBCode.IsMatch(colorchoice))
@@ -117,6 +130,15 @@ namespace Siotrix.Discord.Developer
                     var colorname = text.ToTitleCase(colornamelower);
 
                     HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
+
+                    if (colorname == "Black")
+                    {
+                        colorname = "Black (For Discord)";
+                        hexcolorcaps = "#010101";
+                        rgbvalue.R = 1;
+                        rgbvalue.G = 1;
+                        rgbvalue.B = 1;
+                    }
 
                     var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
