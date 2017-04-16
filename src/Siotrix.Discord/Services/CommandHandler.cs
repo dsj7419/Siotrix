@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Siotrix.Discord.Readers;
+using Discord.Addons.InteractiveCommands;
 
 namespace Siotrix.Discord
 {
@@ -27,6 +28,7 @@ namespace Siotrix.Discord
         {
             _client = client;
             _map = map;
+            _map.Add(new InteractiveService(_client));
         }
 
         public async Task StartAsync()

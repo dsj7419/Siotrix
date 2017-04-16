@@ -20,7 +20,6 @@ namespace Siotrix.Discord
         // General
         private GlobalErrorHandler _handler;
         private CommandHandler _commands;
-        private InteractiveService Interactive;
 
         // Audio
         private AudioService _audio;
