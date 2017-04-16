@@ -29,7 +29,10 @@ namespace Siotrix.Discord
             _client = client;
             _map = map;
             _map.Add(new InteractiveService(_client));
+            client.JoinedGuild += Siotrix_JoinedGuild;
         }
+
+        public object Interactive { get; private set; }
 
         public async Task StartAsync()
         {
@@ -86,7 +89,7 @@ namespace Siotrix.Discord
                     var arr = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
                     if (arr == null || arr.ToList().Count <= 0)
                     {
-                        spec = "!"; 
+                        spec = "!";
                     }
                     else
                     {
@@ -121,12 +124,94 @@ namespace Siotrix.Discord
 
                     if (result is ExecuteResult r)
                         PrettyConsole.NewLine(r.Exception.ToString());
-                    else {
-                    var embed = new EmbedBuilder().WithColor(new Color(255, 0, 0)).WithTitle("**Error:**").WithDescription(result.ErrorReason);
-                    await context.Channel.SendMessageAsync("", false, embed.Build());
+                    else
+                    {
+                        var embed = new EmbedBuilder().WithColor(new Color(255, 0, 0)).WithTitle("**Error:**").WithDescription(result.ErrorReason);
+                        await context.Channel.SendMessageAsync("", false, embed.Build());
                     }
                 }
             }
+        }
+
+        private async Task Siotrix_JoinedGuild(SocketGuild guild)
+        {
+            var gowner = guild.Owner; // Get Guild owner of guild Siotrix just joined.
+
+            try
+            {
+                bool cansend = true;
+                foreach (var p in guild.DefaultChannel.PermissionOverwrites)
+                {
+                    if (p.Permissions.SendMessages == PermValue.Deny)
+                        cansend = false;
+                }
+
+                var builder = new EmbedBuilder()
+                 .WithAuthor(new EmbedAuthorBuilder()
+                 .WithIconUrl("https://i.imgur.com/3sc5OG3.png")
+                 .WithName("Siotrix Bot")
+                 .WithUrl("https://discord.gg/e6sku22"))
+                 .WithColor(new Color(1, 1, 1))
+                 .WithThumbnailUrl("http://img04.imgland.net/WyZ5FoM.png")
+                 .WithTitle($"Hi {guild.Name}!")
+                 .WithDescription($"Thank-You for inviting me to {guild.Name}! It's great to be here! I've already messaged {gowner.Username} about how to configure me, but I " +
+                                        "also have an extensive help system as well. I'm completely customizable to make me look however you want!")
+                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = "Live Support: ", Value = "https://discord.gg/e6sku22" })
+                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = "Invite me to another guild: ", Value = "https://discordapp.com/oauth2/authorize?client_id={application.Id}&scope=bot>" })
+                 .WithFooter(new EmbedFooterBuilder()
+                 .WithIconUrl("http://img04.imgland.net/WyZ5FoM.png")
+                 .WithText("A global bot with a local feel."))
+                 .WithTimestamp(DateTime.UtcNow);
+
+                if (!cansend)
+                {
+                    SocketTextChannel channel = null;
+                    bool pes = true;
+                    foreach (var cha in guild.TextChannels)
+                    {
+                        pes = true;
+                        foreach (var per in cha.PermissionOverwrites)
+                        {
+                            if (per.Permissions.SendMessages == PermValue.Deny)
+                            {
+                                pes = false;
+                                break;
+                            }
+                        }
+                        if (pes == true)
+                        {
+                            channel = cha;
+                            break;
+                        }
+                    }
+                    builder.AddField(new EmbedFieldBuilder() { IsInline = true, Name = ":sob:", Value = "I was not able to send this in the default Channel" });
+                    await channel.SendMessageAsync("", false, builder);
+                }
+                else
+                {
+                    await guild.DefaultChannel.SendMessageAsync("", false, builder);
+                }
+                PrettyConsole.NewLine($"Just joined {guild.Name} ({guild.Id}). Guild Owner: {gowner.Username}");
+            }
+            catch (Exception e)
+            {
+                PrettyConsole.NewLine($"GUILD JOIN ERROR: {e.ToString()}");
+            }
+
+
+            // Initiate Direct Message with guild owner to offer setup of Siotrix
+            /* var ownerdm = await gowner.CreateDMChannelAsync();
+             await ownerdm.SendMessageAsync($"Hi {gowner.Username}, I see you are the owner of {guild.Name}. Since you just invited me to your guild I wanted to see if you'd be interested in a quick interactive setup?\n\n" +
+                                                         "You can answer with a simple yes or no.");
+             var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+             if (response.Content == "no") return;
+
+             var appInfo = await _client.GetApplicationInfoAsync(); // Get app info of our bot
+             var channel = await appInfo.Owner.CreateDMChannelAsync(); // Get the DM channel with our app owner, create it if it doesn't exist
+
+
+             var msg = $"I just joined a guild: `{guild.Name}` ({guild.Id})";
+             await channel.SendMessageAsync(msg); // Send a new message in our DM channel */
         }
     }
 }
