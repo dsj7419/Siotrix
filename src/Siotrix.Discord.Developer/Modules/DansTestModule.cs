@@ -30,6 +30,7 @@ namespace Siotrix.Discord.Developer
         [Command("dantest")]
         public async Task Danstest([Remainder]string colorchoice)
         {
+            System.Console.WriteLine("2222222222222");
             var regexColorCode = new Regex("^#[a-fA-F0-9]{6}$");
             var regexRGBCode = new Regex("^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
 
