@@ -112,8 +112,9 @@ namespace Siotrix.Discord
 
             if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
+                System.Console.WriteLine("======={0}", _client.CurrentUser);
                 var result = await _service.ExecuteAsync(context, argPos, _map);
-
+                System.Console.WriteLine("111111111111");
                 if (!result.IsSuccess)
                 {
                     if (result.Error == CommandError.UnknownCommand)

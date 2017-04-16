@@ -271,8 +271,8 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(txt);
         }
 
-        [Command("info")]
-        [Summary("Will list Siotrix current info description.")]
+        [Command("description")]
+        [Summary("Will list Siotrix current description.")]
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task BotInfoAsync()
@@ -299,8 +299,8 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync(str);
         }
 
-        [Command("info")]
-        [Summary("Will set Siotrix info description.")]
+        [Command("description")]
+        [Summary("Will set Siotrix description.")]
         [Remarks("<text> - Add text for Siotrix information.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task BotInfoAsync([Remainder] string str)

@@ -8,39 +8,20 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Siotrix.Discord.Utility
-{    
-    [Name("Utility")]
+namespace Siotrix.Discord.Admin
+{
+    [Name("Admin")]
     [RequireContext(ContextType.Guild)]
-    [MinPermissions(AccessLevel.User)]
-    public class HelpModule : ModuleBase<SocketCommandContext>
+    [MinPermissions(AccessLevel.GuildAdmin)]
+    public class CsetModule : ModuleBase<SocketCommandContext>
     {
-
         private readonly CommandService _service;
         private readonly IDependencyMap _map;
 
-        public HelpModule(CommandService service, IDependencyMap map)
+        public CsetModule(CommandService service, IDependencyMap map)
         {
             _service = service;
             _map = map;
-        }
-
-        private string GetModuleNames()
-        {
-            var modules_text = "";
-            var modules = _service.Modules.Where(x => !x.Name.ICEquals("default")).GroupBy(p => p.Name).ToList();
-            if (modules.Any())
-            {
-                foreach (var module in modules)
-                {
-                    string tmptxt = $"`` {module.First().Name} `` , ";
-                    modules_text += tmptxt;
-                }
-
-                if (modules_text.TrimEnd().EndsWith(","))
-                    modules_text = modules_text.Truncate(2);
-            }
-            return modules_text;
         }
 
         private string GetGuildIconUrl()
@@ -234,38 +215,8 @@ namespace Siotrix.Discord.Utility
             return prefix;
         }
 
-        [Command("help")]
-        [Summary("Shows info about commands")]
-        [Remarks("help [module] [command]")]
-        public async Task Help()
-        {
-            string g_icon_url = GetGuildIconUrl();
-            string g_name = GetGuildName();
-            string g_url = GetGuildUrl();
-            Color g_color = GetGuildColor();
-            string g_thumbnail = GetGuildThumbNail();
-            string module_list = GetModuleNames();
-            string[] g_footer = GetGuildFooter();
-
-            var builder = new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
-                .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
-                .WithTimestamp(DateTime.UtcNow);
-
-            builder
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Modules"), Value = module_list });
-            await ReplyAsync("", embed: builder);
-        }
-
-        [Command("help")]
-        public async Task Help(string predicate)
+        [Command("cset")]
+        public async Task Cset(string module_name)
         {
             string g_icon_url = GetGuildIconUrl();
             string g_name = GetGuildName();
@@ -276,13 +227,6 @@ namespace Siotrix.Discord.Utility
             string group_commands = null;
             string commands = null;
             string g_prefix = GetGuildPrefix();
-            string sub_commands = null;
-            string summary = null;
-            string remark = null;
-            bool has_group = false;
-            string element_summary_remark_list = null;
-            string buffer_data = "";
-            int element_index = 0;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -296,29 +240,26 @@ namespace Siotrix.Discord.Utility
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
-            var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
-            var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
-
-            if(isMod && !isCommand)
+            var isMod = _service.Modules.Any(x => x.Name.ICEquals(module_name));
+            var isCommand = _service.Commands.Any(x => x.Name.ICEquals(module_name));
+            if (isMod && !isCommand)
             {
-                var modules = _service.Modules.Where(x => x.Name.ICEquals(predicate));
-                System.Console.WriteLine(">>>>>>>>>>{0}======={1}------{2}", isMod, isCommand, modules.Count());
+                var modules = _service.Modules.Where(x => x.Name.ICEquals(module_name));
                 foreach (var module in modules)
                 {
                     bool is_group = module.Aliases.First().Any();
                     if (is_group)
-                    {
-                        group_commands += $"**• {module.Aliases.First()}**" + $" - {module.Summary}\n";
-                    }
+                        group_commands += $"`` {module.Aliases.First()} ``" + ", ";
                     else
                     {
-                        foreach (var cmd in module.Commands.GroupBy(p => p.Name))
+                        foreach (var cmd in module.Commands)
                         {
-                            commands += $"`` {cmd.First().Name} ``" + " , ";
+                            commands += $"`` {cmd.Name} ``" + ", ";
                         }
                     }
                 }
-
+                if (group_commands.TrimEnd().EndsWith(","))
+                    group_commands = group_commands.Truncate(2);
                 if (commands.TrimEnd().EndsWith(","))
                     commands = commands.Truncate(2);
 
@@ -338,90 +279,110 @@ namespace Siotrix.Discord.Utility
                         x.Value = $"{commands}";
                     });
             }
-            else if (!isMod && isCommand)
-            {
-                System.Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
-                var command = _service.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
-                has_group = command.Module.Aliases.First().Any();
-                string group_name = command.Module.Aliases.First() + " ";
-                var list = command.Module.Commands.Where(p => p.Name.Equals(predicate)).ToList();
-                if (list.Count > 1)
-                {
-                    foreach(var ele in list)
-                    {
-                        element_index++;
-                        string cmd_name = ele.Name + " ";
-                        if (!has_group)
-                        {
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {g_prefix}{cmd_name}{ele.Remarks}```\n";
-                        }
-                        else
-                        {
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {g_prefix}{group_name}{cmd_name}{ele.Remarks}```\n";
-                        }
-                            
-                    }
-                    builder
-                    .AddField(x =>
-                    {
-                        x.Name = Format.Underline($"{command.Name}");
-                        x.Value = $"{element_summary_remark_list}";
-                    });
-                }
-                else
-                {
-                    summary = $"**{command.Summary}**";
-                    if (!has_group)
-                    {
-                        remark = $"```Usage : {g_prefix}{command.Name}{command.Remarks}```";
-                    }
-                    else
-                    {
-                        remark = $"```Usage : {g_prefix}{group_name}{command.Name}{command.Remarks}```";
-                    }
-                    builder
-                        .AddField(x =>
-                        {
-                            x.Name = Format.Underline($"{command.Name}");
-                            x.Value = $"{summary}\n" + $"{remark}";
-                        });
-                }
-                
-            }
-            else // isMod = false && isCommand = false
-            {
-                foreach(var item in _service.Modules)
-                {
-                    bool exist_group = item.Aliases.First().Any();
-                    if (!exist_group)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if (predicate.ICEquals(item.Aliases.First()))
-                        {
-                            foreach (var sub_cmd in item.Commands)
-                            {
-                                if (!buffer_data.Equals(sub_cmd.Name))
-                                {
-                                    buffer_data = sub_cmd.Name;
-                                    sub_commands += $"``{buffer_data}``" + " , ";
-                                }
-                            }
-                        }
-                    }
-                }
-                if (sub_commands.TrimEnd().EndsWith(","))
-                    sub_commands =  sub_commands.Truncate(2);
-                builder
-                  .AddField(x =>
-                  {
-                      x.Name = Format.Underline($"{predicate}");
-                      x.Value = $"{sub_commands}";
-                  });
-            }
             await ReplyAsync("", embed: builder);
         }
+
+        [Command("cset")]
+        public async Task Cset(string command, [Remainder]string str)
+        {
+            string g_icon_url = GetGuildIconUrl();
+            string g_name = GetGuildName();
+            string g_url = GetGuildUrl();
+            Color g_color = GetGuildColor();
+            string g_thumbnail = GetGuildThumbNail();
+            string[] g_footer = GetGuildFooter();
+            string g_prefix = GetGuildPrefix();
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(g_color)
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+            bool is_found = _service.Commands.Where(p => p.Name.Equals(command)).Any();
+            if (is_found)
+            {
+                string toggle = str.Substring(0, 6);
+                if (toggle.Equals("toggle") && str.Length < 7)
+                {
+                    using (var db = new LogDatabase())
+                    {
+                        try
+                        {
+                            var val = new DiscordCset();
+                            val.Name = command;
+                            val.GuildId = Context.Guild.Id.ToLong();
+                            val.ChannelId = 0;
+                            val.Status = 1;
+                            db.Gcsets.Add(val);
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
+                    await ReplyAsync("👍");
+                }
+            }
+        }
+
+       /* [Command("cset")]
+        public async Task Cset(string command, [Remainder]string toggle_channel, string channel_name)
+        {
+            string g_icon_url = GetGuildIconUrl();
+            string g_name = GetGuildName();
+            string g_url = GetGuildUrl();
+            Color g_color = GetGuildColor();
+            string g_thumbnail = GetGuildThumbNail();
+            string[] g_footer = GetGuildFooter();
+            string g_prefix = GetGuildPrefix();
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(g_color)
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+            bool is_found = _service.Commands.Where(p => p.Name.Equals(command)).Any();
+            if (is_found)
+            {
+                if (toggle_channel.Equals("togglechannel"))
+                {
+                    string name = "#" + Context.Message.Channel.Name;
+                    if (channel_name.Equals(name))
+                    {
+                        using (var db = new LogDatabase())
+                        {
+                            try
+                            {
+                                var val = new DiscordCset();
+                                val.Name = command;
+                                val.GuildId = Context.Guild.Id.ToLong();
+                                val.ChannelId = Context.Message.Channel.Id.ToLong();
+                                val.Status = 2;
+                                db.Gcsets.Add(val);
+                                db.SaveChanges();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
+                        }
+                        await ReplyAsync("👍");
+                    }
+                }
+            }
+        }*/
     }
 }

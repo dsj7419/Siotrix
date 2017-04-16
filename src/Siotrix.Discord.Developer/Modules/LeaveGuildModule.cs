@@ -11,7 +11,7 @@ namespace Siotrix.Discord.Developer
     [MinPermissions(AccessLevel.BotOwner)]
     public class LeaveGuildModule : ModuleBase<SocketCommandContext>
     {
-        [Command("kick")]
+        [Command("guildkick")]
         [Summary("Instructs the bot to leave a Guild specified by a developer.")]
         [Remarks("<GuildID> <text> - include a brief reason why you are making the bot quit that guild.")]
         public async Task LeaveGuildAsync(ulong ID, [Remainder] string msg)
@@ -49,7 +49,7 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync("Needs to be developed still");
         }
 
-        [Command("ban")]
+        [Command("guildban")]
         [Summary("Bans bot from guild, and makes it quit immediately.")]
         [Remarks("<GuildID> <text> - brief description why the ban is happening.")]
         public async Task BanGuildAsync(ulong ID, [Remainder] string msg)
