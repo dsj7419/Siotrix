@@ -282,8 +282,8 @@ namespace Siotrix.Discord.Admin
             await ReplyAsync("", embed: builder);
         }
 
-        /*[Command("cset")]
-        public async Task Cset(string command, [Remainder]string status_name)
+        [Command("cset")]
+        public async Task Cset(string command, [Remainder]string str)
         {
             string g_icon_url = GetGuildIconUrl();
             string g_name = GetGuildName();
@@ -304,25 +304,74 @@ namespace Siotrix.Discord.Admin
                 .WithIconUrl(g_footer[0])
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            foreach(var cmd in _service.Commands)
+            bool is_found = _service.Commands.Where(p => p.Name.Equals(command)).Any();
+            if (is_found)
             {
-                if (cmd.Name.ICEquals(command))
+                string toggle = str.Substring(0, 6);
+                if (toggle.Equals("toggle") && str.Length < 7)
                 {
-                    if (status_name.Equals("toggle"))
+                    using (var db = new LogDatabase())
                     {
-                        using (var db = new LogDatabase())
+                        try
                         {
                             var val = new DiscordCset();
                             val.Name = command;
                             val.GuildId = Context.Guild.Id.ToLong();
-                            val.ChannelId = Context.Guild.ch
+                            val.ChannelId = 0;
+                            val.Status = 1;
+                            db.Gcsets.Add(val);
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
+                    await ReplyAsync("👍");
+                }
+            }
+        }
+
+       /* [Command("cset")]
+        public async Task Cset(string command, [Remainder]string toggle_channel, string channel_name)
+        {
+            string g_icon_url = GetGuildIconUrl();
+            string g_name = GetGuildName();
+            string g_url = GetGuildUrl();
+            Color g_color = GetGuildColor();
+            string g_thumbnail = GetGuildThumbNail();
+            string[] g_footer = GetGuildFooter();
+            string g_prefix = GetGuildPrefix();
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(g_color)
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+            bool is_found = _service.Commands.Where(p => p.Name.Equals(command)).Any();
+            if (is_found)
+            {
+                if (toggle_channel.Equals("togglechannel"))
+                {
+                    string name = "#" + Context.Message.Channel.Name;
+                    if (channel_name.Equals(name))
+                    {
+                        using (var db = new LogDatabase())
+                        {
                             try
                             {
-                                var arr = db.Gcsets;
-                                if (arr == null || arr.ToList().Count <= 0)
-                                {
-                                    db.Gfooters.Add(val);
-                                }
+                                var val = new DiscordCset();
+                                val.Name = command;
+                                val.GuildId = Context.Guild.Id.ToLong();
+                                val.ChannelId = Context.Message.Channel.Id.ToLong();
+                                val.Status = 2;
+                                db.Gcsets.Add(val);
                                 db.SaveChanges();
                             }
                             catch (Exception e)
@@ -330,18 +379,10 @@ namespace Siotrix.Discord.Admin
                                 Console.WriteLine(e);
                             }
                         }
+                        await ReplyAsync("👍");
                     }
                 }
             }
-            
-                    builder
-                    .AddField(x =>
-                    {
-                        x.Name = command;
-                        x.Value = $"{module_name}";
-                    });
-            
-            await ReplyAsync("", embed: builder);
         }*/
     }
 }

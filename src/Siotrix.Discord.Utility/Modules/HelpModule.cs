@@ -280,9 +280,7 @@ namespace Siotrix.Discord.Utility
             string summary = null;
             string remark = null;
             bool has_group = false;
-            string summary_remark_list = null;
             string element_summary_remark_list = null;
-            int index = 0;
             string buffer_data = "";
             int element_index = 0;
 
