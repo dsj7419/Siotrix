@@ -4,7 +4,6 @@ using Siotrix.Discord.Audio;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Statistics;
 using System.Threading.Tasks;
-using Discord.Addons.InteractiveCommands;
 
 namespace Siotrix.Discord
 {
