@@ -554,6 +554,7 @@ namespace Siotrix.Discord.Admin
                 if (param.Equals("toggled"))
                 {
                     string list = GetDisableCommmands();
+                    if (list == null) list = "None";
                     builder = new EmbedBuilder();
                     builder
                         .AddField(x =>

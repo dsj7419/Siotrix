@@ -82,7 +82,7 @@ namespace Siotrix.Discord
             if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return null;
 
             if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return null;
-            Console.WriteLine("^^^^^^^{0}`````````{1}***{2}", endPos, text[endPos], text.Length);
+           // Console.WriteLine("^^^^^^^{0}`````````{1}***{2}", endPos, text[endPos], text.Length);
             string value = text.Substring(endPos + 2, text.Length - text.Substring(0, endPos + 1).Length - 1);
             return value;
         }
@@ -187,7 +187,7 @@ namespace Siotrix.Discord
                 || msg.Content.Trim()[1] == '?'
                 || (!(msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
                 return;
-            Console.WriteLine("////////////////////////" + context.Channel.Name);
+           // Console.WriteLine("////////////////////////" + context.Channel.Name);
             if(msg.HasStringPrefix(spec, ref argPos))
             {
                 content = ParseStringPrefix(msg, spec);
