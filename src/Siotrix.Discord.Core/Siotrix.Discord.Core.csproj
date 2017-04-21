@@ -7,9 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Addons.EmojiTools" Version="1.1.0-ci-00017" />
+    <PackageReference Include="Discord.Addons.EmojiTools" Version="1.2.1" />
     <PackageReference Include="Discord.Addons.InteractiveCommands" Version="1.2.2" />
-    <PackageReference Include="Discord.Net" Version="1.0.0-rc2-00699" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc2-00701" />
+    <PackageReference Include="ImageSharp" Version="1.0.0-alpha6-00065" />
   </ItemGroup>
 
   <ItemGroup>
