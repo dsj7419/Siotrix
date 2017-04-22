@@ -37,7 +37,7 @@ namespace Siotrix.Discord.Developer
                  var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
                  if (response.Content == "cancel") return;            
 
-                 string colorchoice = response.Content;           
+                 string colorchoice = response.Content.ToLower();           
         
                  _timer.Start();
         
@@ -72,7 +72,7 @@ namespace Siotrix.Discord.Developer
                 var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);                
             }
-            else if (HexColorDict.colorHex.ContainsKey(colorchoice.ToLower()))
+            else if (HexColorDict.colorHex.ContainsKey(colorchoice))
             {               
                 var colorhex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
                 string cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format

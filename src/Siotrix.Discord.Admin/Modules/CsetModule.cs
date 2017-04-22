@@ -11,7 +11,7 @@ using System.Collections;
 
 namespace Siotrix.Discord.Admin
 {
-    [Name("Admin")]
+    [Name("Admin")]    
     [RequireContext(ContextType.Guild)]
     [MinPermissions(AccessLevel.GuildAdmin)]
     public class CsetModule : ModuleBase<SocketCommandContext>
@@ -427,7 +427,7 @@ namespace Siotrix.Discord.Admin
                     var is_found_cmd = db.Gtoggles.Where(p => p.CommandName.Equals(cmd) && p.GuildId.Equals(Context.Guild.Id.ToLong())).Any();
                     if (is_found_cmd)
                     {
-                        toggle_found += "***- Status*** : " + "**Toggles off** in this guild";
+                        toggle_found += "***- Status*** : " + "**Toggled off** in this guild";
                     }
                     else
                     {
@@ -440,11 +440,11 @@ namespace Siotrix.Discord.Admin
                             }
                             if (channels.TrimEnd().EndsWith("and"))
                                 channels = channels.Truncate(4);
-                            toggle_found += "***- Status*** : " + "**Toggles off** in " + channels;
+                            toggle_found += "***- Status*** : " + "**Toggled off** in " + channels;
                         }
                         else
                         {
-                            toggle_found += "***- Status*** : " + "**Toggles on** in this guild";
+                            toggle_found += "***- Status*** : " + "**Toggled on** in this guild";
                         }
                     }
                 }
@@ -457,6 +457,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("cset")]
+        [Summary("command turn on or off globally or for a channel")]
+        [Remarks("<command> toggle (optional:#Channelname)")]
         public async Task Cset(string command, [Remainder]string str)
         {
             string g_icon_url = GetGuildIconUrl();
@@ -491,11 +493,11 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine("========{0}", toggle_on);
                     if (toggle_on)
                     {
-                        await ReplyAsync($"✅ : Toggles ***{command}*** command **on** in this guild !");
+                        await ReplyAsync($"✅ : Toggled ***{command}*** command **on** in this guild !");
                     }
                     else
                     {
-                        await ReplyAsync($"✖️ : Toggles ***{command}*** command **off** in this guild !");
+                        await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in this guild !");
                     }
                 }
             }
@@ -516,15 +518,15 @@ namespace Siotrix.Discord.Admin
                             Console.WriteLine("========{0}", toggle_channel_status);
                             if (toggle_channel_status == 1)
                             {
-                                await ReplyAsync($"📣 : You need to toggle it on first because ***{command}*** command **toggles off** in this guild !");
+                                await ReplyAsync($"📣 : ***{command}*** command **toggled off** in this guild. Please toggle on globally first!");
                             }
                             else if (toggle_channel_status == 2)
                             {
-                                await ReplyAsync($"✅ : Toggles ***{command}*** command **on** in {channel_name} channel !");
+                                await ReplyAsync($"✅ : Toggled ***{command}*** command **on** in {channel_name}!");
                             }
                             else if (toggle_channel_status == 3)
                             {
-                                await ReplyAsync($"✖️ : Toggles ***{command}*** command **off** in {channel_name} channel !");
+                                await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in {channel_name}!");
                             }
                             //await ReplyAsync("✅✖️✔️📪📣🔥🌿🍃🌱⚡❄☁💧💦⭕🐛🌟💫✨💢🎵");
                         }
@@ -534,6 +536,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("cset")]
+        [Summary("List current status of commands turned off in this guild.")]
+        [Remarks("toggled - must be that word exactly.")]
         public async Task Cset(string param)
         {
             string g_icon_url = GetGuildIconUrl();

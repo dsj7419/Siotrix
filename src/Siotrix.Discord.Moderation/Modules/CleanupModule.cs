@@ -21,7 +21,13 @@ namespace Siotrix.Discord.Moderation
         public async Task CleanAsync()
         {
             var self = Context.Guild.CurrentUser;
-            var messages = (await GetMessageAsync(10)).Where(x => x.Author.Id == (ulong)self.Id);
+            var messages = (await GetMessageAsync(10)).Where(x => x.Author.Id == self.Id);
+
+            if (self.GetPermissions(Context.Channel as SocketGuildChannel).ManageMessages)
+                await DeleteMessagesAsync(messages);
+            else
+                foreach (var msg in messages)
+                    await msg.DeleteAsync();
 
             await DeleteMessagesAsync(messages);
             await ReplyAsync($"Deleted **{messages.Count()}** messages(s).");

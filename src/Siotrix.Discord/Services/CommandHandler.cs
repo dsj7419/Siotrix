@@ -204,12 +204,12 @@ namespace Siotrix.Discord
                 {
                     if (data.Equals("all"))
                     {
-                        await context.Channel.SendMessageAsync($"📣 : You can't use it because ***{words[0]}*** command **is toggles off** in this guild !");
+                        await context.Channel.SendMessageAsync($"📣 : Unable to use: ***{words[0]}*** command **is toggled off** in this guild !");
                         return;
                     }
                     else
                     {
-                        await context.Channel.SendMessageAsync($"📣 : You can't use it because ***{words[0]}*** command **is toggles off** in ``#{data}`` channel!");
+                        await context.Channel.SendMessageAsync($"📣 : Unable to use: ***{words[0]}*** command **is toggled off** in ``#{data}`` channel!");
                         return;
                     }
                 }
