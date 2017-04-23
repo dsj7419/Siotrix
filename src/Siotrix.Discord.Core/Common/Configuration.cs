@@ -49,5 +49,6 @@ namespace Siotrix.Discord
     public class AuthTokens
     {
         public string Discord { get; set; } = "";
+        public string StackoverflowToken { get; set; } = "";
     }
 }
