@@ -23,6 +23,7 @@ namespace Siotrix.Discord
         private DiscordSocketClient _client;
         private CommandService _service;
         private DependencyMap _map;
+        private int error = 0;
 
         public CommandHandler(DiscordSocketClient client, DependencyMap map)
         {
@@ -152,6 +153,138 @@ namespace Siotrix.Discord
             return modules_text;
         }
 
+        public EmbedBuilder GetCommandHelp(string predicate, EmbedBuilder builder, string prefix)
+        {
+            string commands = null;
+            string sub_commands = null;
+            string summary = null;
+            string remark = null;
+            bool has_group = false;
+            string element_summary_remark_list = null;
+            string buffer_data = "";
+            int element_index = 0;
+            bool exist_group = false;
+
+            var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
+            var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
+
+            if (isMod && !isCommand)
+            {
+                commands = GetHelpModule();
+                builder
+                    .AddField(x =>
+                    {
+                        x.Name = Format.Underline("Help");
+                        x.Value = $"{commands}";
+                    });
+                error = 2;
+            }
+            else if (!isMod && isCommand)
+            {
+                System.Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
+                var command = _service.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
+                has_group = command.Module.Aliases.First().Any();
+                string group_name = command.Module.Aliases.First() + " ";
+                var list = command.Module.Commands.Where(p => p.Name.Equals(predicate)).ToList();
+                if (list.Count > 1)
+                {
+                    foreach (var ele in list)
+                    {
+                        element_index++;
+                        string cmd_name = ele.Name + " ";
+                        if (!has_group)
+                        {
+                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{cmd_name}{ele.Remarks}```\n";
+                        }
+                        else
+                        {
+                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{group_name}{cmd_name}{ele.Remarks}```\n";
+                        }
+
+                    }
+                    builder
+                    .AddField(x =>
+                    {
+                        x.Name = Format.Underline($"{command.Name}");
+                        x.Value = $"{element_summary_remark_list}";
+                    });
+                }
+                else
+                {
+                    summary = $"**{command.Summary}**";
+                    if (!has_group)
+                    {
+                        remark = $"```Usage : {prefix}{command.Name}{command.Remarks}```";
+                    }
+                    else
+                    {
+                        remark = $"```Usage : {prefix}{group_name}{command.Name}{command.Remarks}```";
+                    }
+                    builder
+                        .AddField(x =>
+                        {
+                            x.Name = Format.Underline($"{command.Name}");
+                            x.Value = $"{summary}\n" + $"{remark}";
+                        });
+                }
+                error = 3;
+            }
+            else // isMod = false && isCommand = false
+            {
+                var list = _service.Modules.Where(p => p.Aliases.First().Equals(predicate));
+                if (list.Any())
+                {
+                    foreach(var sub_command in list.First().Commands)
+                    {
+                        if (!buffer_data.Equals(sub_command.Name))
+                        {
+                            buffer_data = sub_command.Name;
+                            sub_commands += $"``{buffer_data}``" + " , ";
+                        }
+                    }
+                    error = 4;
+                }
+                else
+                {
+                    predicate = "Help";
+                    sub_commands = GetHelpModule();
+                    error = 1;
+                }
+                if (sub_commands.TrimEnd().EndsWith(","))
+                    sub_commands = sub_commands.Truncate(2);
+                builder
+                  .AddField(x =>
+                  {
+                      x.Name = Format.Underline($"{predicate}");
+                      x.Value = $"{sub_commands}";
+                  });
+            }
+            return builder;
+        }
+
+        private string GetReasonResult(int err)
+        {
+            string result = null;
+            switch (err)
+            {
+                case 1:
+                    result = "Unknown Command";
+                    break;
+                case 2:
+                    result = "This is Module Name. Please Input again!";
+                    break;
+                case 3:
+                    result = "This command need some parameters.";
+                    break;
+                case 4:
+                    result = "You can use together with sub-commands because this is group command.";
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        }
+
         private async Task HandleCommandAsync(SocketMessage s)
         {
             var msg = s as SocketUserMessage;
@@ -217,17 +350,12 @@ namespace Siotrix.Discord
                 if (!result.IsSuccess)
                 {
                     var embed = new EmbedBuilder();
-                    if (result.Error == CommandError.UnknownCommand)
-                    {
-                        string help = GetHelpModule();
-                        embed.AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Help"), Value = help });
-                        //await context.Channel.SendMessageAsync("Command not recognized");
-                    }
-
+                    GetCommandHelp(words[0], embed, spec);
+                    string reason = GetReasonResult(error);
                     if (result is ExecuteResult r)
                         PrettyConsole.NewLine(r.Exception.ToString());
                     else 
-                        embed.WithColor(new Color(255, 0, 0)).WithTitle("**Error:**").WithDescription(result.ErrorReason);
+                        embed.WithColor(new Color(255, 0, 0)).WithTitle("**Error:**").WithDescription(reason);
                     await context.Channel.SendMessageAsync("", false, embed.Build());
                 }
             }
