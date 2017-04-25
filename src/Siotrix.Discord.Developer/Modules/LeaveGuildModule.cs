@@ -77,7 +77,7 @@ namespace Siotrix.Discord.Developer
             await ReplyAsync($"Message has been sent and I've left the guild forever! {gld.Name}");
         }
 
-        [Command("unban")]
+        [Command("guildunban")]
         [Summary("Un-bans bot from guild, allowing guild to re-invite Siotrix.")]
         [Remarks("<Id> - ID number in the ban list of the guild you want to unban.")]
         public async Task UnbanGuildAsync(int ID)
