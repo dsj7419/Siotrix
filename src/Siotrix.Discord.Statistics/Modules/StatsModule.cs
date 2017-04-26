@@ -121,91 +121,6 @@ namespace Siotrix.Discord.Statistics
             return url;
         }
 
-        private Color GetGuildColor()
-        {
-            var guild_id = Context.Guild.Id;
-            int id = 0;
-            byte rColor = 0;
-            byte gColor = 0;
-            byte bColor = 0;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                    {
-                        id = 15;
-                    }
-                    else
-                    {
-                        id = val.First().ColorId;
-                    }
-                    var col_value = db.Colorinfos.Where(y => y.Id == id).First();
-                    rColor = Convert.ToByte(col_value.RedParam);
-                    gColor = Convert.ToByte(col_value.GreenParam);
-                    bColor = Convert.ToByte(col_value.BlueParam);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return new Color(rColor, gColor, bColor);
-        }
-
-        private string GetGuildThumbNail()
-        {
-            var guild_id = Context.Guild.Id;
-            string thumbnail_url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                    {
-                        thumbnail_url = "http://img04.imgland.net/WyZ5FoM.png";
-                    }
-                    else
-                    {
-                        thumbnail_url = val.First().ThumbNail;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return thumbnail_url;
-        }
-
-        private string GetGuildPrefix()
-        {
-            var guild_id = Context.Guild.Id;
-            string prefix = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                    {
-                        prefix = "!";
-                    }
-                    else
-                    {
-                        prefix = val.First().Prefix;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return prefix;
-        }
-
         private string[] GetGuildFooter(int id)
         {
             var guild_id = Context.Guild.Id;
@@ -726,10 +641,10 @@ namespace Siotrix.Discord.Statistics
             string g_icon_url = GetGuildIconUrl(0);
             string g_name = GetGuildName(0);
             string g_url = GetGuildUrl(0);
-            Color g_color = GetGuildColor();
-            string g_thumbnail = GetGuildThumbNail();
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
             string[] g_footer = GetGuildFooter(0);
-            string g_prefix = GetGuildPrefix();
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
             string[] m_count = GetLifeTimeMessagesPerGuild();
             string active_channel = GetActivityChannelPerGuild();
             int delete_msg_per_guild = GetDeleteMessagesPerGuild();
@@ -784,10 +699,10 @@ namespace Siotrix.Discord.Statistics
             string g_icon_url = GetGuildIconUrl(id);
             string g_name = GetGuildName(id);
             string g_url = GetGuildUrl(id);
-            Color g_color = GetGuildColor();
-            string g_thumbnail = GetGuildThumbNail();
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
             string[] g_footer = GetGuildFooter(id);
-            string g_prefix = GetGuildPrefix();
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
             string[] m_count = GetLifeTimeMessagesPerUser(person);
             int[] m_stats_count = GetStatsMessagesPerUser(person);
             string active_channel = GetActivityChannelPerUser(person);

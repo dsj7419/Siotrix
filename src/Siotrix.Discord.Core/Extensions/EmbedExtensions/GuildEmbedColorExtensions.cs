@@ -1,0 +1,53 @@
+﻿using Discord;
+using Discord.Commands;
+using System;
+using System.Globalization;
+using System.Linq;
+
+namespace Siotrix.Discord
+{
+
+    public static partial class GuildEmbedColorExtensions
+    {
+        public static Color GetGuildColor(this SocketCommandContext context)
+        {
+            string SIOTRIX_COLOR = "0x010101";
+            var guild_id = context.Guild.Id;
+            string colorHex = null;
+      //      uint color;
+
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0)
+                    {
+                        var instance = new DiscordColor();
+                        instance.ColorHex = SIOTRIX_COLOR;
+                        instance.GuildId = guild_id.ToLong();
+                        db.Gcolors.Add(instance);
+                        db.SaveChanges();
+                        colorHex = SIOTRIX_COLOR;
+                    }
+                    else
+                    {
+                        colorHex = val.First().ColorHex;
+                        if(colorHex == "0x000000")
+                        {
+                            colorHex = "0x010101";
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+
+           // colorHex = colorHex.Substring(2);
+         //  bool parsedSuccessfully =  uint.TryParse(colorHex, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out color);
+             return new Color(Convert.ToUInt32(colorHex, 16));
+        }
+    }
+}
