@@ -555,7 +555,7 @@ namespace Siotrix.Discord.Admin
             string currentHexColor = currentStringColor.Replace("0x", "#").ToUpper();
             var guild_id = Context.Guild.Id;
 
-            await ReplyAsync($"Give me any value of color (Hex, RGB, or a name) to set your guild color.\nYour Current Guild Hex Code is:{Format.Bold(currentGColor.ToString())} {Format.Bold(currentStringColor)} {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
+            await ReplyAsync($"Give me any value of color (Hex, RGB, or a name) to set your guild color.\nYour Current Guild Hex Code is: {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
             var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
             if (response.Content == "cancel") return;
 
@@ -565,17 +565,11 @@ namespace Siotrix.Discord.Admin
             {
                 var colornamelower = HexColorDict.ColorName(currentStringColor); //look up hex in dictionary
 
-                Console.WriteLine($"1. {colornamelower}");
-
                 if (colornamelower == null)
                     colornamelower = "no name found";
 
-                Console.WriteLine($"2. {colornamelower}");
-
                 TextInfo text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
-
-                Console.WriteLine($"3. {colornamelower}");
 
                 HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(currentHexColor); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
