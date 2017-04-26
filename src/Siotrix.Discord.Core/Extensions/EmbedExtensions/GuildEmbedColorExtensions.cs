@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using System;
-using System.Globalization;
 using System.Linq;
 
 namespace Siotrix.Discord
@@ -14,7 +13,6 @@ namespace Siotrix.Discord
             string SIOTRIX_COLOR = "0x010101";
             var guild_id = context.Guild.Id;
             string colorHex = null;
-      //      uint color;
 
             using (var db = new LogDatabase())
             {
@@ -44,10 +42,7 @@ namespace Siotrix.Discord
                     Console.WriteLine(e);
                 }
             }
-
-           // colorHex = colorHex.Substring(2);
-         //  bool parsedSuccessfully =  uint.TryParse(colorHex, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out color);
-             return new Color(Convert.ToUInt32(colorHex, 16));
+              return new Color(Convert.ToUInt32(colorHex, 16));
         }
     }
 }
