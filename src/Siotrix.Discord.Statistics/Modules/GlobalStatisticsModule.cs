@@ -11,7 +11,7 @@ namespace Siotrix.Discord.Statistics
     [MinPermissions(AccessLevel.User)]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
-        [Command("testinfo")]
+  /*      [Command("testinfo")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public Task GlobalDataAsync()
         {
@@ -50,8 +50,8 @@ namespace Siotrix.Discord.Statistics
                                         ChannelName = x.Select(y => y.ChannelName).First()
                                     });
                 var guild_id = Context.Guild.Id;
-                var color_query = (from t1 in db.Gcolors join t2 in db.Colorinfos on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
-                                   select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam });
+      //          var color_query = (from t1 in db.Gcolors join t2 in db.Colorinfos on t1.ColorId equals t2.Id where t1.GuildId == guild_id.ToLong()
+        //                           select new { r = t2.RedParam, g = t2.GreenParam, b = t2.BlueParam });
                 byte rColor = 0;
                 byte gColor = 0;
                 byte bColor = 0;
@@ -245,7 +245,7 @@ namespace Siotrix.Discord.Statistics
                          };
                      });*/
 
-                var builder = new EmbedBuilder()
+          /*      var builder = new EmbedBuilder()
                     .WithTitle("Statistics Data")
                     .WithColor(new Color(rColor, gColor, bColor))
                     .WithDescription(desc_query.Description)
@@ -419,6 +419,6 @@ namespace Siotrix.Discord.Statistics
                 builder.WithFooter(new EmbedFooterBuilder().WithIconUrl(footer_query.FooterIcon).WithText(footer_query.FooterText)).WithTimestamp(DateTime.UtcNow);
                 return ReplyAsync("", embed: builder);
             }
-        }
-    }
-}
+        } */
+    } 
+} 

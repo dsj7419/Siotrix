@@ -120,40 +120,7 @@ namespace Siotrix.Discord.Statistics
             }
             return url;
         }
-
-        private Color GetGuildColor()
-        {
-            var guild_id = Context.Guild.Id;
-            int id = 0;
-            byte rColor = 0;
-            byte gColor = 0;
-            byte bColor = 0;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                    {
-                        id = 15;
-                    }
-                    else
-                    {
-                        id = val.First().ColorId;
-                    }
-                    var col_value = db.Colorinfos.Where(y => y.Id == id).First();
-                    rColor = Convert.ToByte(col_value.RedParam);
-                    gColor = Convert.ToByte(col_value.GreenParam);
-                    bColor = Convert.ToByte(col_value.BlueParam);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return new Color(rColor, gColor, bColor);
-        }
-
+    
         private string GetGuildThumbNail()
         {
             var guild_id = Context.Guild.Id;
@@ -247,32 +214,6 @@ namespace Siotrix.Discord.Statistics
                 }
             }
             return footer;
-        }
-
-        private string GetGuildPrefix()
-        {
-            var guild_id = Context.Guild.Id;
-            string prefix = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                    {
-                        prefix = "!";
-                    }
-                    else
-                    {
-                        prefix = val.First().Prefix;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return prefix;
         }
 
         private bool CheckBot(SocketUser user)
@@ -369,11 +310,11 @@ namespace Siotrix.Discord.Statistics
             string g_icon_url = GetGuildIconUrl(0);
             string g_name = GetGuildName(0);
             string g_url = GetGuildUrl(0);
-            Color g_color = GetGuildColor();
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             string g_thumbnail = GetGuildThumbNail();
             string g_description = GetGuildDescription(0);
             string[] g_footer = GetGuildFooter(0);
-            string g_prefix = GetGuildPrefix();
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
 
             DateTime dt = new DateTime(Context.Guild.CreatedAt.Year, Context.Guild.CreatedAt.Month, Context.Guild.CreatedAt.Day, 0, 0, 0, 0);
             string established_date = String.Format("{0:dddd, MMMM d, yyyy}", dt) + "-" + Math.Round((DateTime.Now - Context.Guild.CreatedAt.DateTime).TotalDays, 0) + " Days Old!";
@@ -434,7 +375,7 @@ namespace Siotrix.Discord.Statistics
             string g_icon_url = GetGuildIconUrl(id);
             string g_name = GetGuildName(id);
             string g_url = GetGuildUrl(id);
-            Color g_color = GetGuildColor();
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             string g_description = GetGuildDescription(id);
             string[] g_footer = GetGuildFooter(id);
             string[] m_count = GetLifeTimeMessages(user);
@@ -464,7 +405,7 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Avatar : "), Value = person.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Playing : "), Value = (person.Game.ToString() != "") ? "Activity" : "Inactivity" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Status : "), Value = person.Status.ToString() })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = join_date })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = $"{join_date} days ago." })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = Math.Round(joined, 0) - 1 })
@@ -481,7 +422,7 @@ namespace Siotrix.Discord.Statistics
                     .AddField( new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Owner : "), Value = Context.User.Id })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Guilds : "), Value = Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Users : "), Value = Context.Guild.Users.Count })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=0" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = "https://discord.gg/saZDC" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = "https://discord.gg/saZDC" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Created : "), Value = Math.Round((DateTime.Now - Context.Client.CurrentUser.CreatedAt.DateTime).TotalDays, 0).ToString() + " Days" })

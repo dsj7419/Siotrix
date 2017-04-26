@@ -4,6 +4,10 @@ using Discord.Addons.EmojiTools;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.InteractiveCommands;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace Siotrix.Discord.Admin
 {
@@ -11,7 +15,16 @@ namespace Siotrix.Discord.Admin
     [Group("settings"), Alias("set")]
     [Summary("Various settings for guild to customize Siotrix with.")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
-    {        
+    {
+        private InteractiveService Interactive;
+
+        public SettingsModule(InteractiveService Inter)
+        {
+            Interactive = Inter;
+        }
+
+        private Stopwatch _timer = new Stopwatch();
+
         [Command("gfootericon")]
         [Summary("Will list bots current footer icon.")]
         [Remarks(" - no additional arguments needed.")]
@@ -530,14 +543,315 @@ namespace Siotrix.Discord.Admin
         }
        
         [Command("color")]
-        [Summary("Lists your guilds current embed color choice.")]
+        [Summary("Set or list your guilds official embed color.")]
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildColorAsync()
         {
-            //TODO: Color needs rework to include custom colors - also can do pre-set colors to static out of this module.
+            var regexColorCode = new Regex("^#[a-fA-F0-9]{6}$");
+            var regexRGBCode = new Regex("^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
+            Color currentGColor = GuildEmbedColorExtensions.GetGuildColor(Context);
+            string currentStringColor = currentGColor.ToString();
+            string currentHexColor = currentStringColor.Replace("0x", "#").ToUpper();
+            var guild_id = Context.Guild.Id;
 
-            string colorName = null;
+            await ReplyAsync($"Give me any value of color (Hex, RGB, or a name) to set your guild color.\nYour Current Guild Hex Code is:{Format.Bold(currentGColor.ToString())} {Format.Bold(currentStringColor)} {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
+            var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            if (response.Content == "cancel") return;
+
+            _timer.Start();
+
+            if (response.Content == "list")
+            {
+                var colornamelower = HexColorDict.ColorName(currentStringColor); //look up hex in dictionary
+
+                Console.WriteLine($"1. {colornamelower}");
+
+                if (colornamelower == null)
+                    colornamelower = "no name found";
+
+                Console.WriteLine($"2. {colornamelower}");
+
+                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var colorname = text.ToTitleCase(colornamelower);
+
+                Console.WriteLine($"3. {colornamelower}");
+
+                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(currentHexColor); // convert hex to an RGB value
+                var red = Convert.ToString(rgbvalue.R); // Red Property
+                var green = Convert.ToString(rgbvalue.G); // Green property
+                var blue = Convert.ToString(rgbvalue.B); // Blue property  
+
+                if (colorname == "Black")
+                {
+                    colorname = "Black (For Discord)";
+                    currentHexColor = "#010101";
+                    rgbvalue.R = 1;
+                    rgbvalue.G = 1;
+                    rgbvalue.B = 1;
+                }
+
+                Console.WriteLine($" {currentHexColor} {colorname} {currentHexColor}");
+
+                var embed = GetEmbed(currentHexColor, colorname, currentHexColor, rgbvalue);
+                await ReplyAsync("", embed: embed);
+
+                return;
+            }
+
+            string colorchoice = response.Content.ToLower();
+
+            if (regexColorCode.IsMatch(colorchoice.Trim()))
+            {
+                string cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+                var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+
+                if (colornamelower == null)
+                    colornamelower = "no name found";
+
+                using (var db = new LogDatabase())
+                {
+                    var guildColor = new DiscordColor();
+                    guildColor.ColorHex = cleanHex;
+                    try
+                    {
+                        var arr = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                        if (arr == null || arr.ToList().Count <= 0)
+                        {
+                            db.Gcolors.Add(guildColor);
+                        }
+                        else
+                        {
+                            var data = arr.First();
+                            data.ColorHex = cleanHex;
+                            db.Gcolors.Update(data);
+                        }
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var colorname = text.ToTitleCase(colornamelower);
+
+                var hexcolor = colorchoice.ToUpper();
+
+                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convert hex to an RGB value
+                var red = Convert.ToString(rgbvalue.R); // Red Property
+                var green = Convert.ToString(rgbvalue.G); // Green property
+                var blue = Convert.ToString(rgbvalue.B); // Blue property  
+
+                if (colorname == "Black")
+                {
+                    colorname = "Black (For Discord)";
+                    hexcolor = "#010101";
+                    rgbvalue.R = 1;
+                    rgbvalue.G = 1;
+                    rgbvalue.B = 1;
+                }
+
+                var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
+                await ReplyAsync("", embed: embed);
+            }
+            else if (HexColorDict.colorHex.ContainsKey(colorchoice))
+            {
+                var colorhex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
+
+                using (var db = new LogDatabase())
+                {
+                    var guildColor = new DiscordColor();
+                    guildColor.ColorHex = colorhex;
+                    try
+                    {
+                        var arr = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                        if (arr == null || arr.ToList().Count <= 0)
+                        {
+                            db.Gcolors.Add(guildColor);
+                        }
+                        else
+                        {
+                            var data = arr.First();
+                            data.ColorHex = colorhex;
+                            db.Gcolors.Update(data);
+                        }
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                string cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
+
+                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var colorname = text.ToTitleCase(colorchoice);
+
+                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanhex); // convert hex to RGB value
+
+                if (colorname == "Black")
+                {
+                    colorname = "Black (For Discord)";
+                    cleanhex = "#010101";
+                    rgbvalue.R = 1;
+                    rgbvalue.G = 1;
+                    rgbvalue.B = 1;
+                }
+
+                var embed = GetEmbed(colorname, colorname, cleanhex, rgbvalue);
+                await ReplyAsync("", embed: embed);
+            }
+            else if (regexRGBCode.IsMatch(colorchoice))
+            {
+                string[] str = colorchoice.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries); // Split up string of numbers into Red/Green/Blue
+                int red = int.Parse(str[0]); //convert to red int
+                int green = int.Parse(str[1]); //convert to green int
+                int blue = int.Parse(str[2]); // convery to blue int
+                RGBtoHex.RGB data = new RGBtoHex.RGB((byte)red, (byte)green, (byte)blue); // convert broken out ints into a data struct - prep for conversion
+
+                var colorhex = RGBtoHex.RGBToHexadecimal(data); // convert RGB input into hex           
+
+                if (!regexColorCode.IsMatch(colorhex))
+                {
+                    var colorname = "No Name Found";
+                    var hexcolorcaps = "Hex Not Available";
+                    byte r = (byte)red;
+                    byte g = (byte)green;
+                    byte b = (byte)blue;
+                    var rgbvalue = new HextoRGB.RGB(r, g, b);
+                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    await ReplyAsync("", embed: embed);
+                }
+                else
+                {
+
+                    string cleanHex = colorhex.Replace("#", "0x"); // replace # with 0x for dictionary lookup
+                    var hexcolorcaps = colorhex.ToUpper();
+
+                    var cleanHexLower = cleanHex.ToLower();
+                    var colornamelower = HexColorDict.ColorName(cleanHexLower); // get color name
+
+                    using (var db = new LogDatabase())
+                    {
+                        var guildColor = new DiscordColor();
+                        guildColor.ColorHex = cleanHexLower;
+                        try
+                        {
+                            var arr = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                            if (arr == null || arr.ToList().Count <= 0)
+                            {
+                                db.Gcolors.Add(guildColor);
+                            }
+                            else
+                            {
+                                var cdata = arr.First();
+                                cdata.ColorHex = cleanHexLower;
+                                db.Gcolors.Update(cdata);
+                            }
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
+
+
+                    if (colornamelower == null)
+                        colornamelower = "no name found";
+
+                    TextInfo text = new CultureInfo("en-US").TextInfo;
+                    var colorname = text.ToTitleCase(colornamelower);
+
+                    HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
+
+                    if (colorname == "Black")
+                    {
+                        colorname = "Black (For Discord)";
+                        hexcolorcaps = "#010101";
+                        rgbvalue.R = 1;
+                        rgbvalue.G = 1;
+                        rgbvalue.B = 1;
+                    }
+
+                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    await ReplyAsync("", embed: embed);
+                }
+            }
+            else
+            {
+                await ReplyAsync("You did not input a correct hex, color name, or RGB value.");
+            }
+        }
+
+            private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRGB.RGB rgbvalue)
+        {
+
+            _timer.Stop();
+            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
+            string g_name = GuildEmbedName.GetGuildName(Context);
+            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
+            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var red = Convert.ToString(rgbvalue.R); // Red Property
+            var green = Convert.ToString(rgbvalue.G); // Green property
+            var blue = Convert.ToString(rgbvalue.B); // Blue property
+            Color color = new Color(rgbvalue.R, rgbvalue.G, rgbvalue.B);
+
+            if (colorname == null)
+                colorname = "No Name Found";
+
+            if (colorchoice == null)
+                colorchoice = "Colorchoice is empty";
+
+            if (colorhex == null)
+                colorhex = "No hex equivalent found.";
+
+            var builder = new EmbedBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+            builder.Title = $"Color Embed Information for: {colorchoice}";
+            builder.Color = color;
+            builder.AddField(x =>
+            {
+                x.IsInline = true;
+                x.Name = "Color Name: ";
+                x.Value = Format.Bold(colorname);
+            });
+
+            builder.AddField(x =>
+            {
+                x.IsInline = true;
+                x.Name = "Hex Color Code: ";
+                x.Value = Format.Bold(colorhex);
+            });
+
+            builder.AddField(x =>
+            {
+                x.IsInline = true;
+                x.Name = "RGB Value: ";
+                x.Value = $"RED:{Format.Bold(red)} GREEN:{Format.Bold(green)} BLUE:{Format.Bold(blue)}";
+            });
+            builder.WithDescription($"In {_timer.ElapsedMilliseconds}ms");
+
+            return builder;
+        }
+
+        /*
+        //TODO: Color needs rework to include custom colors - also can do pre-set colors to static out of this module.
+
+        string colorName = null;
             var guild_id = Context.Guild.Id;
             CheckGuildColorGuilds();
             using (var db = new LogDatabase())
@@ -610,14 +924,6 @@ namespace Siotrix.Discord.Admin
                 {
                     colorName = "None";
                 }
- 
-                /*     else
-                {
-                    RGBtoHex.RGB data = new RGBtoHex.RGB((byte)col.r, (byte)col.g, (byte)col.b);
-                    var cName = RGBtoHex.RGBToHexadecimal(data);
-                    colorName = "Your custom color hex is: " + cName;
-                } */
-
             }
             await ReplyAsync(colorName);
         }
@@ -809,13 +1115,6 @@ namespace Siotrix.Discord.Admin
                             colors += "None" + "\n";
                         }
                     }
-               /*     else
-                    {
-
-                        RGBtoHex.RGB data = new RGBtoHex.RGB((byte)col.RedParam, (byte)col.GreenParam, (byte)col.BlueParam);
-                        var cName = RGBtoHex.RGBToHexadecimal(data);
-                        colors += Format.Bold(cName) + " is custom Hex color of this guild \n";
-                    } */
                 }
             }
             await ReplyAsync(colors);
@@ -940,7 +1239,7 @@ namespace Siotrix.Discord.Admin
                     }
                 }
             }
-        }
+        } */
 
         [Command("gname")]
         [Summary("Sets guild name.")]
@@ -1411,6 +1710,6 @@ namespace Siotrix.Discord.Admin
                     }
                 }
             }
-        }
+        }       
     }
 }
