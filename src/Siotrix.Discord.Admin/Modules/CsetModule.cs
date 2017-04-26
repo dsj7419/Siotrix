@@ -528,7 +528,7 @@ namespace Siotrix.Discord.Admin
                             {
                                 await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in {channel_name}!");
                             }
-                            //await ReplyAsync("✅✖️✔️📪📣🔥🌿🍃🌱⚡❄☁💧💦⭕🐛🌟💫✨💢🎵");
+                            //await ReplyAsync("✅✖️✔️📪📣🔥🌿🍃🌱⚡❄☁💧💦⭕🐛🌟💫✨💢🎵🔇🔊🐼");
                         }
                     }
                 }
