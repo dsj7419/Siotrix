@@ -781,7 +781,7 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-            private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRGB.RGB rgbvalue)
+        private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRGB.RGB rgbvalue)
         {
 
             _timer.Stop();
