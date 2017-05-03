@@ -141,10 +141,6 @@ namespace Siotrix.Discord
             string element_summary_remark_list = null;
             string buffer_data = "";
             int element_index = 0;
-<<<<<<< HEAD
-        //  bool exist_group = false;
-=======
->>>>>>> 9af9d7a3b884242622a6cac89df67435caf0cc9a
 
             var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
             var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
