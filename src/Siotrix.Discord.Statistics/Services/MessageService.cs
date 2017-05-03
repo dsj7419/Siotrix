@@ -38,7 +38,7 @@ namespace Siotrix.Discord.Statistics
             _client.ReactionsCleared -= OnReactionsClearedAsync;
             _db = null;
 
-            await PrettyConsole.LogAsync("Info", "Message", "Service started successfully").ConfigureAwait(false);
+            await PrettyConsole.LogAsync("Info", "Message", "Service stopped successfully").ConfigureAwait(false);
         }
         
         private async Task OnMessageReceivedAsync(SocketMessage message)

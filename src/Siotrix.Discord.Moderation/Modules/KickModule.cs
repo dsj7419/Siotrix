@@ -17,10 +17,10 @@ namespace Siotrix.Discord.Moderation
         public async Task KickAsync(SocketGuildUser user)
         {
             await user.KickAsync();
-            await ReplyAsync("👍");
+            await Context.Channel.SendMessageAsync("What is reason? Case #7");
         }
 
-        [Command]
+        /*[Command]
         [Summary("Will kick user for specified amount of time/days.")]
         [Remarks("<@username> <time> - can specify any time fram 1d, 2d, 1w, 1m, etc. **note** default is normal kick")]
         [RequireContext(ContextType.Guild)]
@@ -31,6 +31,6 @@ namespace Siotrix.Discord.Moderation
             await Context.Guild.AddBanAsync(user, prune);
             await Context.Guild.RemoveBanAsync(user);
             await ReplyAsync("👍");
-        }
+        }*/
     }
 }

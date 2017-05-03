@@ -73,28 +73,6 @@ namespace Siotrix.Discord
             return Task.CompletedTask;
         }
 
-        private string ParseMentionPrefix(IUserMessage msg)
-        {
-            var text = msg.Content;
-            if (text.Length <= 3 || text[0] != '<' || text[1] != '@') return null;
-
-            int endPos = text.IndexOf('>');
-            if (endPos == -1) return null;
-            if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return null;
-
-            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return null;
-           // Console.WriteLine("^^^^^^^{0}`````````{1}***{2}", endPos, text[endPos], text.Length);
-            string value = text.Substring(endPos + 2, text.Length - text.Substring(0, endPos + 1).Length - 1);
-            return value;
-        }
-
-        private string ParseStringPrefix(IUserMessage msg, string spec)
-        {
-            var text = msg.Content;
-            string value = text.Substring(spec.Length, text.Length - spec.Length);
-            return value;
-        }
-
         private string CheckAvaliableCommand(string[] words, SocketCommandContext context)
         {
             string cmd = words[0];
@@ -163,7 +141,10 @@ namespace Siotrix.Discord
             string element_summary_remark_list = null;
             string buffer_data = "";
             int element_index = 0;
+<<<<<<< HEAD
         //  bool exist_group = false;
+=======
+>>>>>>> 9af9d7a3b884242622a6cac89df67435caf0cc9a
 
             var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
             var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
@@ -292,26 +273,8 @@ namespace Siotrix.Discord
             int argPos = 0;
             string spec = null;
             string content = null;
-            using (var db = new LogDatabase())
-            {
-                var guild_id = context.Guild.Id;
-                try
-                {
-                    var arr = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        spec = "!"; 
-                    }
-                    else
-                    {
-                        spec = arr.First().Prefix;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
+            
+            spec = PrefixExtensions.GetGuildPrefix(context);
 
             if (s.Author.IsBot
                 || msg == null
@@ -323,11 +286,11 @@ namespace Siotrix.Discord
            // Console.WriteLine("////////////////////////" + context.Channel.Name);
             if(msg.HasStringPrefix(spec, ref argPos))
             {
-                content = ParseStringPrefix(msg, spec);
+                content = MessageParser.ParseStringPrefix(msg, spec);
             }
             else if(msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
-                content = ParseMentionPrefix(msg);
+                content = MessageParser.ParseMentionPrefix(msg);
             }
             if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
@@ -345,10 +308,17 @@ namespace Siotrix.Discord
                         await context.Channel.SendMessageAsync($"📣 : Unable to use: ***{words[0]}*** command **is toggled off** in ``#{data}`` channel!");
                         return;
                     }
+                    
                 }
+                
                 var result = await _service.ExecuteAsync(context, argPos, _map);
-                if (!result.IsSuccess)
+                if (result.IsSuccess)
                 {
+                    ActionResult.IsSuccess = true;
+                }
+                else
+                {
+                    ActionResult.IsSuccess = false;
                     var embed = new EmbedBuilder();
                     GetCommandHelp(words[0], embed, spec);
                     string reason = GetReasonResult(error);

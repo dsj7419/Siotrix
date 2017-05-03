@@ -25,7 +25,7 @@ namespace Siotrix.Discord.Admin
             _map = map;
         }
 
-        private long GetChannelIdFromName(string name)
+       /* private long GetChannelIdFromName(string name)
         {
             long id = 0;
             if (name == null)
@@ -39,7 +39,7 @@ namespace Siotrix.Discord.Admin
                 }
             }
             return id;
-        }
+        }*/
 
         private bool GetToggleStatus(string cmd)
         {
@@ -75,7 +75,7 @@ namespace Siotrix.Discord.Admin
         private int GetToggleChannelStatus(string channel_name, string command)
         {
             int status = 0;
-            long get_channel_id = GetChannelIdFromName(channel_name);
+            long get_channel_id = ChannelNameExtensions.GetChannelIdFromName(channel_name, Context);
             if (get_channel_id < 0) return -1;
             using (var db = new LogDatabase())
             {

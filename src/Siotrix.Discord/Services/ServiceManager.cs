@@ -33,6 +33,7 @@ namespace Siotrix.Discord
         private AntispamService _antispam;
         private FilterService _filter;
         private WarningService _warning;
+        private LogService _log;
 
         public ServiceManager(DiscordSocketClient client)
         {
@@ -53,13 +54,14 @@ namespace Siotrix.Discord
                 await StartEventsAsync().ConfigureAwait(false);
             if (_config.Modules.Statistics)
                 await StartStatisticsAsync().ConfigureAwait(false);
-            if (_config.Modules.Moderation)
-                await StartModerationAsync().ConfigureAwait(false);
 
             if (!_map.TryAdd(this))
                 await PrettyConsole.LogAsync("Error", "Manager", "Unable to add self to map");
             _commands = new CommandHandler(_client, _map);
             await _commands.StartAsync().ConfigureAwait(false);
+
+            if (_config.Modules.Moderation)
+                await StartModerationAsync().ConfigureAwait(false);
         }
 
         public async Task StopAsync()
@@ -101,10 +103,12 @@ namespace Siotrix.Discord
             _antispam = new AntispamService(_client);
             _filter = new FilterService(_client);
             _warning = new WarningService(_client);
+            _log = new LogService(_client);
 
             await _antispam.StartAsync();
             await _filter.StartAsync();
-         //   await _warning.StartAsync();
+            await _log.StartAsync();
+            //await _warning.StartAsync();
 
             if (!_map.TryAdd(_antispam))
                 await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Antispam to map");
@@ -112,6 +116,8 @@ namespace Siotrix.Discord
                 await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Filter to map");
             if (!_map.TryAdd(_warning))
                 await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Warning to map");
+            if (!_map.TryAdd(_log))
+                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Log to map");
         }
 
         public async Task StartStatisticsAsync()
@@ -151,10 +157,12 @@ namespace Siotrix.Discord
             _antispam = null;
             _filter = null;
             _warning = null;
+            _log = null;
 
             await _antispam.StopAsync();
             await _filter.StopAsync();
             await _warning.StopAsync();
+            await _log.StopAsync();
         }
 
         public async Task StopStatisticsAsync()
