@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    [Group("services"), RequireOwner]
+ /*   [Name("Developer")]
+    [Group("services")]    
+    [Summary("module manipulation and info for Siotrix (DEPRECIATED)")]
+    [MinPermissions(AccessLevel.BotOwner)]
     public class ServiceModule : ModuleBase
     {
         private ServiceManager _manager;
@@ -16,7 +19,9 @@ namespace Siotrix.Discord
             _config = Configuration.Load();
         }
 
-        [Command, Priority(0)]
+        [Command("instance"), Priority(0)]
+        [Summary("list description of a specific instance")]
+        [Remarks(" (instance name) - name of a specific instance")]
         public Task ServicesAsync(string instance)
         {
             if (_config.Instance.ToString() != instance.ToLower())
@@ -29,5 +34,5 @@ namespace Siotrix.Discord
             };
             return ReplyAsync("", true, builder);
         }
-    }
+    } */
 }

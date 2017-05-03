@@ -21,10 +21,11 @@ namespace Siotrix.Discord
                     var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        var instance = new DiscordColor();
-                        instance.ColorHex = SIOTRIX_COLOR;
-                        instance.GuildId = guild_id.ToLong();
-                        db.Gcolors.Add(instance);
+                        db.Gcolors.Add(new DiscordColor()
+                        {
+                            ColorHex = SIOTRIX_COLOR,
+                            GuildId = guild_id.ToLong()
+                        });
                         db.SaveChanges();
                         colorHex = SIOTRIX_COLOR;
                     }

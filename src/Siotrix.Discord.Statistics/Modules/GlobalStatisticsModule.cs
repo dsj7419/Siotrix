@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
-    [Name("TestInfo")]
-    [RequireContext(ContextType.Guild)]
-    [MinPermissions(AccessLevel.User)]
+    [Name("Developer")]
+    [Summary("Testing module for Frank")]
+    [MinPermissions(AccessLevel.BotOwner)]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
   /*      [Command("testinfo")]
+        [Summary("Unless you are Frank, you have no reason to use this.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public Task GlobalDataAsync()
         {

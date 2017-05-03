@@ -21,11 +21,14 @@ namespace Siotrix.Discord.Utility
             _process = Process.GetCurrentProcess();
         }
 
-        [Command]
-        [Summary("General performance information and specs for Siotrix.")]
+        [Command("list")]
+        [Summary("Complete list of all performance information.")]
+        [Remarks(" - no additional argument needed")]
         public Task PerformanceAsync()
         {
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             var builder = new EmbedBuilder();
+            builder.Color = g_color;
             builder.ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl();
             builder.Title = "Performance Summary";
 
@@ -43,26 +46,38 @@ namespace Siotrix.Discord.Utility
         }
 
         [Command("uptime")]
+        [Summary("Lists current update for Siotrix.")]
+        [Remarks(" - no additional argument needed")]
         public Task UptimeAsync()
             => ReplyAsync(GetUptime());
 
         [Command("library"), Alias("lib")]
+        [Summary("Lists present Discord.Net library version.")]
+        [Remarks(" - no additional argument needed")]
         public Task LibraryAsync()
             => ReplyAsync(GetLibrary());
 
         [Command("operatingsystem"), Alias("os")]
+        [Summary("Lists OS Siotrix is currently running on.")]
+        [Remarks(" - no additional argument needed")]
         public Task OperatingSystemAsync()
             => ReplyAsync(GetOperatingSystem());
 
         [Command("framework")]
+        [Summary("Current base framework version for Siotrix.")]
+        [Remarks(" - no additional argument needed")]
         public Task FrameworkAsync()
             => ReplyAsync(GetFramework());
 
         [Command("memoryusage"), Alias("memory", "mem")]
+        [Summary("Lists how much memory load Siotrix has right now.")]
+        [Remarks(" - no additional argument needed")]
         public Task MemoryUsageAsync()
             => ReplyAsync(GetMemoryUsage());
 
         [Command("latency"), Alias("lag", "ping")]
+        [Summary("Lists current latency response of Siotrix.")]
+        [Remarks(" - no additional argument needed")]
         public Task LatencyAsync()
             => ReplyAsync(GetLatency());
 
