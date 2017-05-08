@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace Siotrix.Discord
     {
         private static bool is_success = false;
         private static string content = null;
+        private static IUserMessage instance = null;
         public static bool IsSuccess
         {
             get
@@ -32,6 +34,18 @@ namespace Siotrix.Discord
             set
             {
                 content = value;
+            }
+        }
+
+        public static IUserMessage Instance
+        {
+            get
+            {
+                return instance;
+            }
+            set
+            {
+                instance = value;
             }
         }
     }

@@ -9,12 +9,52 @@ namespace Siotrix.Discord.Moderation
 {
     public class LogService : IService
     {
+        //var channel = context.Guild.GetChannel(data.ChannelId.ToUlong()) as ISocketMessageChannel;
+        
         private DiscordSocketClient _client;
         private LogDatabase _db;
+        private long modlogchannel_id = 0;
+        private long logchannel_id = 0;
+        private bool is_toggled_log = false;
+        private bool is_toggled_modlog = false;
 
         public LogService(DiscordSocketClient client)
         {
             _client = client;
+        }
+
+        private void IsUsableLogChannel(long guild_id)
+        {
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var log_list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                    var modlog_list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
+                    if (log_list.Count() > 0 || log_list.Any())
+                    {
+                        var data = log_list.First();
+                        logchannel_id = data.ChannelId;
+                        if (!data.IsActive)
+                            is_toggled_log = true;
+                        else
+                            is_toggled_log = false;
+                    }
+                    if (modlog_list.Count() > 0 || modlog_list.Any())
+                    {
+                        var mod_data = modlog_list.First();
+                        modlogchannel_id = mod_data.ChannelId;
+                        if (!mod_data.IsActive)
+                            is_toggled_modlog = true;
+                        else
+                            is_toggled_modlog = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         public async Task StartAsync()
@@ -23,11 +63,14 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived += OnMessageReceivedAsync;
             _client.MessageUpdated += OnMesssageUpdatedAsync;
             _client.MessageDeleted += OnMessageDeletedAsync;
-            //_client.ReactionAdded += OnReactionAddedAsync;
-            //_client.ReactionRemoved += OnReactionRemovedAsync;
-            //_client.ReactionsCleared += OnReactionsClearedAsync;
+            _client.ReactionAdded += OnReactionAddedAsync;
+            _client.ReactionRemoved += OnReactionRemovedAsync;
+            _client.ReactionsCleared += OnReactionsClearedAsync;
             _client.UserJoined += OnUserJoinedAsync;
-
+            _client.RoleCreated += OnRoleCreatedAsync;
+            _client.RoleUpdated += OnRoleUpdatedAsync;
+            _client.RoleDeleted += OnRoleDeletedAsync;
+            _client.UserUnbanned += OnUserUnBannedAsync;
             await PrettyConsole.LogAsync("Info", "Log", "Service started successfully").ConfigureAwait(false);
         }
 
@@ -36,10 +79,14 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived -= OnMessageReceivedAsync;
             _client.MessageUpdated -= OnMesssageUpdatedAsync;
             _client.MessageDeleted -= OnMessageDeletedAsync;
-            //_client.ReactionAdded -= OnReactionAddedAsync;
-            //_client.ReactionRemoved -= OnReactionRemovedAsync;
-            //_client.ReactionsCleared -= OnReactionsClearedAsync;
+            _client.ReactionAdded -= OnReactionAddedAsync;
+            _client.ReactionRemoved -= OnReactionRemovedAsync;
+            _client.ReactionsCleared -= OnReactionsClearedAsync;
             _client.UserJoined -= OnUserJoinedAsync;
+            _client.RoleCreated -= OnRoleCreatedAsync;
+            _client.RoleUpdated -= OnRoleUpdatedAsync;
+            _client.RoleDeleted -= OnRoleDeletedAsync;
+            _client.UserUnbanned -= OnUserUnBannedAsync;
             _db = null;
 
             await PrettyConsole.LogAsync("Info", "Log", "Service stopped successfully").ConfigureAwait(false);
@@ -52,7 +99,9 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    id = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id)).First().ChannelId;
+                    var data = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                    if(data.Any() || data.Count() > 0) 
+                        id = data.First().ChannelId;
                 }
                 catch (Exception e)
                 {
@@ -129,7 +178,9 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    id = db.Gmodlogchannels.Where(p => p.GuildId.Equals(context.Guild.Id.ToLong())).First().ChannelId;
+                    var data = db.Gmodlogchannels.Where(p => p.GuildId.Equals(context.Guild.Id.ToLong()));
+                    if(data.Any() || data.Count() > 0)
+                        id = data.First().ChannelId;
                 }
                 catch (Exception e)
                 {
@@ -137,6 +188,39 @@ namespace Siotrix.Discord.Moderation
                 }
             }
             return id;
+        }
+
+        private async Task OnRoleDeletedAsync(SocketRole role)
+        {
+            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var builder = new EmbedBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
+            .WithName("Role has been deleted."))
+            .WithColor(new Color(0, 127, 255));
+            await log_channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        private async Task OnRoleUpdatedAsync(SocketRole role, SocketRole update_role)
+        {
+            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var builder = new EmbedBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
+            .WithName("Role has been updated."))
+            .WithColor(new Color(0, 127, 255));
+            await log_channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        private async Task OnRoleCreatedAsync(SocketRole role)
+        {
+            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var builder = new EmbedBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
+            .WithName("Role has been created."))
+            .WithColor(new Color(0, 127, 255));
+            await log_channel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnMessageReceivedAsync(SocketMessage message)
@@ -147,6 +231,11 @@ namespace Siotrix.Discord.Moderation
             int argPos = 0;
             string spec = null;
             string content = null;
+            
+            IsUsableLogChannel(context.Guild.Id.ToLong());
+            var channel = context.Guild.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var mod_channel = context.Guild.GetChannel(modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                
             spec = PrefixExtensions.GetGuildPrefix(context);
             if (message.Author.IsBot
                 || msg == null
@@ -165,8 +254,6 @@ namespace Siotrix.Discord.Moderation
             }
             if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
-                var channel_id = GetLogChannelId(context.Guild.Id.ToLong());
-                if (channel_id <= 0) return;
                 string[] words = content.Split(' ');
                 var id = MentionUtils.ParseUser(words[1]);
                 var user = _client.GetUser(id);
@@ -178,16 +265,16 @@ namespace Siotrix.Discord.Moderation
                 var case_number = getCaseNumber(words[0]);
                 if (action == null) return;
                 
-                var channel = context.Guild.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(user_identifier + " has been " + action + " by " + mod_identifier))
                 .WithColor(action_color);
-                await channel.SendMessageAsync(user_mention, false, builder.Build());
+                if (is_toggled_log)
+                    await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await channel.SendMessageAsync(user_mention, false, builder.Build());
 
-                var mod_channel_id = GetModLogChannelId(context);
-                var mod_channel = context.Guild.GetChannel(mod_channel_id.ToUlong()) as ISocketMessageChannel;
                 string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
                 string g_name = GuildEmbedName.GetGuildName(context);
                 string g_url = GuildEmbedUrl.GetGuildUrl(context);
@@ -213,10 +300,16 @@ namespace Siotrix.Discord.Moderation
                                   context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" + 
                                   "Reason : Type " + g_prefix + "reason " +  case_number.ToString() + "<reason> to add it.";
                     });
-                await mod_channel.SendMessageAsync("", false, mod_builder.Build());
+                //await mod_channel.SendMessageAsync("", false, mod_builder.Build());
+                if (is_toggled_modlog)
+                    await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
+                else
+                {
+                    IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
 
-                ActionResult.Content = words[0] + "," + case_number.ToString() + "," + user.Username + "(" + user.Id.ToString() + ")" + "," + context.User.Username + "(" + context.User.Id.ToString() + ")";
-                return;
+                    ActionResult.Content = words[0] + "," + case_number.ToString() + "," + user.Username + "(" + user.Id.ToString() + ")" + "," + context.User.Username + "(" + context.User.Id.ToString() + ")";
+                    ActionResult.Instance = msg_instance;
+                }
             }
         }
 
@@ -225,15 +318,19 @@ namespace Siotrix.Discord.Moderation
             var msg = await _db.GetMessageAsync(message.Id);
             if (!msg.IsBot)
             {
-                var channel_id = GetLogChannelId(msg.GuildId.Value);
-                var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+                //var channel_id = GetLogChannelId(msg.GuildId.Value);
+                IsUsableLogChannel(msg.GuildId.Value);
+                var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator))
                 .WithColor(new Color(0, 127, 255));
-                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                if (is_toggled_log)
+                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
 
@@ -242,58 +339,119 @@ namespace Siotrix.Discord.Moderation
             var msg = await _db.GetMessageAsync(cachemsg.Id);
             if (!msg.IsBot)
             {
-                var channel_id = GetLogChannelId(msg.GuildId.Value);
-                var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+                //var channel_id = GetLogChannelId(msg.GuildId.Value);
+                IsUsableLogChannel(msg.GuildId.Value);
+                var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Message has been deleted by " + user.Username + "#" + user.Discriminator))
                 .WithColor(new Color(0, 127, 127));
-                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                if (is_toggled_log)
+                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
+        }
+
+     
+
+        private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            var msg = await _db.GetMessageAsync(cachemsg.Id);
+            if (!msg.IsBot)
+            {
+                //var channel_id = GetLogChannelId(msg.GuildId.Value);
+                IsUsableLogChannel(msg.GuildId.Value);
+                var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var user = _client.GetUser(msg.AuthorId.ToUlong());
+                var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(user.GetAvatarUrl())
+                .WithName("Reaction has been added by " + user.Username + "#" + user.Discriminator))
+                .WithColor(new Color(0, 127, 127));
+                if (is_toggled_log)
+                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
+        }
+
+        private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            var msg = await _db.GetMessageAsync(cachemsg.Id);
+            if (!msg.IsBot)
+            {
+                //var channel_id = GetLogChannelId(msg.GuildId.Value);
+                IsUsableLogChannel(msg.GuildId.Value);
+                var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var user = _client.GetUser(msg.AuthorId.ToUlong());
+                var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(user.GetAvatarUrl())
+                .WithName("Reaction has been removed by " + user.Username + "#" + user.Discriminator))
+                .WithColor(new Color(0, 127, 127));
+                if (is_toggled_log)
+                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
+        }
+
+        private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
+        {
+            var msg = await _db.GetMessageAsync(cachemsg.Id);
+            if (!msg.IsBot)
+            {
+                //var channel_id = GetLogChannelId(msg.GuildId.Value);
+                IsUsableLogChannel(msg.GuildId.Value);
+                var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var user = _client.GetUser(msg.AuthorId.ToUlong());
+                var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(user.GetAvatarUrl())
+                .WithName("Reaction has been cleared by " + user.Username + "#" + user.Discriminator))
+                .WithColor(new Color(0, 127, 127));
+                if (is_toggled_log)
+                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                else
+                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
 
         private async Task OnUserJoinedAsync(SocketGuildUser user)
         {
-            var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            //var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
+            IsUsableLogChannel(user.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
             var guild_user = _client.GetUser(user.Id);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(guild_user.GetAvatarUrl())
                 .WithName(user.Username + "#" + user.Discriminator + " has joined."))
                 .WithColor(new Color(0, 255, 127));
-            await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            if (is_toggled_log)
+                await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+            else
+                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
         }
 
-        /*private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task OnUserUnBannedAsync(SocketUser user, SocketGuild guild)
         {
-            var react = EntityHelper.CreateReaction(reaction);
-
-            _db.Reactions.Add(react);
-            await _db.SaveChangesAsync().ConfigureAwait(false);
+            //var channel_id = GetLogChannelId(guild.Id.ToLong());
+            IsUsableLogChannel(guild.Id.ToLong());
+            var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var guild_user = _client.GetUser(user.Id);
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(guild_user.GetAvatarUrl())
+                .WithName(user.Id.ToString() + " has been unbanned."))
+                .WithColor(new Color(0, 255, 127));
+            if (is_toggled_log)
+                await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+            else
+                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
         }
-
-        private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            var react = await _db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emoji.Name);
-
-            react.DeletedAt = DateTime.UtcNow;
-
-            _db.Reactions.Update(react);
-            await _db.SaveChangesAsync().ConfigureAwait(false);
-        }
-
-        private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
-        {
-            var reacts = await _db.GetReactionsAsync(cachemsg.Id);
-
-            foreach (var react in reacts)
-                react.DeletedAt = DateTime.UtcNow;
-
-            _db.Reactions.UpdateRange(reacts);
-            await _db.SaveChangesAsync().ConfigureAwait(false);
-        }*/
     }
 }

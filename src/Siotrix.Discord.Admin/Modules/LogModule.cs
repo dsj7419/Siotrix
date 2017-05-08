@@ -18,7 +18,7 @@ namespace Siotrix.Discord.Admin
     {
         private readonly CommandService _service;
         private readonly IDependencyMap _map;
-
+        
         public LogModule(CommandService service, IDependencyMap map)
         {
             _service = service;
@@ -155,6 +155,87 @@ namespace Siotrix.Discord.Admin
             return isSuccess;
         }
 
+        private int CheckToggleStatus(long guild_id, string command)
+        {
+            int is_active = 0;
+            int isModLog = -1;
+            if (command.Equals("modlogchannel"))
+                isModLog = 1;
+            if (command.Equals("logchannel"))
+                isModLog = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    if (isModLog == 0)
+                    {
+                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        if (list.Count() <= 0 || !list.Any()) return 0;
+
+                        var data = list.First();
+                        if (data.IsActive)
+                        {
+                            data.IsActive = false;
+                            is_active = 1;
+                        }
+                        else
+                        {
+                            data.IsActive = true;
+                            is_active = 2;
+                        }
+                        db.Glogchannels.Update(data);
+                    }
+                    if (isModLog == 1)
+                    {
+                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        if (list.Count() <= 0 || !list.Any()) return 0;
+
+                        var data = list.First();
+                        if (data.IsActive)
+                        {
+                            data.IsActive = false;
+                            is_active = 3;
+                        }
+                        else
+                        {
+                            data.IsActive = true;
+                            is_active = 4;
+                        }
+                        db.Gmodlogchannels.Update(data);
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return is_active;
+        }
+
+        private string PrintToggleStatus(int active_value)
+        {
+            string status = null;
+            switch (active_value)
+            {
+                case 1:
+                    status = "✖️ : ``logchannel`` has been **Toggled off** !";
+                    break;
+                case 2:
+                    status = "✅ : ``logchannel`` has been **Toggled on** !";
+                    break;
+                case 3:
+                    status = "✖️ : ``modlogchannel`` has been **Toggled off** !";
+                    break;
+                case 4:
+                    status = "✅ : ``modlogchannel`` has been **Toggled on** !";
+                    break;
+                default:
+                    break;
+            }
+            return status;
+        }
+
         [Command("logs")]
         [Summary("----------")]
         [Remarks("--------")]
@@ -207,12 +288,13 @@ namespace Siotrix.Discord.Admin
             
             if (name.Equals("toggle"))
             {
-                System.Console.WriteLine("toggle");
+                int active_value = CheckToggleStatus(Context.Guild.Id.ToLong(), command);
+                string status = PrintToggleStatus(active_value);
+                await ReplyAsync(status);
             }
             else
             {
                 channel_id = ChannelNameExtensions.GetChannelIdFromName(name, Context);
-                System.Console.WriteLine("--------{0}", channel_id);
                 if (channel_id <= 0) return;
                 is_setting = SetLogChannelPerGuild(Context.Guild.Id.ToLong(), command, channel_id);
                 if(is_setting)

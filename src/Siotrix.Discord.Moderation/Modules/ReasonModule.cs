@@ -35,7 +35,7 @@ namespace Siotrix.Discord.Moderation
             string[] data = ActionResult.Content.Split(',');
             if (!case_number.ToString().Equals(data[1]))
             {
-                await ReplyAsync("Wrong Number Try again!");
+                await ReplyAsync("Wrong Number. Try again!");
                 return;
             }
                 
@@ -68,14 +68,17 @@ namespace Siotrix.Discord.Moderation
                     x.Value = "User : " + data[2] + "\n" + "Moderator : " + data[3] + "\n" + "Reason : " + reason + " (edited)";
                 });
 
-            await channel.SendMessageAsync("", false, builder.Build());
+            //await channel.SendMessageAsync("", false, builder.Build());
+            await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
+            await ReplyAsync("Case #" + data[1].ToString() + " has been updated.");
         }
 
         [Command("reason")]
         [Summary("Reason")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task ReasonAsync(string reason)
+        public async Task ReasonAsync([Remainder]string reason)
         {
+            string[] data = ActionResult.Content.Split(',');
             var mod_channel_id = GetModLogChannelId();
             if (mod_channel_id <= 0) return;
             var channel = Context.Guild.GetChannel(mod_channel_id.ToUlong()) as ISocketMessageChannel;
@@ -97,7 +100,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(g_footer[0])
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            string[] data = ActionResult.Content.Split(',');
+            
             builder
                 .AddField(x =>
                 {
@@ -105,7 +108,8 @@ namespace Siotrix.Discord.Moderation
                     x.Value = "User : " + data[2] + "\n" + "Moderator : " + data[3] + "\n" + "Reason : " + reason + " (edited)";
                 });
 
-            await channel.SendMessageAsync("", false, builder.Build());
+            await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
+            await ReplyAsync("Case #" + data[1].ToString() + " has been updated.");
         }
     }
 }
