@@ -322,21 +322,16 @@ namespace Siotrix.Discord.Moderation
             if (!msg.IsBot)
             {
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
-                var oldmsg = await cachemsg.GetOrDownloadAsync();
                 IsUsableLogChannel(msg.GuildId.Value);
                 var oldmsg = await cachemsg.GetOrDownloadAsync();
                 var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-<<<<<<< HEAD
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator + " in #" + (message.Channel as SocketTextChannel).Name))
                 .WithDescription("Before: " + oldmsg.Content+"\n" +
                                  "After: " + message.Content)              
-=======
-                .WithIconUrl(user.GetAvatarUrl()))
->>>>>>> 0f2a698faad280b84ba7850417962ced5479b47d
                 .WithColor(new Color(0, 127, 255));
                 builder
                 .AddField(x =>
