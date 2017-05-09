@@ -320,12 +320,15 @@ namespace Siotrix.Discord.Moderation
             {
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
                 IsUsableLogChannel(msg.GuildId.Value);
+                var oldmsg = await cachemsg.GetOrDownloadAsync();
                 var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
-                .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator))
+                .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator + " in #" + (message.Channel as SocketTextChannel).Name))
+                .WithDescription("Before: " + oldmsg.Content+"\n" +
+                                 "After: " + message.Content)              
                 .WithColor(new Color(0, 127, 255));
                 if (is_toggled_log)
                     await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
