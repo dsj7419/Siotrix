@@ -17,7 +17,8 @@ namespace Siotrix.Discord.Moderation
         {
             int prune = prunedays == -1 ? 0 : prunedays;
             await Context.Guild.AddBanAsync(user, prune);
-            await Context.Channel.SendMessageAsync("What is reason? Case #8");
+            var case_id = CaseExtensions.GetCaseNumber("ban", Context, user as SocketGuildUser);
+            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
 
         [Command("tempban")]
@@ -28,7 +29,8 @@ namespace Siotrix.Discord.Moderation
         public async Task TempBanAsync(SocketUser user, [Remainder]TimeSpan duration)
         {
             await Context.Guild.AddBanAsync(user);
-            await Context.Channel.SendMessageAsync("What is reason? Case #8");
+            var case_id = CaseExtensions.GetCaseNumber("ban", Context, user as SocketGuildUser);
+            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
     }
 }
