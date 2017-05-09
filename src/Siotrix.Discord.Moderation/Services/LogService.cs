@@ -328,10 +328,7 @@ namespace Siotrix.Discord.Moderation
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(user.GetAvatarUrl())
-                .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator + " in #" + (message.Channel as SocketTextChannel).Name))
-                .WithDescription("Before: " + oldmsg.Content+"\n" +
-                                 "After: " + message.Content)              
+                .WithIconUrl(user.GetAvatarUrl()))           
                 .WithColor(new Color(0, 127, 255));
                 builder
                 .AddField(x =>
