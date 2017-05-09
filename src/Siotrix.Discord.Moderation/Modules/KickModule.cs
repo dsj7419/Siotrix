@@ -17,7 +17,8 @@ namespace Siotrix.Discord.Moderation
         public async Task KickAsync(SocketGuildUser user)
         {
             await user.KickAsync();
-            await Context.Channel.SendMessageAsync("What is reason? Case #7");
+            var case_id = CaseExtensions.GetCaseNumber("kick", Context, user);
+            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
 
         [Command]
@@ -30,7 +31,8 @@ namespace Siotrix.Discord.Moderation
             int prune = prunedays == -1 ? 0 : prunedays;
             await Context.Guild.AddBanAsync(user, prune);
             await Context.Guild.RemoveBanAsync(user);
-            await Context.Channel.SendMessageAsync("What is reason? Case #7");
+            var case_id = CaseExtensions.GetCaseNumber("kick", Context, user as SocketGuildUser);
+            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
     }
 }
