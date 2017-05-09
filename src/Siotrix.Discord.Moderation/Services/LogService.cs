@@ -328,14 +328,12 @@ namespace Siotrix.Discord.Moderation
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(user.GetAvatarUrl()))           
+                .WithIconUrl(user.GetAvatarUrl())
+                .WithName("Message has been updated by " + user.Username + "#" + user.Discriminator + " in #" + channel.Name))
+                .WithDescription("Before: " + oldmsg.Content+"\n" +
+                                 "After: " + message.Content)              
                 .WithColor(new Color(0, 127, 255));
-                builder
-                .AddField(x =>
-                {
-                    x.Name = "Message has been updated by " + user.Username + "#" + user.Discriminator + " in " + channel.Name + " channel.";
-                    x.Value = "Before : " + oldmsg + "\n" + "After : " + message.Content;
-                });
+
                 if (is_toggled_log)
                     await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
                 else
