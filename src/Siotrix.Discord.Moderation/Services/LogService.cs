@@ -193,6 +193,25 @@ namespace Siotrix.Discord.Moderation
             return id;
         }
 
+        private long GetCaseNumberAync(string cmdName, SocketCommandContext context, SocketGuildUser user)
+        {
+            long case_id = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var data = db.Casenums.Where(x => x.CmdName.Equals(cmdName) && x.UserId.Equals(user.Id) && x.GuildId.Equals(context.Guild.Id.ToLong())).Last();
+                    if (data != null)
+                        case_id = data.Id;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return case_id;
+        }
+
         private async Task OnRoleDeletedAsync(SocketRole role)
         {
             var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
@@ -234,7 +253,8 @@ namespace Siotrix.Discord.Moderation
             int argPos = 0;
             string spec = null;
             string content = null;
-            
+            long case_id = 0;
+
             IsUsableLogChannel(context.Guild.Id.ToLong());
             var channel = context.Guild.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
             var mod_channel = context.Guild.GetChannel(modlogchannel_id.ToUlong()) as ISocketMessageChannel;
@@ -265,6 +285,7 @@ namespace Siotrix.Discord.Moderation
                 var mod_identifier = context.User.Username + "#" + context.User.Discriminator;
                 var action = getAction(words[0]);
                 var action_color = getActionColor(words[0]);
+                
                 //var case_number = getCaseNumber(words[0]);
                 if (action == null) return;
                 
@@ -295,13 +316,17 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
+                if (ActionResult.CaseId <= 0)
+                    case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
+                else
+                    case_id = ActionResult.CaseId;
                 mod_builder
                     .AddField(x =>
                     {
-                        x.Name = "Case #" + ActionResult.CaseId.ToString() + " | " + words[0];
+                        x.Name = "Case #" + case_id + " | " + words[0];
                         x.Value = "User : " + user.Username + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " + 
                                   context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" + 
-                                  "Reason : Type " + g_prefix + "reason " +  ActionResult.CaseId.ToString() + "<reason> to add it.";
+                                  "Reason : Type " + g_prefix + "reason " +  case_id + "<reason> to add it.";
                     });
                 //await mod_channel.SendMessageAsync("", false, mod_builder.Build());
                 if (is_toggled_modlog)

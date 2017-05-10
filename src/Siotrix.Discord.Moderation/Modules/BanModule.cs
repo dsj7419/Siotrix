@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Discord.Commands;
 using System;
 using System.Threading.Tasks;
@@ -31,6 +32,19 @@ namespace Siotrix.Discord.Moderation
             await Context.Guild.AddBanAsync(user);
             var case_id = CaseExtensions.GetCaseNumber("ban", Context, user as SocketGuildUser);
             await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+        }
+
+        [Command("unban")]
+        [Summary("===========")]
+        [Remarks("============")]
+        [RequireContext(ContextType.Guild)]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task UnBanAsync()
+        {
+            //await Context.Guild.RemoveBanAsync(user);
+            var banned_data = Context.Guild.GetBansAsync();
+            Console.WriteLine(banned_data.User.Username);
+            await Context.Channel.SendMessageAsync(banned_data.User.Username);
         }
     }
 }
