@@ -33,7 +33,5 @@ namespace Siotrix.Discord.Moderation
             var case_id = CaseExtensions.GetCaseNumber("ban", Context, user as SocketGuildUser);
             await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
-
-      
     }
 }
