@@ -316,17 +316,14 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                if (ActionResult.CaseId <= 0)
-                    case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
-                else
-                    case_id = ActionResult.CaseId;
+                    //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
                 mod_builder
                     .AddField(x =>
                     {
-                        x.Name = "Case #" + case_id + " | " + words[0];
+                        x.Name = "Case #" + ActionResult.CaseId + " | " + words[0];
                         x.Value = "User : " + user.Username + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " + 
                                   context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" + 
-                                  "Reason : Type " + g_prefix + "reason " +  case_id + "<reason> to add it.";
+                                  "Reason : Type " + g_prefix + "reason " +  ActionResult.CaseId + "<reason> to add it.";
                     });
                 //await mod_channel.SendMessageAsync("", false, mod_builder.Build());
                 if (is_toggled_modlog)
