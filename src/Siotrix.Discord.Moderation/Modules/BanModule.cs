@@ -34,7 +34,7 @@ namespace Siotrix.Discord.Moderation
             await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
         }
 
-        [Command("unban")]
+    /*    [Command("unban")]
         [Summary("===========")]
         [Remarks("============")]
         [RequireContext(ContextType.Guild)]
@@ -45,6 +45,6 @@ namespace Siotrix.Discord.Moderation
             var banned_data = Context.Guild.GetBansAsync();
             Console.WriteLine(banned_data.User.Username);
             await Context.Channel.SendMessageAsync(banned_data.User.Username);
-        }
+        } */
     }
 }

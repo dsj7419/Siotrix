@@ -71,6 +71,9 @@ namespace Siotrix.Discord.Moderation
             _client.RoleUpdated += OnRoleUpdatedAsync;
             _client.RoleDeleted += OnRoleDeletedAsync;
             _client.UserUnbanned += OnUserUnBannedAsync;
+            _client.GuildMemberUpdated += GuildMemberUpdated_RoleChange;
+            _client.GuildMemberUpdated += UserUpdated_NameChange;
+            _client.GuildMemberUpdated += GuildMemberUpdated_NickChange;
             _client.UserLeft += OnUserLeftAsync;
             await PrettyConsole.LogAsync("Info", "Log", "Service started successfully").ConfigureAwait(false);
         }
@@ -88,6 +91,9 @@ namespace Siotrix.Discord.Moderation
             _client.RoleUpdated -= OnRoleUpdatedAsync;
             _client.RoleDeleted -= OnRoleDeletedAsync;
             _client.UserUnbanned -= OnUserUnBannedAsync;
+            _client.GuildMemberUpdated -= GuildMemberUpdated_RoleChange;
+            _client.GuildMemberUpdated -= UserUpdated_NameChange;
+            _client.GuildMemberUpdated -= GuildMemberUpdated_NickChange;
             _client.UserLeft -= OnUserLeftAsync;
             _db = null;
 
@@ -496,6 +502,85 @@ namespace Siotrix.Discord.Moderation
                 await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
             else
                 await log_channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        private async Task GuildMemberUpdated_RoleChange(SocketGuildUser b, SocketGuildUser a)
+        {
+            if (b.Roles == a.Roles) return;
+            IsUsableLogChannel(b.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+          //  var guild = (_client.GetChannel(log_channel) as SocketGuildChannel).Guild;
+            if (b.Roles.Count() > a.Roles.Count())
+            {
+                if (!is_toggled_log)
+                {
+                    var role = b.Roles.Except(a.Roles).FirstOrDefault();
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(b.GetAvatarUrl())
+                    .WithName($"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has lost role: {role.Name}"))
+                    .WithColor(new Color(255, 67, 164));
+                    await log_channel.SendMessageAsync("", false, builder.Build());
+                }
+            }
+            else
+            {
+                if (!is_toggled_log)
+                {
+                    var role = a.Roles.Except(b.Roles).FirstOrDefault();
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(b.GetAvatarUrl())
+                    .WithName($"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has gained role: {role.Name}"))
+                    .WithColor(new Color(67, 255, 164));
+                    await log_channel.SendMessageAsync("", false, builder.Build());
+                }
+            }
+        }
+
+        private async Task UserUpdated_NameChange(SocketUser b, SocketUser a)
+        {
+            if (b.Username == a.Username) return;
+            IsUsableLogChannel(b.Id.ToLong());
+            var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+            if (!is_toggled_log)
+            {
+                var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(b.GetAvatarUrl())
+                .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) changed their username to {a.Username}"))
+                .WithColor(new Color(1, 1, 1));
+                await log_channel.SendMessageAsync("", false, builder.Build());
+            }
+        }
+
+        private async Task GuildMemberUpdated_NickChange(SocketGuildUser b, SocketGuildUser a)
+        {
+            if (b.Nickname == a.Nickname) return;
+            IsUsableLogChannel(b.Guild.Id.ToLong());
+            var log_channel = _client.GetChannel(logchannel_id.ToUlong()) as ISocketMessageChannel;
+            if (!is_toggled_log)
+            {
+
+                if (a.Nickname == null)
+                {
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(b.GetAvatarUrl())
+                    .WithName($"{b.Username}#{b.Discriminator} ({b.Nickname}) ({b.Id}) removed their nickname."))
+                    .WithColor(new Color(1, 1, 1));
+                    await log_channel.SendMessageAsync("", false, builder.Build());
+                }
+                else
+                {
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(b.GetAvatarUrl())
+                    .WithName($"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) changed their nickname to {a.Nickname}"))
+                    .WithColor(new Color(1, 1, 1));
+                    await log_channel.SendMessageAsync("", false, builder.Build());
+                }
+            }
         }
     }
 }
