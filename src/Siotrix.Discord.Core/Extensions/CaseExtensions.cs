@@ -9,29 +9,25 @@ namespace Siotrix.Discord
 {
     public static class CaseExtensions
     {
-        public static long GetCaseNumber(this string cmdName, SocketCommandContext context, SocketGuildUser user)
+        public static long GetCaseNumber(this SocketCommandContext context)
         {
-            long case_id = 0;
+            long case_num = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var record = new DiscordCaseNum();
-                    record.GuildId = context.Guild.Id.ToLong();
-                    record.UserId = user.Id.ToLong();
-                    record.UserName = user.Username;
-                    record.CmdName = cmdName;
-                    db.Casenums.Add(record);
-                    db.SaveChanges();
-                    case_id = db.Casenums.Last().Id;
-                    ActionResult.CaseId = case_id;
+                    var list = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()));
+                    if (!list.Any())
+                        case_num = 1;
+                    else
+                        case_num = list.Last().GCaseNum + 1;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return case_id;
+            return case_num;
         }
     }
 }

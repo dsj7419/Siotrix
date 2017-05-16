@@ -206,9 +206,11 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Casenums.Where(x => x.CmdName.Equals(cmdName) && x.UserId.Equals(user.Id) && x.GuildId.Equals(context.Guild.Id.ToLong())).Last();
-                    if (data != null)
-                        case_id = data.Id;
+                    var data = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()));
+                    if (!data.Any())
+                        case_id = 1;
+                    else
+                        case_id = data.Last().GCaseNum + 1;
                 }
                 catch (Exception e)
                 {
@@ -293,7 +295,7 @@ namespace Siotrix.Discord.Moderation
                 var action_color = getActionColor(words[0]);
                 
                 //var case_number = getCaseNumber(words[0]);
-                if (action == null) return;
+                if (action == null) return; // If action is not kick or ban or mute command, not display log information.
                 
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -322,23 +324,24 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                    //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
+                //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
+                case_id = CaseExtensions.GetCaseNumber(context);
                 mod_builder
                     .AddField(x =>
                     {
-                        x.Name = "Case #" + ActionResult.CaseId + " | " + words[0];
-                        x.Value = "User : " + user.Username + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " + 
+                        x.Name = "Case #" + case_id + " | " + words[0];
+                        x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " + 
                                   context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" + 
-                                  "Reason : Type " + g_prefix + "reason " +  ActionResult.CaseId + "<reason> to add it.";
+                                  "Reason : Type " + g_prefix + "reason " +  case_id + "<reason> to add it.";
                     });
-                //await mod_channel.SendMessageAsync("", false, mod_builder.Build());
                 if (is_toggled_modlog)
                     await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
                 else
                 {
                     IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
-
-                    ActionResult.Content = words[0] + "," + ActionResult.CaseId.ToString() + "," + user.Username + "(" + user.Id.ToString() + ")" + "," + context.User.Username + "(" + context.User.Id.ToString() + ")";
+                    ActionResult.CommandName = words[0];
+                    ActionResult.CaseId = case_id;
+                    ActionResult.UserId = user.Id.ToLong();
                     ActionResult.Instance = msg_instance;
                 }
             }

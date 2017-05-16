@@ -27,13 +27,44 @@ namespace Siotrix.Discord.Moderation
             return id;
         }
 
+        private async Task SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id, string reason)
+        {
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var exist_data = db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) && x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
+                    if (exist_data.Any())
+                    {
+                        var data = exist_data.First();
+                        data.Reason = reason;
+                        db.Casenums.Update(data);
+                    }
+                    else
+                    {
+                        var record = new DiscordCaseNum();
+                        record.GCaseNum = case_num;
+                        record.GuildId = guild_id;
+                        record.UserId = user_id;
+                        record.CmdName = cmd_name;
+                        record.Reason = reason;
+                        db.Casenums.Add(record);
+                    }
+                    await db.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
         [Command("reason")]
         [Summary("Reason")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task ReasonAsync(int case_number, [Remainder]string reason)
+        public async Task ReasonAsync(long case_number, [Remainder]string reason)
         {
-            string[] data = ActionResult.Content.Split(',');
-            if (!case_number.ToString().Equals(data[1]))
+            if (!case_number.Equals(ActionResult.CaseId))
             {
                 await ReplyAsync("Wrong Number. Try again!");
                 return;
@@ -60,17 +91,16 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(g_footer[0])
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            
+            var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
             builder
                 .AddField(x =>
                 {
-                    x.Name = "Case " + "#" + data[1].ToString() + " | " + data[0];
-                    x.Value = "User : " + data[2] + "\n" + "Moderator : " + data[3] + "\n" + "Reason : " + reason + " (edited)";
+                    x.Name = "Case " + "#" + case_number.ToString() + " | " + ActionResult.CommandName;
+                    x.Value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" + "Reason : " + reason + " (edited)";
                 });
-
-            //await channel.SendMessageAsync("", false, builder.Build());
+            await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
-            await ReplyAsync("Case #" + data[1].ToString() + " has been updated.");
+            await ReplyAsync("Case #" + case_number.ToString() + " has been updated.");
         }
 
         [Command("reason")]
@@ -78,7 +108,6 @@ namespace Siotrix.Discord.Moderation
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task ReasonAsync([Remainder]string reason)
         {
-            string[] data = ActionResult.Content.Split(',');
             var mod_channel_id = GetModLogChannelId();
             if (mod_channel_id <= 0) return;
             var channel = Context.Guild.GetChannel(mod_channel_id.ToUlong()) as ISocketMessageChannel;
@@ -100,16 +129,16 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(g_footer[0])
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            
+            var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
             builder
                 .AddField(x =>
                 {
-                    x.Name = "Case " + "#" + data[1].ToString() + " | " + data[0];
-                    x.Value = "User : " + data[2] + "\n" + "Moderator : " + data[3] + "\n" + "Reason : " + reason + " (edited)";
+                    x.Name = "Case " + "#" + ActionResult.CaseId.ToString() + " | " + ActionResult.CommandName;
+                    x.Value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" + "Reason : " + reason + " (edited)";
                 });
-
+            await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
-            await ReplyAsync("Case #" + data[1].ToString() + " has been updated.");
+            await ReplyAsync("Case #" + ActionResult.CaseId.ToString() + " has been updated.");
         }
     }
 }
