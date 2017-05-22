@@ -80,6 +80,7 @@ namespace Siotrix.Discord.Moderation
             Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
             string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
+            string value = null;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(g_icon_url)
@@ -92,11 +93,18 @@ namespace Siotrix.Discord.Moderation
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
+            if(ActionResult.CommandName.Equals("mute"))
+                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" +
+                    "Length : " + ActionResult.TimeLength.ToString() + "minutes" + "\n" +
+                    "Reason : " + reason + " (edited)";
+            else
+                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" +                    
+                    "Reason : " + reason + " (edited)";
             builder
                 .AddField(x =>
                 {
                     x.Name = "Case " + "#" + case_number.ToString() + " | " + ActionResult.CommandName;
-                    x.Value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" + "Reason : " + reason + " (edited)";
+                    x.Value = value;
                 });
             await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
@@ -118,6 +126,7 @@ namespace Siotrix.Discord.Moderation
             Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
             string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
+            string value = null;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(g_icon_url)
@@ -130,11 +139,18 @@ namespace Siotrix.Discord.Moderation
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
+            if (ActionResult.CommandName.Equals("mute"))
+                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" +
+                    "Length : " + ActionResult.TimeLength.ToString() + "minutes" + "\n" +
+                    "Reason : " + reason + " (edited)";
+            else
+                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" +
+                    "Reason : " + reason + " (edited)";
             builder
                 .AddField(x =>
                 {
                     x.Name = "Case " + "#" + ActionResult.CaseId.ToString() + " | " + ActionResult.CommandName;
-                    x.Value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " + Context.User.Username + "(" + Context.User.Id.ToString() + ")\n" + "Reason : " + reason + " (edited)";
+                    x.Value = value;
                 });
             await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });

@@ -15,7 +15,7 @@ namespace Siotrix.Discord
         private static IUserMessage instance = null;
         private static long case_id = 0;
         private static long user_id = 0;
-        private static string user_name = null;
+        private static int time_length = 0;
 
         public static bool IsSuccess
         {
@@ -38,6 +38,18 @@ namespace Siotrix.Discord
             set
             {
                 cmd_name = value;
+            }
+        }
+
+        public static int TimeLength
+        {
+            get
+            {
+                return time_length;
+            }
+            set
+            {
+                time_length = value;
             }
         }
 
