@@ -53,9 +53,13 @@ namespace Siotrix.Discord.Moderation
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var repeat_spam_value = GetSpamValue(context.Guild.Id.ToLong(), 1);
             var caps_spam_value = GetSpamValue(context.Guild.Id.ToLong(), 4);
+            var mute_repeat_spam_value = GetSpamValue(context.Guild.Id.ToLong(), 2);
+            var mute_caps_spam_value = GetSpamValue(context.Guild.Id.ToLong(), 5);
+            var mute_repeat_time_value = GetSpamValue(context.Guild.Id.ToLong(), 3);
+            var mute_caps_time_value = GetSpamValue(context.Guild.Id.ToLong(), 6);
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
 
-            if (message.Content.Cap(message.Content.Length).Equals(message.Content))
+            if (message.Content.ToUpper().Equals(message.Content))
             {
                 number_of_the_cap_msg++;
                 if(number_of_the_cap_msg == caps_spam_value)
@@ -86,6 +90,10 @@ namespace Siotrix.Discord.Moderation
                     }
                     else if (number_of_the_same_msg > repeat_spam_value)
                     {
+                        if(number_of_the_same_msg == mute_repeat_spam_value)
+                        {
+                            await MuteSpamUser(context.User as IGuildUser, mute_repeat_time_value, context);
+                        }
                         builder = GetBuilder(context, repeat_spam_value, number_of_the_same_msg, true);
                         await msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                         return;
@@ -99,6 +107,25 @@ namespace Siotrix.Discord.Moderation
             }
             
             await Task.Delay(0);
+        }
+
+        private async Task MuteSpamUser(IGuildUser user, int minutes, SocketCommandContext context)
+        {
+            try
+            {
+                if(!user.IsBot)
+                    await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true).ConfigureAwait(false);
+                /*var is_save = MuteExtensions.SaveMuteUser(user, minutes);
+                if (is_save)
+                {
+                    var case_id = CaseExtensions.GetCaseNumber(context);
+                    await context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+                }*/
+            }
+            catch
+            {
+                await context.Channel.SendMessageAsync("mute_error").ConfigureAwait(false);
+            }
         }
 
         private EmbedBuilder GetBuilder(SocketCommandContext context, int set_num, long spam_num, bool is_repeat_message)

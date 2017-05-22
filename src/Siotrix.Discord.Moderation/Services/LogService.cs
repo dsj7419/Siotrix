@@ -122,11 +122,11 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = CaseExtensions.GetCaseNumber(context);
+                case_id = CaseExtensions.GetCaseNumber(context, "unmute");
                 if (is_auto)
                 {
                     value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
-                                  context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
+                                  context.Guild.CurrentUser.Mention + "\n" +
                                   "Reason : auto";
                 }
                 else
@@ -158,12 +158,14 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private async void OnMuteReceivedAsync(IGuildUser user, MuteExtensions.MuteType muteType, SocketCommandContext context, int minutes)
+        private async void OnMuteReceivedAsync(IGuildUser user, MuteExtensions.MuteType muteType, SocketCommandContext context, int minutes, bool is_auto)
         {
             try
             {
                 long case_id = 0;
                 var guild = user.Guild as SocketGuild;
+                string mute_data = null;
+                string value = null;
                 LogChannelExtensions.IsUsableLogChannel(guild.Id.ToLong());
                 var channel = guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
                 var mod_channel = guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
@@ -182,10 +184,14 @@ namespace Siotrix.Discord.Moderation
                         break;
                 }
 
+                if (is_auto)
+                    mute_data = user.Username + "#" + user.Discriminator + " has been auto " + mutes + " muted.";
+                else
+                    mute_data = user.Username + "#" + user.Discriminator + " has been " + mutes + " muted by " + context.User.Username + "#" + context.User.Discriminator + ".";
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
-                .WithName(user.Username + "#" + user.Discriminator + " has been " + mutes + " muted by " + context.User.Username + "#" + context.User.Discriminator + "."))
+                .WithName(mute_data))
                 .WithColor(new Color(127, 255, 0));
                 if (LogChannelExtensions.is_toggled_log)
                     await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
@@ -209,15 +215,27 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = CaseExtensions.GetCaseNumber(context);
+                case_id = CaseExtensions.GetCaseNumber(context, "mute");
+
+                if (is_auto)
+                {
+                    value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
+                                  context.Guild.CurrentUser.Mention + "\n" +
+                                  "Length : " + minutes.ToString() + "minutes" + "\n" +
+                                  "Reason : auto";
+                }
+                else
+                {
+                    value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
+                                  context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
+                                  "Length : " + minutes.ToString() + "minutes" + "\n" +
+                                  "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
+                }
                 mod_builder
                     .AddField(x =>
                     {
                         x.Name = "Case #" + case_id + " | mute";
-                        x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
-                                  context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
-                                  "Length : " + minutes.ToString() + "minutes" + "\n" +
-                                  "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
+                        x.Value = value;
                     });
                 if (LogChannelExtensions.is_toggled_modlog)
                     await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
@@ -447,7 +465,7 @@ namespace Siotrix.Discord.Moderation
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
-                case_id = CaseExtensions.GetCaseNumber(context);
+                case_id = CaseExtensions.GetCaseNumber(context, words[0]);
                 mod_builder
                     .AddField(x =>
                     {

@@ -14,7 +14,7 @@ namespace Siotrix.Discord
         public static readonly OverwritePermissions denyOverwrite = new OverwritePermissions(sendMessages: PermValue.Deny, attachFiles: PermValue.Deny);
         public static ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, Timer>> unmuteTimers { get; }
         = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, Timer>>();
-        public static event Action<IGuildUser, MuteType, SocketCommandContext, int> UserMuted = delegate { };
+        public static event Action<IGuildUser, MuteType, SocketCommandContext, int, bool> UserMuted = delegate { };
         public static event Action<IGuildUser, MuteType, SocketCommandContext, bool> UserUnmuted = delegate { };
 
         public enum MuteType
@@ -141,9 +141,9 @@ namespace Siotrix.Discord
             return is_remove;
         }
 
-        public static async Task TimedMute(IGuildUser user, TimeSpan after, int minutes, SocketCommandContext context)
+        public static async Task TimedMute(IGuildUser user, TimeSpan after, int minutes, SocketCommandContext context, bool is_auto)
         {
-            await MuteUser(user, minutes, context).ConfigureAwait(false); // mute the user. This will also remove any previous unmute timers
+            await MuteUser(user, minutes, context, is_auto).ConfigureAwait(false); // mute the user. This will also remove any previous unmute timers
 
             StartUnmuteTimer(user.GuildId, user.Id, after, context); // start the timer
         }
@@ -160,14 +160,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task MuteUser(IGuildUser usr, int minutes, SocketCommandContext context)
+        public static async Task MuteUser(IGuildUser usr, int minutes, SocketCommandContext context, bool is_auto)
         {
             await usr.ModifyAsync(x => x.Mute = true).ConfigureAwait(false);
             var muteRole = await GetMuteRole(usr.Guild);
             if (!usr.RoleIds.Contains(muteRole.Id))
                 await usr.AddRoleAsync(muteRole).ConfigureAwait(false);
             StopUnmuteTimer(usr.GuildId, usr.Id);
-            UserMuted(usr, MuteType.All, context, minutes);
+            UserMuted(usr, MuteType.All, context, minutes, is_auto);
         }
 
         public static void StartUnmuteTimer(ulong guildId, ulong userId, TimeSpan after, SocketCommandContext context)
@@ -198,14 +198,25 @@ namespace Siotrix.Discord
 
         public static async Task UnmuteUser(this IGuildUser usr, bool is_auto, SocketCommandContext context)
         {
-            var is_remove = RemoveMuteUser(usr);
-            if (is_remove)
+            if (is_auto)
             {
                 StopUnmuteTimer(usr.GuildId, usr.Id);
                 try { await usr.ModifyAsync(x => x.Mute = false).ConfigureAwait(false); } catch { }
                 try { await usr.RemoveRoleAsync(await GetMuteRole(usr.Guild)).ConfigureAwait(false); } catch { /*ignore*/ }
 
                 UserUnmuted(usr, MuteType.All, context, is_auto);
+            }
+            else
+            {
+                var is_remove = RemoveMuteUser(usr);
+                if (is_remove)
+                {
+                    StopUnmuteTimer(usr.GuildId, usr.Id);
+                    try { await usr.ModifyAsync(x => x.Mute = false).ConfigureAwait(false); } catch { }
+                    try { await usr.RemoveRoleAsync(await GetMuteRole(usr.Guild)).ConfigureAwait(false); } catch { /*ignore*/ }
+
+                    UserUnmuted(usr, MuteType.All, context, is_auto);
+                }
             }
         }
     }

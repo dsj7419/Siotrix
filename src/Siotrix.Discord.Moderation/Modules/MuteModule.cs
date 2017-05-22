@@ -363,11 +363,11 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 //await MuteUser(user).ConfigureAwait(false); // no parameter
-                await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, Context).ConfigureAwait(false);
+                await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, Context, false).ConfigureAwait(false);
                 var is_save = MuteExtensions.SaveMuteUser(user, minutes);
                 if (is_save)
                 {
-                    var case_id = CaseExtensions.GetCaseNumber(Context);
+                    var case_id = CaseExtensions.GetCaseNumber(Context, "mute");
                     await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
                 }
             }
@@ -387,7 +387,7 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 await MuteExtensions.UnmuteUser(user, false, Context).ConfigureAwait(false);
-                var case_id = CaseExtensions.GetCaseNumber(Context);
+                var case_id = CaseExtensions.GetCaseNumber(Context, "unmute");
                 await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
             }
             catch
