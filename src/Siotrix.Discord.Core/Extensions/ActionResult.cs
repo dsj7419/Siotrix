@@ -16,6 +16,7 @@ namespace Siotrix.Discord
         private static long case_id = 0;
         private static long user_id = 0;
         private static int time_length = 0;
+        private static bool is_founded_case_number = false;
 
         public static bool IsSuccess
         {
@@ -86,6 +87,18 @@ namespace Siotrix.Discord
             set
             {
                 user_id = value;
+            }
+        }
+        
+        public static bool IsFoundedCaseNumber
+        {
+            get
+            {
+                return is_founded_case_number;
+            }
+            set
+            {
+                is_founded_case_number = value;
             }
         }
     }

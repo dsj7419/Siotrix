@@ -367,8 +367,11 @@ namespace Siotrix.Discord.Moderation
                 var is_save = MuteExtensions.SaveMuteUser(user, minutes);
                 if (is_save)
                 {
-                    var case_id = CaseExtensions.GetCaseNumber(Context, "mute");
+                    var case_id = CaseExtensions.GetCaseNumber(Context);
                     await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+
+                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(), ""); // add save in db
+                    Console.WriteLine("mute ========================={0}", case_id);
                 }
             }
             catch
@@ -387,8 +390,11 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 await MuteExtensions.UnmuteUser(user, false, Context).ConfigureAwait(false);
-                var case_id = CaseExtensions.GetCaseNumber(Context, "unmute");
+                var case_id = CaseExtensions.GetCaseNumber(Context);
                 await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+
+                    CaseExtensions.SaveCaseDataAsync("unmute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(), ""); // add save in db
+                Console.WriteLine("unmute ========================={0}", case_id);
             }
             catch
             {
