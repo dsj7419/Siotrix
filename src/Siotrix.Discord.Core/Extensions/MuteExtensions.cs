@@ -181,6 +181,8 @@ namespace Siotrix.Discord
                 try
                 {
                     await UnmuteUser(context.Guild.GetUser(userId), true, context).ConfigureAwait(false);
+                    var case_id = CaseExtensions.GetCaseNumber(context);
+                    CaseExtensions.SaveCaseDataAsync("unmute", case_id, userId.ToLong(), context.Guild.Id.ToLong(), "auto"); 
                 }
                 catch (Exception ex)
                 {
