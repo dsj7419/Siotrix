@@ -90,7 +90,6 @@ namespace Siotrix.Discord.Moderation
                             list += "**Type** : " + "``" + data + "``" + "   " + "**Count** : " + item.SpamValue.ToString() + "\n";
                         }
                     }
-                    db.SaveChanges();
                 }
                 catch (Exception e)
                 {
@@ -100,7 +99,7 @@ namespace Siotrix.Discord.Moderation
             return list;
         }
 
-        [Command("list")]
+        [Command]
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
