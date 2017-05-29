@@ -181,6 +181,8 @@ namespace Siotrix.Discord
                 try
                 {
                     await UnmuteUser(context.Guild.GetUser(userId), true, context).ConfigureAwait(false);
+                    var case_id = CaseExtensions.GetCaseNumber(context);
+                    CaseExtensions.SaveCaseDataAsync("unmute", case_id, userId.ToLong(), context.Guild.Id.ToLong(), "auto"); 
                 }
                 catch (Exception ex)
                 {
@@ -198,16 +200,7 @@ namespace Siotrix.Discord
 
         public static async Task UnmuteUser(this IGuildUser usr, bool is_auto, SocketCommandContext context)
         {
-            if (is_auto)
-            {
-                StopUnmuteTimer(usr.GuildId, usr.Id);
-                try { await usr.ModifyAsync(x => x.Mute = false).ConfigureAwait(false); } catch { }
-                try { await usr.RemoveRoleAsync(await GetMuteRole(usr.Guild)).ConfigureAwait(false); } catch { /*ignore*/ }
-
-                UserUnmuted(usr, MuteType.All, context, is_auto);
-            }
-            else
-            {
+            
                 var is_remove = RemoveMuteUser(usr);
                 if (is_remove)
                 {
@@ -217,7 +210,6 @@ namespace Siotrix.Discord
 
                     UserUnmuted(usr, MuteType.All, context, is_auto);
                 }
-            }
         }
     }
 }

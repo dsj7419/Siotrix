@@ -27,37 +27,7 @@ namespace Siotrix.Discord.Moderation
             return id;
         }
 
-        private async Task SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id, string reason)
-        {
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var exist_data = db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) && x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
-                    if (exist_data.Any())
-                    {
-                        var data = exist_data.First();
-                        data.Reason = reason;
-                        db.Casenums.Update(data);
-                    }
-                    else
-                    {
-                        var record = new DiscordCaseNum();
-                        record.GCaseNum = case_num;
-                        record.GuildId = guild_id;
-                        record.UserId = user_id;
-                        record.CmdName = cmd_name;
-                        record.Reason = reason;
-                        db.Casenums.Add(record);
-                    }
-                    await db.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-        }
+        
 
         [Command("reason")]
         [Summary("Reason")]
@@ -106,7 +76,7 @@ namespace Siotrix.Discord.Moderation
                     x.Name = "Case " + "#" + case_number.ToString() + " | " + ActionResult.CommandName;
                     x.Value = value;
                 });
-            await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
+            CaseExtensions.SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
             await ReplyAsync("Case #" + case_number.ToString() + " has been updated.");
         }
@@ -152,7 +122,7 @@ namespace Siotrix.Discord.Moderation
                     x.Name = "Case " + "#" + ActionResult.CaseId.ToString() + " | " + ActionResult.CommandName;
                     x.Value = value;
                 });
-            await SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
+            CaseExtensions.SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId, Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
             await ReplyAsync("Case #" + ActionResult.CaseId.ToString() + " has been updated.");
         }

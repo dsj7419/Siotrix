@@ -115,12 +115,12 @@ namespace Siotrix.Discord.Moderation
             {
                 if(!user.IsBot)
                     await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true).ConfigureAwait(false);
-                /*var is_save = MuteExtensions.SaveMuteUser(user, minutes);
+                var is_save = MuteExtensions.SaveMuteUser(user, minutes);
                 if (is_save)
                 {
                     var case_id = CaseExtensions.GetCaseNumber(context);
-                    await context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
-                }*/
+                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(), "auto");
+                }
             }
             catch
             {

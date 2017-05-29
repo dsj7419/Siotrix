@@ -4,19 +4,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
     public static class CaseExtensions
     {
-        public static long GetCaseNumber(this SocketCommandContext context, string command_name)
+        public static long GetCaseNumber(this SocketCommandContext context)
         {
             long case_num = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var list = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()) && x.CmdName.Equals(command_name));
+                    var list = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()));
                     if (!list.Any())
                         case_num = 1;
                     else
@@ -28,6 +29,38 @@ namespace Siotrix.Discord
                 }
             }
             return case_num;
+        }
+
+        public static async void SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id, string reason)
+        {
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var exist_data = db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) && x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
+                    if (exist_data.Any())
+                    {
+                        var data = exist_data.First();
+                        data.Reason = reason;
+                        db.Casenums.Update(data);
+                    }
+                    else
+                    {
+                        var record = new DiscordCaseNum();
+                        record.GCaseNum = case_num;
+                        record.GuildId = guild_id;
+                        record.UserId = user_id;
+                        record.CmdName = cmd_name;
+                        record.Reason = reason;
+                        db.Casenums.Add(record);
+                    }
+                    await db.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }

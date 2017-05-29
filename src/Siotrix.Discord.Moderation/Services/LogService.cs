@@ -122,7 +122,8 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = CaseExtensions.GetCaseNumber(context, "unmute");
+                case_id = CaseExtensions.GetCaseNumber(context);
+                
                 if (is_auto)
                 {
                     value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
@@ -150,6 +151,8 @@ namespace Siotrix.Discord.Moderation
                     ActionResult.CaseId = case_id;
                     ActionResult.UserId = user.Id.ToLong();
                     ActionResult.Instance = msg_instance;
+                    ActionResult.IsFoundedCaseNumber = true;
+                    Console.WriteLine("Service-Unmute +++++++++++++++++++++++++++++++{0}", case_id);
                 }
             }
             catch (Exception e)
@@ -215,7 +218,7 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(g_footer[0])
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = CaseExtensions.GetCaseNumber(context, "mute");
+                case_id = CaseExtensions.GetCaseNumber(context);
 
                 if (is_auto)
                 {
@@ -247,6 +250,7 @@ namespace Siotrix.Discord.Moderation
                     ActionResult.UserId = user.Id.ToLong();
                     ActionResult.TimeLength = minutes;
                     ActionResult.Instance = msg_instance;
+                    Console.WriteLine("Service-Mute ------------------{0}", case_id);
                 }
             }
             catch (Exception e)
@@ -465,7 +469,7 @@ namespace Siotrix.Discord.Moderation
                     .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
-                case_id = CaseExtensions.GetCaseNumber(context, words[0]);
+                case_id = CaseExtensions.GetCaseNumber(context);
                 mod_builder
                     .AddField(x =>
                     {
