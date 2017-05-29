@@ -85,7 +85,7 @@ namespace Siotrix.Discord.Statistics
 
         private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            var react = await _db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emoji.Name);
+            var react = await _db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emote.Name);
 
             react.DeletedAt = DateTime.UtcNow;
 

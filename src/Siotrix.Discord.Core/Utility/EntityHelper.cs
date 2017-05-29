@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System.Text;
 
 namespace Siotrix.Discord
@@ -40,11 +41,12 @@ namespace Siotrix.Discord
 
         public static DiscordReaction CreateReaction(SocketReaction reaction)
         {
+
             return new DiscordReaction()
             {
                 AuthorId = (long)reaction.UserId,
-                EmojiId = (long?)reaction.Emoji.Id,
-                EmojiName = reaction.Emoji.Name,
+          //      EmojiId =  (long?)reaction.Emote.Id,
+                EmojiName = reaction.Emote.Name,
                 MessageId = (long)reaction.MessageId
             };
         }

@@ -17,9 +17,9 @@ namespace Siotrix.Discord.Admin
     public class CsetModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _service;
-        private readonly IDependencyMap _map;
+        private readonly IServiceProvider _map;
 
-        public CsetModule(CommandService service, IDependencyMap map)
+        public CsetModule(CommandService service, IServiceProvider map)
         {
             _service = service;
             _map = map;

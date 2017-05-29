@@ -28,7 +28,7 @@ namespace Siotrix.Discord
             Level = level;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IDependencyMap map)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider map)
         {
             var access = GetPermission(context);            // Get the acccesslevel for this context
 

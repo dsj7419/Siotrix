@@ -17,9 +17,9 @@ namespace Siotrix.Discord.Utility
     {
 
         private readonly CommandService _service;
-        private readonly IDependencyMap _map;
+        private readonly IServiceProvider _map;
 
-        public HelpModule(CommandService service, IDependencyMap map)
+        public HelpModule(CommandService service, IServiceProvider map)
         {
             _service = service;
             _map = map;

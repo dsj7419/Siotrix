@@ -1,9 +1,13 @@
 ﻿using Discord.WebSocket;
+using Discord;
 using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Statistics;
 using System.Threading.Tasks;
+using System;
+using Discord.Addons.InteractiveCommands;
 
 namespace Siotrix.Discord
 {
@@ -11,14 +15,14 @@ namespace Siotrix.Discord
     {
         public SiotrixModules Modules => _modules;
 
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
         private SiotrixModules _modules;
         private Configuration _config;
-        private DependencyMap _map;
+
 
         // General
         private GlobalErrorHandler _handler;
-        private CommandHandler _commands;
+      //  private CommandHandler _commands;
 
         // Audio
         private AudioService _audio;
@@ -38,7 +42,6 @@ namespace Siotrix.Discord
         public ServiceManager(DiscordSocketClient client)
         {
             _client = client;
-            _map = new DependencyMap();
             _config = Configuration.Load();
             _modules = new SiotrixModules();
         }
@@ -55,14 +58,21 @@ namespace Siotrix.Discord
             if (_config.Modules.Statistics)
                 await StartStatisticsAsync().ConfigureAwait(false);
 
-            if (!_map.TryAdd(this))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add self to map");
-            _commands = new CommandHandler(_client, _map);
-            await _commands.StartAsync().ConfigureAwait(false);
+            //if (!_map.TryAdd(this))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add self to map");
+            //_commands = new CommandHandler(_client, _map);
+
+            var provider = ConfigureServices();
+
+       //     await _commands.StartAsync().ConfigureAwait(false);
 
             if (_config.Modules.Moderation)
                 await StartModerationAsync().ConfigureAwait(false);
-        }
+
+            var handler = provider.GetService<CommandHandler>();
+            await handler.StartAsync();
+        }      
+
 
         public async Task StopAsync()
         {
@@ -75,7 +85,7 @@ namespace Siotrix.Discord
             if (_config.Modules.Moderation)
                 await StopModerationAsync();
 
-            await _commands.StopAsync();
+          //  await _commands.StopAsync();
         }
 
         #region Start
@@ -87,8 +97,9 @@ namespace Siotrix.Discord
 
             await _audio.StartAsync();
 
-            if (!_map.TryAdd(_audio))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Audio to map");
+            //if (!_map.TryAdd(_audio))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Audio to map");
+
         }
 
         public Task StartEventsAsync()
@@ -110,14 +121,16 @@ namespace Siotrix.Discord
             await _log.StartAsync();
             //await _warning.StartAsync();
 
-            if (!_map.TryAdd(_antispam))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Antispam to map");
-            if (!_map.TryAdd(_filter))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Filter to map");
-            if (!_map.TryAdd(_warning))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Warning to map");
-            if (!_map.TryAdd(_log))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Log to map");
+            //if (!_map.TryAdd(_antispam))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Antispam to map");
+            //if (!_map.TryAdd(_filter))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Filter to map");
+            //if (!_map.TryAdd(_warning))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Warning to map");
+            //if (!_map.TryAdd(_log))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Log to map");
+
+
         }
 
         public async Task StartStatisticsAsync()
@@ -129,10 +142,11 @@ namespace Siotrix.Discord
             await _membership.StartAsync();
             await _message.StartAsync();
 
-            if (!_map.TryAdd(_membership))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Membership to map");
-            if (!_map.TryAdd(_message))
-                await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Message to map");
+            //if (!_map.TryAdd(_membership))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Membership to map");
+            //if (!_map.TryAdd(_message))
+            //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Message to map");
+
         }
 
         #endregion
@@ -176,5 +190,29 @@ namespace Siotrix.Discord
         }
 
         #endregion
+
+        private IServiceProvider ConfigureServices()
+        {
+            var config = Configuration.Load();
+
+            var services = new ServiceCollection()
+                .AddSingleton<CommandHandler>()
+             //   .AddSingleton<Random>()
+                .AddSingleton(_client)
+                .AddSingleton(config)
+                .AddSingleton(new CommandService(new CommandServiceConfig()
+                {
+                    CaseSensitiveCommands = false,
+                    DefaultRunMode = RunMode.Async,
+                    LogLevel = LogSeverity.Info,
+                    ThrowOnError = false
+                }))
+                .AddSingleton(new InteractiveService(_client));
+
+            var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
+            provider.GetService<CommandHandler>();
+
+            return provider;
+        }
     }
 }

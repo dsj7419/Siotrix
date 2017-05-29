@@ -353,18 +353,44 @@ namespace Siotrix.Discord.Moderation
         }
         */
 
+        //[Command("mute")]
+        //[Summary("====")]
+        //[Remarks("==")]
+        //[RequireContext(ContextType.Guild)]
+        //[MinPermissions(AccessLevel.GuildMod)]
+        //private async Task Mute(IGuildUser user, int minutes)
+        //{
+        //    try
+        //    {
+        //        //await MuteUser(user).ConfigureAwait(false); // no parameter
+        //        await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, Context, false).ConfigureAwait(false);
+        //        var is_save = MuteExtensions.SaveMuteUser(user, minutes);
+        //        if (is_save)
+        //        {
+        //            var case_id = CaseExtensions.GetCaseNumber(Context, "mute");
+        //            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        await Context.Channel.SendMessageAsync("mute_error").ConfigureAwait(false);
+        //    }
+        //}
+
+
         [Command("mute")]
         [Summary("====")]
         [Remarks("==")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
-        private async Task Mute(IGuildUser user, int minutes)
+        private async Task Mute(IGuildUser user, [Remainder]TimeSpan time)
         {
             try
             {
+                var minutes = time.TotalMinutes;
                 //await MuteUser(user).ConfigureAwait(false); // no parameter
-                await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, Context, false).ConfigureAwait(false);
-                var is_save = MuteExtensions.SaveMuteUser(user, minutes);
+                await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), (int)minutes, Context, false).ConfigureAwait(false);
+                var is_save = MuteExtensions.SaveMuteUser(user, (int)minutes);
                 if (is_save)
                 {
                     var case_id = CaseExtensions.GetCaseNumber(Context, "mute");

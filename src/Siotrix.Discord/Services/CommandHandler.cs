@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Siotrix.Discord.Admin;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Events;
@@ -15,60 +15,73 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Siotrix.Discord.Readers;
 using Discord.Addons.InteractiveCommands;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
     public class CommandHandler
     {
-        private DiscordSocketClient _client;
-        private CommandService _service;
-        private DependencyMap _map;
+        private readonly DiscordSocketClient _client;
+        private readonly CommandService _commands;
+        private readonly IServiceProvider _provider;
         private int error = 0;
 
-        public CommandHandler(DiscordSocketClient client, DependencyMap map)
+        // public CommandHandler(DiscordSocketClient client, DependencyMap map)
+        public CommandHandler(IServiceProvider provider)
         {
-            _client = client;
-            _map = map;
-            _map.Add(new InteractiveService(_client));
+         //   _client = client;
+         //   _map = map;
+         //   _map.Add(new InteractiveService(_client));
+            _provider = provider;
+            _client = _provider.GetService<DiscordSocketClient>();
+            _commands = _provider.GetService<CommandService>();
         }
 
         public async Task StartAsync()
         {
-            _service = new CommandService(new CommandServiceConfig()
-            {
-                CaseSensitiveCommands = false,
-                DefaultRunMode = RunMode.Async
-            });
-           
-            _service.AddTypeReader(typeof(Uri), new UriTypeReader());
-            _service.AddTypeReader(typeof(TimeSpan), new TimeSpanTypeReader());
-            await _service.AddModulesAsync(Assembly.GetEntryAssembly());
+
+
+
+            //_commands = new CommandService(new CommandServiceConfig()
+            // {
+            //     CaseSensitiveCommands = false,
+            //     DefaultRunMode = RunMode.Async
+            // });
+
+      //      _service.AddTypeReader(typeof(Uri), new UriTypeReader());
+      //      _service.AddTypeReader(typeof(TimeSpan), new TimeSpanTypeReader());
+      //      await _service.AddModulesAsync(Assembly.GetEntryAssembly());
+
+            _commands.AddTypeReader(typeof(Uri), new UriTypeReader());
+            _commands.AddTypeReader(typeof(TimeSpan), new TimeSpanTypeReader());
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            await _commands.AddModulesAsync(typeof(Entity).GetTypeInfo().Assembly);
 
             var config = Configuration.Load();
             if (config.Modules.Admin)
-                await _service.LoadAdminAsync();
+                await _commands.LoadAdminAsync();
             if (config.Modules.Audio)
-                await _service.LoadAudioAsync();
+                await _commands.LoadAudioAsync();
             if (config.Modules.Events)
-                await _service.LoadEventsAsync();
+                await _commands.LoadEventsAsync();
             if (config.Modules.Utility)
-                await _service.LoadUtilityAsync();
+                await _commands.LoadUtilityAsync();
             if (config.Modules.Developer)
-                await _service.LoadDeveloperAsync();
+                await _commands.LoadDeveloperAsync();
             if (config.Modules.Moderation)
-                await _service.LoadModerationAsync();
+                await _commands.LoadModerationAsync();
             if (config.Modules.Roslyn)
-                await _service.LoadRoslynAsync();
+                await _commands.LoadRoslynAsync();
             if (config.Modules.Statistics)
-                await _service.LoadStatisticsAsync();
+                await _commands.LoadStatisticsAsync();
 
             _client.MessageReceived += HandleCommandAsync;
-            await PrettyConsole.LogAsync("Info", "Commands", $"Loaded {_service.Commands.Count()} commands");
+            await PrettyConsole.LogAsync("Info", "Commands", $"Loaded {_commands.Commands.Count()} commands");
         }
 
         public Task StopAsync()
         {
-            _service = null;
+            // _service = null;
             _client.MessageReceived -= HandleCommandAsync;
             return Task.CompletedTask;
         }
@@ -106,8 +119,8 @@ namespace Siotrix.Discord
         private bool CheckInputData(string[] input)
         {
             string first_param = input[0];
-            bool is_found = _service.Commands.Where(p => p.Name.Equals(first_param)).Any();
-            bool is_group_found = _service.Modules.Where(p => p.Aliases.First().Equals(first_param)).Any();
+            bool is_found = _commands.Commands.Where(p => p.Name.Equals(first_param)).Any();
+            bool is_group_found = _commands.Modules.Where(p => p.Aliases.First().Equals(first_param)).Any();
             if (!is_found && !is_group_found)
                 return true;
             return false;
@@ -116,7 +129,7 @@ namespace Siotrix.Discord
         private string GetHelpModule()
         {
             var modules_text = "";
-            var modules = _service.Modules.Where(x => !x.Name.ICEquals("default")).GroupBy(p => p.Name).ToList();
+            var modules = _commands.Modules.Where(x => !x.Name.ICEquals("default")).GroupBy(p => p.Name).ToList();
             if (modules.Any())
             {
                 foreach (var module in modules)
@@ -142,8 +155,8 @@ namespace Siotrix.Discord
             string buffer_data = "";
             int element_index = 0;
 
-            var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
-            var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
+            var isMod = _commands.Modules.Any(x => x.Name.ICEquals(predicate));
+            var isCommand = _commands.Commands.Any(x => x.Name.ICEquals(predicate));
 
             if (isMod && !isCommand)
             {
@@ -159,7 +172,7 @@ namespace Siotrix.Discord
             else if (!isMod && isCommand)
             {
                 System.Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
-                var command = _service.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
+                var command = _commands.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
                 has_group = command.Module.Aliases.First().Any();
                 string group_name = command.Module.Aliases.First() + " ";
                 var list = command.Module.Commands.Where(p => p.Name.Equals(predicate)).ToList();
@@ -208,7 +221,7 @@ namespace Siotrix.Discord
             }
             else // isMod = false && isCommand = false
             {
-                var list = _service.Modules.Where(p => p.Aliases.First().Equals(predicate));
+                var list = _commands.Modules.Where(p => p.Aliases.First().Equals(predicate));
                 if (list.Any())
                 {
                     foreach(var sub_command in list.First().Commands)
@@ -307,7 +320,7 @@ namespace Siotrix.Discord
                     
                 }
                 
-                var result = await _service.ExecuteAsync(context, argPos, _map);
+                var result = await _commands.ExecuteAsync(context, argPos, _provider);
                 if (result.IsSuccess)
                 {
                     ActionResult.IsSuccess = true;
