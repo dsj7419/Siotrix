@@ -23,7 +23,7 @@ namespace Siotrix.Discord
             Contexts = contexts;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IDependencyMap map)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IServiceProvider map)
         {
             var context = icontext as SocketCommandContext;
             bool isValid = false;

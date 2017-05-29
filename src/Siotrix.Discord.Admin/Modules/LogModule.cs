@@ -17,9 +17,9 @@ namespace Siotrix.Discord.Admin
     public class LogModule : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _service;
-        private readonly IDependencyMap _map;
+        private readonly IServiceProvider _map;
         
-        public LogModule(CommandService service, IDependencyMap map)
+        public LogModule(CommandService service, IServiceProvider map)
         {
             _service = service;
             _map = map;

@@ -23,7 +23,7 @@ namespace Siotrix.Discord
             GuildPermission = null;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IDependencyMap map)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IServiceProvider map)
         {
             var context = icontext as SocketCommandContext;
             var guildUser = context.Guild.CurrentUser;

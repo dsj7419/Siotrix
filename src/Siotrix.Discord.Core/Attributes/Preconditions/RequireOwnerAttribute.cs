@@ -7,7 +7,7 @@ namespace Siotrix.Discord
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {
-        public override async Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IDependencyMap map)
+        public override async Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IServiceProvider map)
         {
             var context = icontext as SocketCommandContext;
             var appinfo = await context.Client.GetApplicationInfoAsync();

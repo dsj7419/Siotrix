@@ -152,13 +152,13 @@ namespace Siotrix.Discord.Moderation
             {
                 value = "**Caps Setting Limit** : " + set_num.ToString() + "\n" +
                                 "**Number of Caps Messages founded** : " + spam_num.ToString() + "\n" +
-                                "**Note** : *" + context.User.Mention + "* keep to try caps spam attack!";
+                                "**Note** : *" + context.User.Mention + "* caps spam attack!";
             }
             else
             {
                 value = "**Repeat Setting Limit** : " + set_num.ToString() + "\n" +
                                 "**Number of Repeat Messages founded** : " + spam_num.ToString() + "\n" +
-                                "**Note** : *" + context.User.Mention + "* keep to try spam attack!";
+                                "**Note** : *" + context.User.Mention + "* spamming attack!";
             }
             embed
                 .AddField(x =>
