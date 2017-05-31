@@ -62,15 +62,16 @@ namespace Siotrix.Discord
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add self to map");
             //_commands = new CommandHandler(_client, _map);
 
-            var provider = ConfigureServices();
+            await ConfigureServices();
 
        //     await _commands.StartAsync().ConfigureAwait(false);
 
             if (_config.Modules.Moderation)
                 await StartModerationAsync().ConfigureAwait(false);
 
-            var handler = provider.GetService<CommandHandler>();
-            await handler.StartAsync();
+            //var handler = provider.GetService<CommandHandler>();
+           // var handler = new CommandHandler(provider);
+          //  await handler.StartAsync();
         }      
 
 
@@ -191,7 +192,7 @@ namespace Siotrix.Discord
 
         #endregion
 
-        private IServiceProvider ConfigureServices()
+        public async Task ConfigureServices()
         {
             var config = Configuration.Load();
 
@@ -210,9 +211,9 @@ namespace Siotrix.Discord
                 .AddSingleton(new InteractiveService(_client));
 
             var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
-            provider.GetService<CommandHandler>();
-
-            return provider;
+            var handler = provider.GetService<CommandHandler>();
+            await handler.StartAsync();
+           // return provider;
         }
     }
 }
