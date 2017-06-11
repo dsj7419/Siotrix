@@ -388,10 +388,7 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 var minutes = time.TotalMinutes;
-<<<<<<< HEAD
-=======
                 //await MuteUser(user).ConfigureAwait(false); // no parameter
->>>>>>> 47dac1fe4da0de7d8349056b8b0b686d91b8688e
                 await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), (int)minutes, Context, false).ConfigureAwait(false);
                 var is_save = MuteExtensions.SaveMuteUser(user, (int)minutes);
                 if (is_save)
