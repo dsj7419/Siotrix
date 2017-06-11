@@ -76,13 +76,14 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(x => x.UserId == user_id && x.GuildId == guild_id).OrderByDescending(x => x.CreatedAt).Take(10);
+                    var data = db.Gwarningusers.Where(x => x.UserId == user_id && x.GuildId == guild_id);
                     var compare = db.Warninginfos.ToList();
                     var falloff = db.Gwarns.Where(x => x.GuildId == guild_id && x.Option == 6);
                     if (data.Any() && compare.Any() && falloff.Any()) 
                     {
                         int index = 0;
-                        foreach(var item in data)
+                        var list = data.OrderByDescending(x => x.CreatedAt).Take(10);
+                        foreach (var item in list)
                         {
                             foreach(var i in compare)
                             {
