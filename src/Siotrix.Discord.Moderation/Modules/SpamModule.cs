@@ -15,7 +15,6 @@ namespace Siotrix.Discord.Moderation
     [Group("spam")]
     [Summary("Special guild-specific spam moderation commands.")]
     [RequireContext(ContextType.Guild)]
-    [MinPermissions(AccessLevel.GuildMod)]
     public class SpamModule : ModuleBase<SocketCommandContext>
     {
         private bool SaveAndUpdateSpamData(int option, int num)
@@ -55,6 +54,7 @@ namespace Siotrix.Discord.Moderation
         {
             string data = null;
             string list = null;
+            string spam_value = null;
             using (var db = new LogDatabase())
             {
                 try
@@ -67,27 +67,39 @@ namespace Siotrix.Discord.Moderation
                             switch (item.Option)
                             {
                                 case 1:
-                                    data = "set repeatspam";
+                                    data = "Repeat spam warning";
+                                    spam_value = item.SpamValue.ToString();
                                     break;
                                 case 2:
-                                    data = "mute repeatspam";
+                                    data = "Repeat spam mute";
+                                    spam_value = item.SpamValue.ToString();
                                     break;
                                 case 3:
-                                    data = "mutetime repeatspam";
+                                    data = "Spam Mute Time";
+                                    var time1 = TimeSpan.FromMinutes((double)item.SpamValue);
+                                    spam_value = string.Format("{0}{1}{2}", (time1.Days > 0) ? time1.Days.ToString() + " days " : null,
+                                                    (time1.Hours > 0) ? time1.Hours.ToString() + " hours " : null,
+                                                    (time1.Minutes > 0) ? time1.Minutes.ToString() + " minutes " : null);
                                     break;
                                 case 4:
-                                    data = "set capsspam";
+                                    data = "Caps spam warning";
+                                    spam_value = item.SpamValue.ToString();
                                     break;
                                 case 5:
-                                    data = "mute capsspam";
+                                    data = "Repeat Caps mute";
+                                    spam_value = item.SpamValue.ToString();
                                     break;
                                 case 6:
-                                    data = "mutetime capsspam";
+                                    data = "Caps Mute Time";
+                                    var time2 = TimeSpan.FromMinutes((double)item.SpamValue);
+                                    spam_value = string.Format("{0}{1}{2}", (time2.Days > 0) ? time2.Days.ToString() + " days " : null,
+                                                    (time2.Hours > 0) ? time2.Hours.ToString() + " hours " : null,
+                                                    (time2.Minutes > 0) ? time2.Minutes.ToString() + " minutes " : null);
                                     break;
                                 default:
                                     break;
                             }
-                            list += "**Type** : " + "``" + data + "``" + "   " + "**Count** : " + item.SpamValue.ToString() + "\n";
+                            list += "``" + data + "``" + " : **" + spam_value + "**\n";
                         }
                     }
                 }
@@ -126,7 +138,7 @@ namespace Siotrix.Discord.Moderation
             builder
            .AddField(x =>
            {
-               x.Name = "Spam List";
+               x.Name = "Spam Settings";
                x.Value = value;
            });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
@@ -158,9 +170,10 @@ namespace Siotrix.Discord.Moderation
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task MuteTimeRepeatAsync(int num)
+        public async Task MuteTimeRepeatAsync([Remainder]TimeSpan time)
         {
-            var success = SaveAndUpdateSpamData(3, num);
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateSpamData(3, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
         }
@@ -191,9 +204,10 @@ namespace Siotrix.Discord.Moderation
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task MuteTimeCapsAsync(int num)
+        public async Task MuteTimeCapsAsync([Remainder]TimeSpan time)
         {
-            var success = SaveAndUpdateSpamData(6, num);
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateSpamData(6, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
         }

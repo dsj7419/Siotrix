@@ -16,12 +16,10 @@ namespace Siotrix.Discord.Moderation
     [Group("warn")]
     [Summary("Warn a misbehaving user.")]
     [RequireContext(ContextType.Guild)]
-    [MinPermissions(AccessLevel.GuildMod)]
     public class WarnModule : ModuleBase<SocketCommandContext>
     {
         private string GetWarnData(long guild_id)
         {
-            int[] time = new int[6];
             string list = null;
             using (var db = new LogDatabase())
             {
@@ -31,14 +29,23 @@ namespace Siotrix.Discord.Moderation
                     if (result.Any())
                     {
                         string mute_warn_num = result.FirstOrDefault(x => x.Option == 1).WarnValue.ToString();
-                        string mute_time_num = result.FirstOrDefault(x => x.Option == 2).WarnValue.ToString();
+                        var time1 = TimeSpan.FromMinutes((double)result.FirstOrDefault(x => x.Option == 2).WarnValue);
+                        string mute_time_num = string.Format("{0}{1}{2}", (time1.Days > 0) ? time1.Days.ToString() + " days " : null,
+                            (time1.Hours > 0) ? time1.Hours.ToString() + " hours " : null,
+                            (time1.Minutes > 0) ? time1.Minutes.ToString() + " minutes " : null);
                         string ban_warn_num = result.FirstOrDefault(x => x.Option == 3).WarnValue.ToString();
-                        string ban_time_num = result.FirstOrDefault(x => x.Option == 4).WarnValue.ToString();
+                        var time2 = TimeSpan.FromMinutes((double)result.FirstOrDefault(x => x.Option == 4).WarnValue);
+                        string ban_time_num = string.Format("{0}{1}{2}", (time2.Days > 0) ? time2.Days.ToString() + " days " : null,
+                            (time2.Hours > 0) ? time2.Hours.ToString() + " hours " : null,
+                            (time2.Minutes > 0) ? time2.Minutes.ToString() + " minutes " : null);
                         string perm_ban_num = result.FirstOrDefault(x => x.Option == 5).WarnValue.ToString();
-                        string fall_off_num = result.FirstOrDefault(x => x.Option == 6).WarnValue.ToString();
-                        list = "``Max number of warnings before a  ``**" + mute_time_num + "**``  time mute`` : " + "**" + mute_warn_num + "**\n" +
-                            "``Max number of warnings before a  ``**" + ban_time_num + "**``  time ban`` : " + "**" + ban_warn_num + "**\n" +
-                            "``Max number of serious offenses before a permanent ban`` : " + "**" + perm_ban_num + "**\n" +
+                        var time3 = TimeSpan.FromMinutes((double)result.FirstOrDefault(x => x.Option == 6).WarnValue);
+                        string fall_off_num = string.Format("{0}{1}{2}", (time3.Days > 0) ? time3.Days.ToString() + " days " : null,
+                            (time3.Hours > 0) ? time3.Hours.ToString() + " hours " : null,
+                            (time3.Minutes > 0) ? time3.Minutes.ToString() + " minutes " : null);
+                        list = "``Warning points before a  ``**" + mute_time_num + "**``  mute`` : " + "**" + mute_warn_num + "**\n" +
+                            "``Warning points before a  ``**" + ban_time_num + "**``  ban`` : " + "**" + ban_warn_num + "**\n" +
+                            "``Serious offences needed for permenent ban`` : " + "**" + perm_ban_num + "**\n" +
                             "``Rate at which warning points fall off a member`` : " + "**" + fall_off_num + "**\n";
                     }
                 }
@@ -186,9 +193,10 @@ namespace Siotrix.Discord.Moderation
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task SetMuteTimeAsync(int num)
+        public async Task SetMuteTimeAsync([Remainder]TimeSpan time)
         {
-            var success = SaveAndUpdateWarnData(2, num);
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(2, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
         }
@@ -208,9 +216,10 @@ namespace Siotrix.Discord.Moderation
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task SetBanTimeAsync(int num)
+        public async Task SetBanTimeAsync([Remainder]TimeSpan time)
         {
-            var success = SaveAndUpdateWarnData(4, num);
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(4, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
         }
@@ -230,9 +239,10 @@ namespace Siotrix.Discord.Moderation
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task SetFallOffAsync(int num)
+        public async Task SetFallOffAsync([Remainder]TimeSpan time)
         {
-            var success = SaveAndUpdateWarnData(6, num);
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(6, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
         }

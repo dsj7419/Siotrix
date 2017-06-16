@@ -40,6 +40,8 @@ namespace Siotrix.Discord.Moderation
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
+            int argPos = 0;
+            string spec = null;
             var context = new SocketCommandContext(_client, message);
             var dictionary = GetFilterWords(context.Guild.Id.ToLong());
             string[] words = msg.Content.Split(' ');
@@ -56,6 +58,35 @@ namespace Siotrix.Discord.Moderation
                 await channel.SendMessageAsync("", false, builder.Build());
                 await msg.DeleteAsync();
             }
+
+           /* var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
+            if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            {
+                //run auto delete command function
+                
+                System.Console.WriteLine("--------{0}==========={1}", is_found, message.Content);
+                if (is_found)
+                    await message.DeleteAsync();
+            }*/
+        }
+
+        private bool IsUsableAutoDeleteCommand(long guild_id)
+        {
+            bool isFound = false;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var data = db.Gautodeletes.Where(x => x.GuildId == guild_id);
+                    if (data.Any())
+                        isFound = true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return isFound;
         }
 
         private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg, ISocketMessageChannel channel)

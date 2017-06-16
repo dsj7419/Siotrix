@@ -1318,6 +1318,59 @@ namespace Siotrix.Discord.Admin
                     }
                 }
             }
-        }       
+        }
+
+        [Command("autodelete")]
+        [Summary("")]
+        [Remarks("")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task GuildAutoDeleteAsync(string user = "None")
+        {
+            var guild_id = Context.Guild.Id;
+            int option = 0;
+            string status = null;
+            using (var db = new LogDatabase())
+            {
+                var val = new DiscordGuildAutoDelete();
+                switch (user)
+                {
+                    case "EveryOne":
+                        option = 1;
+                        break;
+                    case "Moderator":
+                        option = 2;
+                        break;
+                    case "User":
+                        option = 3;
+                        break;
+                    default:
+                        option = 0;
+                        break;
+                }
+                try
+                {
+                    var result = db.Gautodeletes.Where(x => x.GuildId == guild_id.ToLong() && x.Option == option);
+                    if (result.Any())
+                    {
+                        db.Gautodeletes.RemoveRange(result);
+                        status = "✖️ : Auto-delete command function has been deleted.";
+                    }
+                    else
+                    {
+                        var record = new DiscordGuildAutoDelete();
+                        record.Option = option;
+                        record.GuildId = guild_id.ToLong();
+                        db.Gautodeletes.Add(record);
+                        status = "✅ : Auto-delete command function has been applied.";
+                    }
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            await ReplyAsync(status);
+        }
     }
 }

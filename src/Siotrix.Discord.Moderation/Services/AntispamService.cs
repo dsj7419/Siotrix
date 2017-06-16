@@ -39,7 +39,17 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived -= OnMessageReceivedAsync;
             return Task.CompletedTask;
         }
-        
+
+        private bool IsAllUpper(string input)
+        {
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
+                    return false;
+            }
+            return true;
+        }
+
         private async Task OnMessageReceivedAsync(SocketMessage s)
         {
             if (!HasManageMessages(s))
@@ -59,7 +69,7 @@ namespace Siotrix.Discord.Moderation
             var mute_caps_time_value = GetSpamValue(context.Guild.Id.ToLong(), 6);
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
 
-            if (message.Content.ToUpper().Equals(message.Content))
+            if (IsAllUpper(message.Content))
             {
                 number_of_the_cap_msg++;
                 if(number_of_the_cap_msg == caps_spam_value)
@@ -70,6 +80,10 @@ namespace Siotrix.Discord.Moderation
                 }
                 else if(number_of_the_cap_msg > caps_spam_value)
                 {
+                    if (number_of_the_cap_msg == mute_caps_spam_value)
+                    {
+                        await MuteSpamUser(context.User as IGuildUser, mute_caps_time_value, context);
+                    }
                     builder = GetBuilder(context, caps_spam_value, number_of_the_cap_msg, false);
                     await msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                     return;
