@@ -170,7 +170,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Remarks("Check your current warning level")]
+        [Summary(" - Check your current warning level.")]
+        [Remarks(" - Check your current warning level")]
         [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync()
         {
@@ -206,7 +207,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Remarks("Check warnings you received between two dates")]
+        [Summary(" - Check warnings you received between two dates.")]
+        [Remarks(" - Check warnings you received between two dates")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(DateTime from, DateTime to)
         {
@@ -238,6 +240,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
+        [Summary(" - Check warnings of chosen user")]
+        [Remarks(" - Check warnings of chosen user")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(SocketGuildUser user)
         {
@@ -269,6 +273,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
+        [Summary(" - Check warnings with user and id")]
+        [Remarks(" - Check warnings with user and id")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(SocketGuildUser user, int id)
         {
@@ -300,7 +306,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Remarks("View information about a specific warning")]
+        [Summary(" - View information about a specific warning")]
+        [Remarks(" - View information about a specific warning")]
         [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync(int id)
         {
@@ -332,6 +339,9 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
+        [Summary(" - Save Information")]
+        [Remarks(" - Save Information")]
+        [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync(int id, [Remainder] string info)
         {
             var success = SaveWarningInformation(id, info);

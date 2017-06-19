@@ -144,7 +144,7 @@ namespace Siotrix.Discord.Moderation
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
-        [Command("set repeatspam")]
+       /* [Command("allow repeatspam")]
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
@@ -155,7 +155,41 @@ namespace Siotrix.Discord.Moderation
                 await ReplyAsync("👍");
         }
 
-        [Command("mute repeatspam")]
+        [Command("allow capsspam")]
+        [Summary("==============")]
+        [Remarks("====================")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task SetCapsAsync(int num)
+        {
+            var success = SaveAndUpdateSpamData(4, num);
+            if (success)
+                await ReplyAsync("👍");
+        }*/
+
+        [Command("allow")]
+        [Summary("==============")]
+        [Remarks("====================")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task AllowSpamAsync(string param, int num)
+        {
+            bool success = false;
+            switch (param)
+            {
+                case "repeatspam":
+                    success = SaveAndUpdateSpamData(1, num);
+                    break;
+                case "capsspam":
+                    success = SaveAndUpdateSpamData(4, num);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
+            if (success)
+                await ReplyAsync("👍");
+        }
+
+        /*[Command("makemute repeatspam")]
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
@@ -166,7 +200,41 @@ namespace Siotrix.Discord.Moderation
                 await ReplyAsync("👍");
         }
 
-        [Command("mutetime repeatspam")]
+        [Command("makemute capsspam")]
+        [Summary("==============")]
+        [Remarks("====================")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task MuteCapsAsync(int num)
+        {
+            var success = SaveAndUpdateSpamData(5, num);
+            if (success)
+                await ReplyAsync("👍");
+        }*/
+
+        [Command("makemute")]
+        [Summary("==============")]
+        [Remarks("====================")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task MakeMuteAsync(string param, int num)
+        {
+            bool success = false;
+            switch (param)
+            {
+                case "repeatspam":
+                    success = SaveAndUpdateSpamData(2, num);
+                    break;
+                case "capsspam":
+                    success = SaveAndUpdateSpamData(5, num);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
+            if (success)
+                await ReplyAsync("👍");
+        }
+
+        /*[Command("mutetime repeatspam")]
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
@@ -174,28 +242,6 @@ namespace Siotrix.Discord.Moderation
         {
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateSpamData(3, (int)minutes);
-            if (success)
-                await ReplyAsync("👍");
-        }
-
-        [Command("set capsspam")]
-        [Summary("==============")]
-        [Remarks("====================")]
-        [MinPermissions(AccessLevel.GuildMod)]
-        public async Task SetCapsAsync(int num)
-        {
-            var success = SaveAndUpdateSpamData(4, num);
-            if (success)
-                await ReplyAsync("👍");
-        }
-
-        [Command("mute capsspam")]
-        [Summary("==============")]
-        [Remarks("====================")]
-        [MinPermissions(AccessLevel.GuildMod)]
-        public async Task MuteCapsAsync(int num)
-        {
-            var success = SaveAndUpdateSpamData(5, num);
             if (success)
                 await ReplyAsync("👍");
         }
@@ -208,6 +254,30 @@ namespace Siotrix.Discord.Moderation
         {
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateSpamData(6, (int)minutes);
+            if (success)
+                await ReplyAsync("👍");
+        }*/
+
+        [Command("mutetime")]
+        [Summary("==============")]
+        [Remarks("====================")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task MuteTimeAsync(string param, [Remainder]TimeSpan time)
+        {
+            bool success = false;
+            var minutes = time.TotalMinutes;
+            switch (param)
+            {
+                case "repeatspam":
+                    success = SaveAndUpdateSpamData(3, (int)minutes);
+                    break;
+                case "capsspam":
+                    success = SaveAndUpdateSpamData(6, (int)minutes);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
             if (success)
                 await ReplyAsync("👍");
         }

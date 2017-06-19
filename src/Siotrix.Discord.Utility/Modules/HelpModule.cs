@@ -95,6 +95,8 @@ namespace Siotrix.Discord.Utility
             string element_summary_remark_list = null;
             string buffer_data = "";
             int element_index = 0;
+            int unname_command_index = 0;
+            string unname_commmand_summary_remark_list = null;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -215,8 +217,21 @@ namespace Siotrix.Discord.Utility
                         {
                             foreach (var sub_cmd in item.Commands)
                             {
+                                //Console.WriteLine("======{0}", sub_cmd.Name);
                                 if (!buffer_data.Equals(sub_cmd.Name))
                                 {
+                                    if(sub_cmd.Name.Length > 5)
+                                    {
+                                        var reverse_command_name = new string(sub_cmd.Name.ToArray().Reverse().ToArray());
+                                        if (reverse_command_name.Substring(0, 5).Equals("cnysA"))
+                                        {
+                                            //Console.WriteLine("~~~~~~~~{0}", sub_cmd.Aliases.First().ToString());
+                                                unname_command_index++;
+                                                unname_commmand_summary_remark_list += $"[Option - {unname_command_index}] " + $"**{sub_cmd.Summary}**\n" + $"```Usage : {g_prefix}{sub_cmd.Aliases.First()} {sub_cmd.Remarks}```\n";
+                                            continue;
+                                        }
+                                            
+                                    }
                                     buffer_data = sub_cmd.Name;
                                     sub_commands += $"``{buffer_data}``" + " , ";
                                 }
@@ -224,8 +239,22 @@ namespace Siotrix.Discord.Utility
                         }
                     }
                 }
-                if (sub_commands.TrimEnd().EndsWith(","))
-                    sub_commands =  sub_commands.Truncate(2);
+
+                if(sub_commands == null)
+                {
+                    if (unname_commmand_summary_remark_list != null)
+                        sub_commands = unname_commmand_summary_remark_list;
+                    else
+                        sub_commands = "No help data!";
+                }
+                else
+                {
+                    if (sub_commands.TrimEnd().EndsWith(","))
+                        sub_commands = sub_commands.Truncate(2);
+                    if (unname_commmand_summary_remark_list != null)
+                        sub_commands += "\n" + unname_commmand_summary_remark_list;
+                }
+
                 builder
                   .AddField(x =>
                   {

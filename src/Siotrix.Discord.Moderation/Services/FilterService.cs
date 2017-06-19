@@ -59,15 +59,14 @@ namespace Siotrix.Discord.Moderation
                 await msg.DeleteAsync();
             }
 
-           /* var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
-            if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
-            {
-                //run auto delete command function
-                
-                System.Console.WriteLine("--------{0}==========={1}", is_found, message.Content);
-                if (is_found)
-                    await message.DeleteAsync();
-            }*/
+            spec = PrefixExtensions.GetGuildPrefix(context);
+             var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
+             if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+             {
+                 //run auto delete command function
+                 if (is_found)
+                     await message.DeleteAsync();
+             }
         }
 
         private bool IsUsableAutoDeleteCommand(long guild_id)

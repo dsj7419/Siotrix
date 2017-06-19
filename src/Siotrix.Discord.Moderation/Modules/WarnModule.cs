@@ -135,7 +135,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Remarks("Increase a user's warning level by the specified amount")]
+        [Summary(" - Increase a user's warning level by the specified amount")]
+        [Remarks(" - Increase a user's warning level by the specified amount")]
         public async Task WarnAsync()
         {
             var value = GetWarnData(Context.Guild.Id.ToLong()) ?? "No Setting Warn";
@@ -166,8 +167,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary("=======")]
-        [Remarks("Increase a user's warning level by the specified amount")]
+        [Summary(" - user, level, reason")]
+        [Remarks(" - user, level, reason")]
         public async Task WarnAsync(SocketGuildUser user, int level, [Remainder] string reason)
         {
             var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), level, reason, DateTime.Now, Context.User.Id.ToLong());
@@ -178,7 +179,7 @@ namespace Siotrix.Discord.Moderation
                 await ReplyAsync("📣 : You can not use this level because no information of this level!"); 
         }
 
-        [Command("set mutewarn")]
+        /*[Command("set mutewarn")]
         [Summary("==============")]
         [Remarks("====================")]
         [MinPermissions(AccessLevel.GuildMod)]
@@ -245,6 +246,97 @@ namespace Siotrix.Discord.Moderation
             var success = SaveAndUpdateWarnData(6, (int)minutes);
             if (success)
                 await ReplyAsync("👍");
+        }*/
+
+        [Command("set")]
+        [Summary("time person is muted or baned or falloff.")]
+        [Remarks("<parameter> <timespan> - parameters such as **mutetime** : time person is muted for when it hits warning number. **bantime** : time person is banned for when it hits ban number. **falloff** : time person is falloff for when it hits falloff number.")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task SetTimeSpanAsync(string param, [Remainder]TimeSpan time)
+        {
+            bool success = false;
+            switch (param)
+            {
+                case "mutetime":
+                    success = SetMuteTime(time);
+                    break;
+                case "bantime":
+                    success = SetBanTime(time);
+                    break;
+                case "falloff":
+                    success = SetFallOff(time);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
+            if (success)
+                await ReplyAsync("👍");
+        }
+
+        private bool SetMuteTime(TimeSpan time)
+        {
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(2, (int)minutes);
+            return success;
+        }
+
+        private bool SetBanTime(TimeSpan time)
+        {
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(4, (int)minutes);
+            return success;
+        }
+
+        private bool SetFallOff(TimeSpan time)
+        {
+            var minutes = time.TotalMinutes;
+            var success = SaveAndUpdateWarnData(6, (int)minutes);
+            return success;
+        }
+
+        [Command("set")]
+        [Summary("Number of warnings before user is muted or baned or permanently banned.")]
+        [Remarks("<parameter> <number> - parameters such as **mutewarn** :  number of warnings before user is muted. **banwarn** : number of warnings before user is temporarily banned. **permban** : number of SERIOUS INFRACTIONS before person is permanently banned.")]
+        [MinPermissions(AccessLevel.GuildMod)]
+        public async Task SetActionAsync(string param, int num)
+        {
+            bool success = false;
+            switch (param)
+            {
+                case "mutewarn":
+                    success = SetMuteWarn(num);
+                    break;
+                case "banwarn":
+                    success = SetBanWarn(num);
+                    break;
+                case "permban":
+                    success = SetPermBan(num);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
+            if (success)
+                await ReplyAsync("👍");
+        }
+
+        private bool SetMuteWarn(int num)
+        {
+            var success = SaveAndUpdateWarnData(1, num);
+            return success;
+        }
+
+        private bool SetBanWarn(int num)
+        {
+            var success = SaveAndUpdateWarnData(3, num);
+            return success;
+        }
+
+        private bool SetPermBan(int num)
+        {
+            var success = SaveAndUpdateWarnData(5, num);
+            return success;
         }
     }
 }

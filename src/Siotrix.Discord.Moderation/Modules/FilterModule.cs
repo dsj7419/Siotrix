@@ -126,14 +126,16 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Remarks("Receive a private message listing words filtered from this channel.")]
+        [Summary(" - Receive a private message listing words filtered from this channel.")]
+        [Remarks(" - Receive a private message listing words filtered from this channel.")]
         public async Task FilterAsync()
         {
             await Task.Delay(1);
         }
 
         [Command("add")]
-        [Remarks("Add a new word to this channel's filter.")]
+        [Summary(" - Add a new word to this channel's filter.")]
+        [Remarks(" - Add a new word to this channel's filter.")]
         public async Task AddAsync(string word)
         {
             var success = SaveAndUpdateFilterWord(word, Context.Guild.Id.ToLong());
@@ -142,7 +144,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("remove")]
-        [Remarks("Remove an existing word from this channel's filter.")]
+        [Summary(" - Remove an existing word from this channel's filter.")]
+        [Remarks(" - Remove an existing word from this channel's filter.")]
         public async Task RemoveAsync(string word)
         {
             var success = RemoveFilterWord(word, Context.Guild.Id.ToLong());
@@ -153,7 +156,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("import")]
-        [Remarks("========")]
+        [Summary(" - summary of import")]
+        [Remarks(" - remarks of import")]
         public async Task ImportAsync()
         {
             await ReplyAsync("📣 : **WARNING**! You are about to import the siotrix default filter! This will delete any filters you have added for your guild, are you sure you want to do this? (Yes or No)");
@@ -167,7 +171,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("reset")]
-        [Remarks("========")]
+        [Summary(" - Here is summary of reset")]
+        [Remarks(" - Here is remarks of reset")]
         public async Task ResetAsync()
         {
             await ReplyAsync("📣 : **WARNING**! This will delete all filters you have added for your guild, are you sure you want to do this? (Yes or No)");
