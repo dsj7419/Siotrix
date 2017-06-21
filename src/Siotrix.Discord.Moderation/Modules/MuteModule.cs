@@ -379,8 +379,8 @@ namespace Siotrix.Discord.Moderation
 
 
         [Command("mute")]
-        [Summary("====")]
-        [Remarks("==")]
+        [Summary("Mutes a user from being able to type in any channels for a period of time.")]
+        [Remarks(" @username (time) - can be set as 2d, 2 days, or 3d 2h 3m.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         private async Task Mute(IGuildUser user, [Remainder]TimeSpan time)
@@ -407,8 +407,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("unmute")]
-        [Summary("====")]
-        [Remarks("==")]
+        [Summary("Unmute a muted user.")]
+        [Remarks(" @username")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         private async Task UnMute(IGuildUser user)
@@ -429,8 +429,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("mute")]
-        [Summary("====")]
-        [Remarks("==")]
+        [Summary("Using with no args will create and/or verify a proper mute role is in the guild.")]
+        [Remarks(" - No additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         private async Task SetMuteRole()
@@ -468,8 +468,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("mute list")]
-        [Summary("====")]
-        [Remarks("==")]
+        [Summary("List all members currently muted in this guild.")]
+        [Remarks(" - No additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildMod)]
         private async Task MuteList()

@@ -30,7 +30,8 @@ namespace Siotrix.Discord.Moderation
         
 
         [Command("reason")]
-        [Summary("Reason")]
+        [Summary("Give or edit an existing reason for a specified case number.")]
+        [Remarks(" <number> (reason)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task ReasonAsync(long case_number, [Remainder]string reason)
         {
@@ -82,7 +83,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("reason")]
-        [Summary("Reason")]
+        [Summary("Updates reason for your last case.")]
+        [Remarks(" (reason)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task ReasonAsync([Remainder]string reason)
         {

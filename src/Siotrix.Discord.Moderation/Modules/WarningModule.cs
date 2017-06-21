@@ -170,8 +170,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - Check your current warning level.")]
-        [Remarks(" - Check your current warning level")]
+        [Summary("Check your current warning level")]
+        [Remarks(" - No additional arguments needed.")]
         [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync()
         {
@@ -207,8 +207,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - Check warnings you received between two dates.")]
-        [Remarks(" - Check warnings you received between two dates")]
+        [Summary("Check warnings you received between two dates.")]
+        [Remarks(" (from date) (to date)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(DateTime from, DateTime to)
         {
@@ -240,8 +240,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - Check warnings of chosen user")]
-        [Remarks(" - Check warnings of chosen user")]
+        [Summary("Check warnings of a specified user")]
+        [Remarks(" @username")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(SocketGuildUser user)
         {
@@ -273,8 +273,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - Check warnings with user and id")]
-        [Remarks(" - Check warnings with user and id")]
+        [Summary("Check detailed warning of specified user using id number from list.")]
+        [Remarks(" @username [number] - number from users warning list")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task WarningAsync(SocketGuildUser user, int id)
         {
@@ -306,8 +306,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - View information about a specific warning")]
-        [Remarks(" - View information about a specific warning")]
+        [Summary("View information about a specific warning of yourself using a number from the list.")]
+        [Remarks(" [number] - number from personal warning list.")]
         [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync(int id)
         {
