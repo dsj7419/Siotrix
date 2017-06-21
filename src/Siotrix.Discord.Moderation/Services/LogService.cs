@@ -606,6 +606,7 @@ namespace Siotrix.Discord.Moderation
             //var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var custom_message = GetWecomeMessage(1, user.Guild.Id.ToLong());
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
@@ -615,6 +616,28 @@ namespace Siotrix.Discord.Moderation
                 await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
             else
                 await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            await log_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
+        }
+
+        private string GetWecomeMessage(int id, long guild_id)
+        {
+            string msg = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncemessages.Where(p => p.MessageId == id && p.GuildId == guild_id);
+                    if (list.Any())
+                        msg = list.First().Message;
+                    else
+                        msg = "No message";
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return msg;
         }
 
         private async Task OnUserUnBannedAsync(SocketUser user, SocketGuild guild)
@@ -726,6 +749,14 @@ namespace Siotrix.Discord.Moderation
                     await log_channel.SendMessageAsync("", false, builder.Build());
                 }
             }
+        }
+
+        private string ReplaceInfo(SocketGuildUser user, string message)
+        {
+            var edited = message.Replace("{@user}", $"{user.Mention}#{user.Discriminator}");
+            edited = edited.Replace("{server}", $"{user.Guild.Name}");
+            edited = edited.Replace("{count}", $"{user.Guild.MemberCount}");
+            return edited;
         }
     }
 }

@@ -12,7 +12,7 @@ using System.Globalization;
 namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]    
-    [Group("settings"), Alias("set")]
+    [Group("settings"), Alias("settings")]
     [Summary("Various settings for guild to customize Siotrix with.")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
