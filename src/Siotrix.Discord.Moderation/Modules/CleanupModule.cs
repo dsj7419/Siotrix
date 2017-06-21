@@ -35,7 +35,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("all")]
         [Summary("Clean up past X amount of messages in channel.")]
-        [Remarks("<number> - cleanup past X amount of messages **note** if you do not put a number, default is 25.")]
+        [Remarks(" <number> - cleanup past X amount of messages **note** if you do not put a number, default is 25.")]
         public async Task AllAsync(int history = 25)
         {
             var messages = await GetMessageAsync(history);
@@ -45,7 +45,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("user")]
         [Summary("Clean up past X amount of messages in channel from a specific user.")]
-        [Remarks("<@username> <number> - cleanup past X amount of messages specific user wrote. Default is 25")]
+        [Remarks( "<@username> <number> - cleanup past X amount of messages specific user wrote. Default is 25")]
         public async Task UserAsync(SocketUser user, int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Author.Id == user.Id);
@@ -55,7 +55,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("bots")]
         [Summary("Clean up past X amount of messages in channel from any channel bot.")]
-        [Remarks("<number> - cleanup past X amount of messages done by bots. Default is 25")]
+        [Remarks(" <number> - cleanup past X amount of messages done by bots. Default is 25")]
         public async Task BotsAsync(int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Author.IsBot);
@@ -65,7 +65,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("contains")]
         [Summary("Clean up past X amount of messages in channel that contains a keyword or words you provide.")]
-        [Remarks("<keyword(s)> <number> - cleanup past X amount of messages containing those parameters. Default is 25")]
+        [Remarks(" <keyword(s)> <number> - cleanup past X amount of messages containing those parameters. Default is 25")]
         public async Task ContainsAsync(string text, int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Content.ToLower().Contains(text.ToLower()));
@@ -75,7 +75,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("attachments")]
         [Summary("Clean up past X amount of messages in channel with attachments.")]
-        [Remarks("<number> - cleanup past X amount of message attachments. Default is 25")]
+        [Remarks(" <number> - cleanup past X amount of message attachments. Default is 25")]
         public async Task AttachmentsAsync(int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Attachments.Count() != 0);

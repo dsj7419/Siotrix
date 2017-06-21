@@ -112,8 +112,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary("==============")]
-        [Remarks("====================")]
+        [Summary("See current guild spam settings.")]
+        [Remarks(" - No additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task GetSpamsAsync()
         {
@@ -167,8 +167,8 @@ namespace Siotrix.Discord.Moderation
         }*/
 
         [Command("allow")]
-        [Summary("==============")]
-        [Remarks("====================")]
+        [Summary("Sets how many lines of spam are allowed before a warning is issued.")]
+        [Remarks(" (repeatspam or capsspam)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AllowSpamAsync(string param, int num)
         {
@@ -211,9 +211,9 @@ namespace Siotrix.Discord.Moderation
                 await ReplyAsync("👍");
         }*/
 
-        [Command("makemute")]
-        [Summary("==============")]
-        [Remarks("====================")]
+        [Command("spammute")]
+        [Summary("Sets how many lines of spam are allowed before a mute is issued.")]
+        [Remarks(" (repeatspam or capsspam)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task MakeMuteAsync(string param, int num)
         {
@@ -259,8 +259,8 @@ namespace Siotrix.Discord.Moderation
         }*/
 
         [Command("mutetime")]
-        [Summary("==============")]
-        [Remarks("====================")]
+        [Summary("How long to mute the person if they break the spammute parameters set by guild.")]
+        [Remarks(" (repeatspam or capsspam) [time duration] - Can use 2d or 1h20m or 1 week.")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task MuteTimeAsync(string param, [Remainder]TimeSpan time)
         {

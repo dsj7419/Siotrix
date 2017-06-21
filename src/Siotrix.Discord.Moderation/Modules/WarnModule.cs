@@ -249,8 +249,8 @@ namespace Siotrix.Discord.Moderation
         }*/
 
         [Command("set")]
-        [Summary("time person is muted or baned or falloff.")]
-        [Remarks("<parameter> <timespan> - parameters such as **mutetime** : time person is muted for when it hits warning number. **bantime** : time person is banned for when it hits ban number. **falloff** : time person is falloff for when it hits falloff number.")]
+        [Summary("Length of Time person is muted, banned, or set the falloff time(how long a warning lasts on a user once issued).")]
+        [Remarks(" <parameter> <timespan> - Parameters are: **mutetime** : time person is muted for when it hits warning number. **bantime** : time person is banned for when it hits ban number. **falloff** : time person is falloff for when it hits falloff number.")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task SetTimeSpanAsync(string param, [Remainder]TimeSpan time)
         {
@@ -296,8 +296,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("set")]
-        [Summary("Number of warnings before user is muted or baned or permanently banned.")]
-        [Remarks("<parameter> <number> - parameters such as **mutewarn** :  number of warnings before user is muted. **banwarn** : number of warnings before user is temporarily banned. **permban** : number of SERIOUS INFRACTIONS before person is permanently banned.")]
+        [Summary("Number of warnings before user is muted, banned, or permanently banned.")]
+        [Remarks("<parameter> <number> - Parameters are: **mutewarn** :  number of warnings before user is muted. **banwarn** : number of warnings before user is temporarily banned. **permban** : number of SERIOUS INFRACTIONS before person is permanently banned.")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task SetActionAsync(string param, int num)
         {

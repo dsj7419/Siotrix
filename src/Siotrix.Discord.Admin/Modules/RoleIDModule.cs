@@ -17,7 +17,7 @@ namespace Siotrix.Discord.Admin
             string message = null;
             foreach (var role in Context.Guild.Roles)
                 message += $"{role.Name}: {role.Id}\n";
-            var channel = await Context.User.CreateDMChannelAsync();
+            var channel = await Context.User.GetOrCreateDMChannelAsync();
             await channel.SendMessageAsync(message);
             await ReplyAsync($"{Context.User.Mention}, all Role IDs have been DMed to you!");
         }

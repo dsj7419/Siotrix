@@ -39,7 +39,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command("Forgive")]
-        [Summary("----------------")]
+        [Summary("Forgive a user from ALL of their previous warnings.")]
+        [Remarks(" - No additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task ForgiveAsync(SocketGuildUser user)
         {

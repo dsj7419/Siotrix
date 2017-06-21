@@ -12,7 +12,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.IO;
-using imgshp = ImageSharp;
+using ImageSharp;
 
 namespace Siotrix.Discord.Developer
 {
@@ -62,12 +62,12 @@ namespace Siotrix.Discord.Developer
             if (manipulate.Content == "blackwhite")
             {
                 await ReplyAsync("Great! You'd like that image in Black and White, give me just a brief moment");
-                using (var input = imgshp.Image.Load(filename))
+                using (var input = ImageSharp.Image.Load(filename))
                 {
                     using (var output = File.OpenWrite($"BW.{filename}"))
                     {
-                        var image = new imgshp.Image(input);
-                        imgshp.ImageExtensions.BlackWhite(image);
+                        var image = new Image<Rgba32>(input);
+                        ImageExtensions.BlackWhite(image);
                         image.Save(output);
                         output.Dispose();
                     }
@@ -100,12 +100,12 @@ namespace Siotrix.Discord.Developer
             if (manipulate.Content == "sepia")
             {
                 await ReplyAsync("Great! You'd like that image with sepia processing, give me just a brief moment");
-                using (var input = imgshp.Image.Load(filename))
+                using (var input = ImageSharp.Image.Load(filename))
                 {
                     using (var output = File.OpenWrite($"SEPIA.{filename}"))
                     {
-                        var image = new imgshp.Image(input);
-                        imgshp.ImageExtensions.Sepia(image);
+                        var image = new Image<Rgba32>(input);
+                        ImageExtensions.Sepia(image);
                         image.Save(output);
                         output.Dispose();
                     }
@@ -138,12 +138,12 @@ namespace Siotrix.Discord.Developer
             if (manipulate.Content == "polaroid")
             {
                 await ReplyAsync("Great! You'd like that image with polaroid processing, give me just a brief moment");
-                using (var input = imgshp.Image.Load(filename))
+                using (var input = ImageSharp.Image.Load(filename))
                 {
                     using (var output = File.OpenWrite($"POL.{filename}"))
                     {
-                        var image = new imgshp.Image(input);
-                        imgshp.ImageExtensions.Polaroid(image);
+                        var image = new Image<Rgba32>(input);
+                        ImageExtensions.Polaroid(image);
                         image.Save(output);
                         output.Dispose();
                     }
