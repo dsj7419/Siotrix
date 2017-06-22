@@ -81,8 +81,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("welcome")]
-        [Summary("- welcome")]
-        [Remarks(" - no additional arguments needed")]
+        [Summary("Turn welcome message on or off when user joins your guild.")]
+        [Remarks("toggle - use keyword toggle to turn on or off.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task WelcomeAsync(string toggle)
@@ -98,8 +98,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("leave")]
-        [Summary("- leave")]
-        [Remarks(" - no additional arguments needed")]
+        [Summary("Turn the leave message on or off when user leaves your guild.")]
+        [Remarks("toggle - use keyword toggle to turn on or off.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LeaveAsync(string toggle)
@@ -115,8 +115,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("return")]
-        [Summary("- return")]
-        [Remarks(" - no additional arguments needed")]
+        [Summary("Turn the return message on or off when user rejoins your guild.")]
+        [Remarks("toggle - use keyword toggle to turn on or off.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task ReturnAsync(string toggle)
@@ -133,7 +133,7 @@ namespace Siotrix.Discord.Admin
 
         [Command("welcome")]
         [Summary("- welcome")]
-        [Remarks(" - need some arguments")]
+        [Remarks("- need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task WelcomeAsync(string set, [Remainder]string text)
@@ -148,7 +148,7 @@ namespace Siotrix.Discord.Admin
 
         [Command("leave")]
         [Summary("- leave")]
-        [Remarks(" - need some arguments")]
+        [Remarks("- need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LeaveAsync(string set, [Remainder]string text)
@@ -163,7 +163,7 @@ namespace Siotrix.Discord.Admin
 
         [Command("return")]
         [Summary("- return")]
-        [Remarks(" - need some arguments")]
+        [Remarks("- need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task ReturnAsync(string set, [Remainder]string text)
