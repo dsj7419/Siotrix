@@ -16,6 +16,7 @@ namespace Siotrix.Discord.Developer
         {
             var client = Context.Client as DiscordSocketClient;
             var embed = new EmbedBuilder();
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             foreach (SocketGuild guild in client.Guilds)
             {
                 embed.AddField(x =>
@@ -26,11 +27,11 @@ namespace Siotrix.Discord.Developer
                 });
             }
             embed.Title = "=== Server List ===";
-            embed.Color = new Color(0, 0, 255);
+            embed.Color = g_color;
             embed.Footer = new EmbedFooterBuilder()
             {
                 Text = $"Total Guilds: {client.Guilds.Count.ToString()}",
-                IconUrl = "http://img04.imgland.net/WyZ5FoM.png"
+                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png"
             };
 
             await ReplyAsync("", embed: embed);

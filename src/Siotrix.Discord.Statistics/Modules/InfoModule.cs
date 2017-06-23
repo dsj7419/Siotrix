@@ -132,7 +132,7 @@ namespace Siotrix.Discord.Statistics
                     var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        thumbnail_url = "http://img04.imgland.net/WyZ5FoM.png";
+                        thumbnail_url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
                     }
                     else
                     {
@@ -164,7 +164,7 @@ namespace Siotrix.Discord.Statistics
                         var val = db.Gdescriptions.Where(p => p.GuildId == guild_id.ToLong());
                         if (val == null || val.ToList().Count <= 0)
                         {
-                            description = "Siotrix Bot has been made by Dan Johnson and Frank Thomas.";
+                            description = "Siotrix: A global bot with a local feel.";
                         }
                         else
                         {
@@ -228,7 +228,16 @@ namespace Siotrix.Discord.Statistics
         private string GetUptime()
         {
             var uptime = (DateTime.Now - _process.StartTime);
-            return $"{uptime.Days} day {uptime.Hours} hr {uptime.Minutes} min {uptime.Seconds} sec";
+            string dayname = null;
+            if (uptime.Days == 1)
+            {
+               dayname = "day";
+            }
+            else
+            {
+                dayname = "days";
+            }
+            return $"{uptime.Days} {dayname} {uptime.Hours} hr {uptime.Minutes} min {uptime.Seconds} sec";
         }
 
         private string[] GetLifeTimeMessages(SocketUser user)
@@ -317,7 +326,7 @@ namespace Siotrix.Discord.Statistics
             string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
 
             DateTime dt = new DateTime(Context.Guild.CreatedAt.Year, Context.Guild.CreatedAt.Month, Context.Guild.CreatedAt.Day, 0, 0, 0, 0);
-            string established_date = String.Format("{0:dddd, MMMM d, yyyy}", dt) + "-" + Math.Round((DateTime.Now - Context.Guild.CreatedAt.DateTime).TotalDays, 0) + " Days Old!";
+            string established_date = String.Format("{0:dddd, MMMM d, yyyy}", dt) + " | " + Math.Round((DateTime.Now - Context.Guild.CreatedAt.DateTime).TotalDays, 0) + " Days Ago!";
             
 
             var builder = new EmbedBuilder()
@@ -348,7 +357,7 @@ namespace Siotrix.Discord.Statistics
                 .AddField(x =>
                 {
                     x.Name = $"For guild statistical data type {g_prefix}stats";
-                    x.Value = GetUptime();
+                    x.Value = $"Uptime: {GetUptime()}";
                 });
 
             return ReplyAsync("", embed: builder);
@@ -393,22 +402,33 @@ namespace Siotrix.Discord.Statistics
                 .WithTimestamp(DateTime.UtcNow);
             if(id == 1)
             {
-                double joined = (DateTime.Now - person.JoinedAt)?.TotalDays ?? 0;
+                double joined = (DateTime.Now - person.JoinedAt)?.TotalDays ?? 0;                
                 string join_date = String.Format("{0:dddd, MMMM d, yyyy}", person.JoinedAt?.DateTime ?? DateTime.Now);
+                var days_old = Math.Round((DateTime.Now - (person.JoinedAt?.DateTime ?? DateTime.Now)).TotalDays, 0);
+                string days_old_concat = null;
+                if (days_old < 1) days_old = 1;
+                if (days_old == 1)
+                {
+                    days_old_concat = join_date + " | " + days_old + " day ago.";
+                } else
+                {
+                    days_old_concat = join_date + " | " + days_old + " days ago.";
+                }
+
                 string last_seen = GetLastMessageTime(user);
                 builder
                     .WithTitle("General Information sheet for " + Context.Guild.GetUser(user.Id).Username)
                     .WithThumbnailUrl(person.GetAvatarUrl().ToString())
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("ID : "), Value = person.Id })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Nickname : "), Value = person.Nickname ?? "no previous Nickname" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Past Names : "), Value = person.Nickname ?? "no previous Nickname" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Nickname : "), Value = person.Nickname ?? "None" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Past Names : "), Value = person.Nickname ?? "None" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Avatar : "), Value = person.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Playing : "), Value = (person.Game.ToString() != "") ? "Activity" : "Inactivity" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Status : "), Value = person.Status.ToString() })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = $"{join_date} days ago." })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = days_old_concat })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("lifetime messages : "), Value = m_count[0] })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages / hour : "), Value = m_count[1] })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = Math.Round(joined, 0) - 1 })
+                //    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Joined Server : "), Value = $" {Math.Round(joined, 0) - 1} Days Ago!" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Last Seen : "), Value = last_seen })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Last Spoke : "), Value = last_seen })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Roles : "), Value = person.Guild.Roles.Count });
@@ -425,7 +445,7 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = "https://discord.gg/saZDC" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = "https://discord.gg/saZDC" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Created : "), Value = Math.Round((DateTime.Now - Context.Client.CurrentUser.CreatedAt.DateTime).TotalDays, 0).ToString() + " Days" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Created : "), Value = Math.Round((DateTime.Now - Context.Client.CurrentUser.CreatedAt.DateTime).TotalDays, 0).ToString() + " Days ago." })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Icon : "), Value = Context.Client.CurrentUser.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = GetActiveGuildName() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Uptime : "), Value = GetUptime() })

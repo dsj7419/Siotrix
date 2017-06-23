@@ -19,6 +19,7 @@ namespace Siotrix.Discord.Developer
         public async Task GetDocumentationAsync([Remainder]string term)
         {
             var response = await new CSDocsService().GetDocumentationResultsAsync(term);
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             var embedCount = 0;
 
             foreach (var res in response.Results.Take(3).OrderBy(x => x.DisplayName))
@@ -26,7 +27,7 @@ namespace Siotrix.Discord.Developer
                 embedCount++;
 
                 var builder = new EmbedBuilder()
-                    .WithColor(new Color(1, 1, 1))
+                    .WithColor(g_color)
                     .WithTitle($"{res.ItemKind}: {res.DisplayName}")
                     .WithUrl(res.Url)
                     .WithDescription(res.Description);

@@ -7,7 +7,7 @@ namespace Siotrix.Discord.Developer
     public class PowerDownModule : ModuleBase<SocketCommandContext>
     {
         [Command("powerdown"), Alias("pd")]
-        [Summary("Terminates the bot application")]
+        [Summary("Shuts down Siotrix.")]
         [Remarks(" - no additional arguments needed")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task PowerdownAsync()

@@ -50,7 +50,7 @@ namespace Siotrix.Discord.Developer
                 {
                     var result = db.Banguildlists;
                     if (!result.Any())
-                        list = "No banned Guild";
+                        list = "No banned guilds at this moment.";
                     else
                     {
                         int index = 0;
@@ -110,7 +110,7 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = "http://img04.imgland.net/WyZ5FoM.png",
+                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png",
                 Url = "https://discord.gg/e6sku22"
             };
             await ch.SendMessageAsync("", embed: embed);
@@ -172,7 +172,7 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = "http://img04.imgland.net/WyZ5FoM.png",
+                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png",
                 Url = "https://discord.gg/e6sku22"
             };
             await ch.SendMessageAsync("", embed: embed);
@@ -214,7 +214,8 @@ namespace Siotrix.Discord.Developer
                     .WithDescription("Hi, thank you for inviting me to the server. Unfortunately I am not able to stay as you have been added to my banlist.\nReason: " + " ***" + reason + " ***")
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("If you have questions, feel free to join our Discord at : "),
-                        Value = "https://discordapp.com/api/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=0"});
+                        Value = "https://discord.gg/e6sku22"
+                    });
                 await ReplyAsync("", embed: builder);
             }
         }
