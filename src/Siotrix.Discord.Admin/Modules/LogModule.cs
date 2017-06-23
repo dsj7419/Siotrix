@@ -111,7 +111,7 @@ namespace Siotrix.Discord.Admin
                         }
                         else
                         {
-                            var record = new DiscordLogChannel();
+                            var record = new DiscordGuildLogChannel();
                             record.ChannelId = channel_id;
                             record.GuildId = guild_id;
                             record.IsActive = false;
@@ -135,7 +135,7 @@ namespace Siotrix.Discord.Admin
                         }
                         else
                         {
-                            var record = new DiscordModLogChannel();
+                            var record = new DiscordGuildModLogChannel();
                             record.ChannelId = channel_id;
                             record.GuildId = guild_id;
                             record.IsActive = false;
