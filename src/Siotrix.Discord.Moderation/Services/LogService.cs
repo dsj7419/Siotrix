@@ -400,94 +400,101 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnMessageReceivedAsync(SocketMessage message)
         {
-            if (!ActionResult.IsSuccess) return;
-            var msg = message as SocketUserMessage;
-            var context = new SocketCommandContext(_client, msg);
-            int argPos = 0;
-            string spec = null;
-            string content = null;
-            long case_id = 0;
+            try
+            {
+                if (!ActionResult.IsSuccess) return;
+                var msg = message as SocketUserMessage;
+                var context = new SocketCommandContext(_client, msg);
+                int argPos = 0;
+                string spec = null;
+                string content = null;
+                long case_id = 0;
 
-            LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
-            var channel = context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            var mod_channel = context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
-                
-            spec = PrefixExtensions.GetGuildPrefix(context);
-            if (message.Author.IsBot
-                || msg == null
-                || !msg.Content.Except("?").Any()
-                || msg.Content.Trim().Length <= 1
-                || msg.Content.Trim()[1] == '?'
-                || (!(msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
-                return;
-            if (msg.HasStringPrefix(spec, ref argPos))
-            {
-                content = MessageParser.ParseStringPrefix(msg, spec);
-            }
-            else if (msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
-            {
-                content = MessageParser.ParseMentionPrefix(msg);
-            }
-            if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
-            {
-                string[] words = content.Split(' ');
-                var id = MentionUtils.ParseUser(words[1]);
-                var user = _client.GetUser(id);
-                var user_identifier = user.Username + "#" + user.Discriminator;
-                var user_mention = user.Mention;
-                var mod_identifier = context.User.Username + "#" + context.User.Discriminator;
-                var action = getAction(words[0]);
-                var action_color = getActionColor(words[0]);
-                
-                if (action == null) return; // If action is not kick or ban or mute command, not display log information.
-                
-                var builder = new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(user.GetAvatarUrl())
-                .WithName(user_identifier + " has been " + action + " by " + mod_identifier))
-                .WithColor(action_color);
-                if (LogChannelExtensions.is_toggled_log)
-                    await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
-                    await channel.SendMessageAsync(user_mention, false, builder.Build());
+                LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
+                var channel = context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var mod_channel = context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
 
-                string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
-                string g_name = GuildEmbedName.GetGuildName(context);
-                string g_url = GuildEmbedUrl.GetGuildUrl(context);
-                string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-                string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
-                string g_prefix = PrefixExtensions.GetGuildPrefix(context);
-                var mod_builder = new EmbedBuilder()
-                    .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                    .WithColor(action_color)
-                    .WithThumbnailUrl(g_thumbnail)
-                    .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
-                    .WithTimestamp(DateTime.UtcNow);
-                //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
-                case_id = CaseExtensions.GetCaseNumber(context);
-                mod_builder
-                    .AddField(x =>
-                    {
-                        x.Name = "Case #" + case_id + " | " + words[0];
-                        x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " + 
-                                  context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" + 
-                                  "Reason : Type " + g_prefix + "reason " +  case_id + "<reason> to add it.";
-                    });
-                if (LogChannelExtensions.is_toggled_modlog)
-                    await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
-                else
+                spec = PrefixExtensions.GetGuildPrefix(context);
+                if (message.Author.IsBot
+                    || msg == null
+                    || !msg.Content.Except("?").Any()
+                    || msg.Content.Trim().Length <= 1
+                    || msg.Content.Trim()[1] == '?'
+                    || (!(msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))))
+                    return;
+                if (msg.HasStringPrefix(spec, ref argPos))
                 {
-                    IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
-                    ActionResult.CommandName = words[0];
-                    ActionResult.CaseId = case_id;
-                    ActionResult.UserId = user.Id.ToLong();
-                    ActionResult.Instance = msg_instance;
+                    content = MessageParser.ParseStringPrefix(msg, spec);
                 }
+                else if (msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                {
+                    content = MessageParser.ParseMentionPrefix(msg);
+                }
+                if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+                {
+                    string[] words = content.Split(' ');
+                    var action = getAction(words[0]);
+                    if (action == null) return; // If action is not kick or ban or mute command, not display log information.
+                    var id = MentionUtils.ParseUser(words[1]);
+                    var user = _client.GetUser(id);
+                    var user_identifier = user.Username + "#" + user.Discriminator;
+                    var user_mention = user.Mention;
+                    var mod_identifier = context.User.Username + "#" + context.User.Discriminator;
+                    
+                    var action_color = getActionColor(words[0]);
+
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(user.GetAvatarUrl())
+                    .WithName(user_identifier + " has been " + action + " by " + mod_identifier))
+                    .WithColor(action_color);
+                    if (LogChannelExtensions.is_toggled_log)
+                        await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                    else
+                        await channel.SendMessageAsync(user_mention, false, builder.Build());
+
+                    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
+                    string g_name = GuildEmbedName.GetGuildName(context);
+                    string g_url = GuildEmbedUrl.GetGuildUrl(context);
+                    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
+                    string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
+                    string g_prefix = PrefixExtensions.GetGuildPrefix(context);
+                    var mod_builder = new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder()
+                        .WithIconUrl(g_icon_url)
+                        .WithName(g_name)
+                        .WithUrl(g_url))
+                        .WithColor(action_color)
+                        .WithThumbnailUrl(g_thumbnail)
+                        .WithFooter(new EmbedFooterBuilder()
+                        .WithIconUrl(g_footer[0])
+                        .WithText(g_footer[1]))
+                        .WithTimestamp(DateTime.UtcNow);
+                    //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
+                    case_id = CaseExtensions.GetCaseNumber(context);
+                    mod_builder
+                        .AddField(x =>
+                        {
+                            x.Name = "Case #" + case_id + " | " + words[0];
+                            x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" + "Moderator : " +
+                                      context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
+                                      "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
+                        });
+                    if (LogChannelExtensions.is_toggled_modlog)
+                        await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
+                    else
+                    {
+                        IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
+                        ActionResult.CommandName = words[0];
+                        ActionResult.CaseId = case_id;
+                        ActionResult.UserId = user.Id.ToLong();
+                        ActionResult.Instance = msg_instance;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 

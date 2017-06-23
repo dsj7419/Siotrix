@@ -33,6 +33,7 @@ namespace Siotrix.Discord
 
         public static async void SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id, string reason)
         {
+            Console.WriteLine("================================================{0}", case_num);
             using (var db = new LogDatabase())
             {
                 try

@@ -47,6 +47,25 @@ namespace Siotrix.Discord.Admin
             return status;
         }
 
+        private bool CheckUsableCommand(int cmd_id)
+        {
+            bool is_usable = false;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncetoggles.Where(p => p.CommandId == cmd_id && p.GuildId == Context.Guild.Id.ToLong());
+                    if (!list.Any())
+                        is_usable = true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return is_usable;
+        }
+
         private bool SaveAndUpdateAnnounceMessage(long guild_id, int msgId, string text)
         {
             bool is_success = false;
@@ -80,99 +99,175 @@ namespace Siotrix.Discord.Admin
             return is_success;
         }
 
-        [Command("welcome")]
+        private string GetAnnouncementInfo(long guild_id)
+        {
+            string info = null;
+            string welcome_data = "Welcome Off";
+            string leave_data = "Leave Off";
+            string return_data = "Return Off";
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncetoggles.Where(p => p.GuildId == guild_id);
+                    if (list.Any())
+                    {
+                        foreach(var item in list)
+                        {
+                            if (item.CommandId == 1)
+                                welcome_data = "Welcome On";
+                            else if (item.CommandId == 2)
+                                leave_data = "Welcome On";
+                            else if (item.CommandId == 3)
+                                return_data = "Return On";
+                        }
+                        info = welcome_data + "\n" + leave_data + "\n" + return_data;
+                    }
+                    else
+                        info = "No Informations";
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return info;
+        }
+
+        [Command]
         [Summary("- welcome")]
-        [Remarks(" - no additional arguments needed")]
+        [Remarks(" - need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task WelcomeAsync(string toggle)
+        public async Task AnnouncementAsync()
         {
-            if (toggle.Equals("toggle"))
+            var info = GetAnnouncementInfo(Context.Guild.Id.ToLong());
+            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
+            string g_name = GuildEmbedName.GetGuildName(Context);
+            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
+            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName(g_name)
+                .WithUrl(g_url))
+                .WithColor(new Color(255, 127, 0))
+                .WithThumbnailUrl(g_thumbnail)
+                .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(g_footer[0])
+                .WithText(g_footer[1]))
+                .WithTimestamp(DateTime.UtcNow);
+            builder
+           .AddField(x =>
+           {
+               x.Name = "Announcements Informations";
+               x.Value = info;
+           });
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
+        }
+
+        [Command("welcome")]
+        [Summary("- welcome")]
+        [Remarks(" - need some arguments")]
+        [RequireContext(ContextType.Guild)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
+        public async Task WelcomeAsync(string param, [Remainder]string text = null)
+        {
+            
+            if (param.Equals("toggle"))
             {
                 var toggle_on = GetToggleStatus(1);
-                if(toggle_on)
+                if (toggle_on)
                     await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
                 else
-                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **on** in this guild !");
+                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **off** in this guild !");
+            }
+            else if (param.Equals("set"))
+            {
+                var is_usable_cmd = CheckUsableCommand(1);
+                if (is_usable_cmd)
+                {
+                    if (text == null)
+                    {
+                        await ReplyAsync("📣 : Please input your message!");
+                        return;
+                    }
+                    var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 1, text);
+                    if (success)
+                        await ReplyAsync("👍");
+                }
+                else
+                    await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
         }
 
         [Command("leave")]
         [Summary("- leave")]
-        [Remarks(" - no additional arguments needed")]
+        [Remarks(" - need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task LeaveAsync(string toggle)
+        public async Task LeaveAsync(string param, [Remainder]string text = null)
         {
-            if (toggle.Equals("toggle"))
+            if (param.Equals("toggle"))
             {
                 var toggle_on = GetToggleStatus(2);
                 if (toggle_on)
-                    await ReplyAsync($"✅ : Toggled ***leave*** command **on** in this guild !");
+                    await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
                 else
-                    await ReplyAsync($"✖️ : Toggled ***leave*** command **on** in this guild !");
+                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **off** in this guild !");
+            }
+            else if (param.Equals("set"))
+            {
+                var is_usable_cmd = CheckUsableCommand(2);
+                if (is_usable_cmd)
+                {
+                    if (text == null)
+                    {
+                        await ReplyAsync("📣 : Please input your message!");
+                        return;
+                    }
+                    var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 2, text);
+                    if (success)
+                        await ReplyAsync("👍");
+                }
+                else
+                    await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
         }
 
         [Command("return")]
         [Summary("- return")]
-        [Remarks(" - no additional arguments needed")]
+        [Remarks(" - need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task ReturnAsync(string toggle)
+        public async Task ReturnAsync(string param, [Remainder]string text = null)
         {
-            if (toggle.Equals("toggle"))
+            if (param.Equals("toggle"))
             {
                 var toggle_on = GetToggleStatus(3);
                 if (toggle_on)
-                    await ReplyAsync($"✅ : Toggled ***return*** command **on** in this guild !");
+                    await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
                 else
-                    await ReplyAsync($"✖️ : Toggled ***return*** command **on** in this guild !");
+                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **off** in this guild !");
             }
-        }
-
-        [Command("welcome")]
-        [Summary("- welcome")]
-        [Remarks(" - need some arguments")]
-        [RequireContext(ContextType.Guild)]
-        [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task WelcomeAsync(string set, [Remainder]string text)
-        {
-            if (set.Equals("set"))
+            else if (param.Equals("set"))
             {
-                var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 1, text);
-                if(success)
-                    await ReplyAsync("👍");
-            }
-        }
-
-        [Command("leave")]
-        [Summary("- leave")]
-        [Remarks(" - need some arguments")]
-        [RequireContext(ContextType.Guild)]
-        [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task LeaveAsync(string set, [Remainder]string text)
-        {
-            if (set.Equals("set"))
-            {
-                var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 2, text);
-                if (success)
-                    await ReplyAsync("👍");
-            }
-        }
-
-        [Command("return")]
-        [Summary("- return")]
-        [Remarks(" - need some arguments")]
-        [RequireContext(ContextType.Guild)]
-        [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task ReturnAsync(string set, [Remainder]string text)
-        {
-            if (set.Equals("set"))
-            {
-                var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 3, text);
-                if (success)
-                    await ReplyAsync("👍");
+                var is_usable_cmd = CheckUsableCommand(3);
+                if (is_usable_cmd)
+                {
+                    if (text == null)
+                    {
+                        await ReplyAsync("📣 : Please input your message!");
+                        return;
+                    }
+                    var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 3, text);
+                    if (success)
+                        await ReplyAsync("👍");
+                }
+                else
+                    await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
         }
     }
