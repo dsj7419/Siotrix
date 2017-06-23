@@ -28,7 +28,7 @@ namespace Siotrix.Discord.Developer
         {
             if (url.ToString().Equals("reset"))
             {
-                url = new Uri("https://s27.postimg.org/hgn3yw4gz/Siotrix_Logo_Side_Alt1_No_Text.png");
+                url = new Uri("https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png");
             }
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
@@ -59,14 +59,14 @@ namespace Siotrix.Discord.Developer
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
                     {
-                        url = "http://img04.imgland.net/WyZ5FoM.png";
+                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                     }
                     else
                     {
                         url = db.Authors.First().AuthorIcon;
                         if (url == null || url == "")
                         {
-                            url = "http://img04.imgland.net/WyZ5FoM.png";
+                            url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                             var data = db.Authors.First();
                             data.AuthorIcon = url;
                             db.Authors.Update(data);
@@ -93,7 +93,7 @@ namespace Siotrix.Discord.Developer
                 var val = new DiscordAuthor();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.AuthorIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                    val.AuthorIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                 }
                 else
                 {
@@ -284,7 +284,7 @@ namespace Siotrix.Discord.Developer
                 {
                     if (db.Binfos == null || db.Binfos.ToList().Count <= 0)
                     {
-                        str = "Siotrix Bot";
+                        str = "Siotrix";
                     }
                     else
                     {
@@ -404,7 +404,7 @@ namespace Siotrix.Discord.Developer
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
                     {
-                        url = "http://img04.imgland.net/WyZ5FoM.png";
+                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                     }
                     else
                     {
@@ -428,7 +428,14 @@ namespace Siotrix.Discord.Developer
             using (var db = new LogDatabase())
             {
                 var val = new DiscordSiotrixFooter();
-                val.FooterIcon = url.ToString();
+                if (url.ToString().Equals("reset"))
+                {
+                    val.FooterIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+                }
+                else
+                {
+                    val.FooterIcon = url.ToString();
+                }
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
@@ -496,7 +503,7 @@ namespace Siotrix.Discord.Developer
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
                     {
-                        txt = "Siotrix Footer";
+                        txt = "A global bot with a local feel.";
                     }
                     else
                     {

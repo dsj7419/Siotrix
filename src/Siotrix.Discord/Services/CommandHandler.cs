@@ -261,13 +261,13 @@ namespace Siotrix.Discord
                     result = "Unknown Command";
                     break;
                 case 2:
-                    result = "This is Module Name. Please Input again!";
+                    result = "This is a module Name. Please try an alternate command!";
                     break;
                 case 3:
-                    result = "This command need some parameters.";
+                    result = "This command needs some additional parameters.";
                     break;
                 case 4:
-                    result = "You can use together with sub-commands because this is group command.";
+                    result = "This is a group command that requires additional sub-commands.";
                     break;
                 default:
                     break;

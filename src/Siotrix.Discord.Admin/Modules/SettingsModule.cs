@@ -41,7 +41,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "http://img04.imgland.net/WyZ5FoM.png";
+                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildFooter();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.FooterIcon = "http://img04.imgland.net/WyZ5FoM.png";
+                    val.FooterIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
                 }
                 else
                 {
@@ -119,8 +119,8 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildFooter();
                         instance.GuildId = id;
-                        instance.FooterIcon = "http://img04.imgland.net/WyZ5FoM.png";
-                        instance.FooterText = "Siotrix Footer";
+                        instance.FooterIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+                        instance.FooterText = "A global bot with a local feel.";
                         db.Gfooters.Add(instance);
                         db.SaveChanges();
                     }
@@ -145,7 +145,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildFooter();
                 if (txt.ToString().Equals("reset"))
                 {
-                    val.FooterText = "Siotrix Footer";
+                    val.FooterText = "A global bot with a local feel.";
                 }
                 else
                 {
@@ -190,7 +190,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        txt = "Siotrix Footer";
+                        txt = "A global bot with a local feel.";
                     }
                     else
                     {
@@ -221,7 +221,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "http://img04.imgland.net/WyZ5FoM.png";
+                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
                     }
                     else
                     {
@@ -249,7 +249,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildThumbNail();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.ThumbNail = "http://img04.imgland.net/WyZ5FoM.png";
+                    val.ThumbNail = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
                 }
                 else
                 {
@@ -299,7 +299,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildThumbNail();
                         instance.GuildId = id;
-                        instance.ThumbNail = "http://img04.imgland.net/WyZ5FoM.png";
+                        instance.ThumbNail = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
                         db.Gthumbnails.Add(instance);
                         db.SaveChanges();
                     }
@@ -433,7 +433,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gdescriptions.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        desc = "Siotrix Bot";
+                        desc = "Siotrix";
                     }
                     else
                     {
@@ -504,7 +504,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildDescription();
                         instance.GuildId = id;
-                        instance.Description = "Siotrix Bot";
+                        instance.Description = "Siotrix - A global bot with a local feel.";
                         db.Gdescriptions.Add(instance);
                         db.SaveChanges();
                     }
@@ -971,7 +971,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "http://www.clipartkid.com/images/47/clipart-information-image-information-gif-anim-information-2noIRl-clipart.png";
+                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
                     }
                     else
                     {
@@ -999,7 +999,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildAvatar();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.Avatar = "http://www.clipartkid.com/images/47/clipart-information-image-information-gif-anim-information-2noIRl-clipart.png";
+                    val.Avatar = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
                 }
                 else
                 {
@@ -1049,7 +1049,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildAvatar();
                         instance.GuildId = id;
-                        instance.Avatar = "http://www.clipartkid.com/images/47/clipart-information-image-information-gif-anim-information-2noIRl-clipart.png";
+                        instance.Avatar = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
                         db.Gavatars.Add(instance);
                         db.SaveChanges();
                     }
@@ -1230,7 +1230,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gmotds.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        str = "Welcome to .";
+                        str = $"Welcome to {Context.Guild.Name}.";
                     }
                     else
                     {
@@ -1258,7 +1258,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildMotd();
                 if (str.Equals("reset"))
                 {
-                    val.Message = "Welcome to .";
+                    val.Message = $"Welcome to {Context.Guild.Name}.";
                 }
                 else
                 {
@@ -1308,7 +1308,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildMotd();
                         instance.GuildId = id;
-                        instance.Message = "Welcome to .";
+                        instance.Message = $"Welcome to {Context.Guild.Name}.";
                         db.Gmotds.Add(instance);
                         db.SaveChanges();
                     }

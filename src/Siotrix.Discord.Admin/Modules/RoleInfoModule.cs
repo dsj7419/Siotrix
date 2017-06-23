@@ -25,9 +25,10 @@ namespace Siotrix.Discord.Admin.Modules
                 throw new ArgumentException("You must supply a role.");
             var grl = grp as SocketRole;
             var gls = gld as SocketGuild;
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
 
             var embed = new EmbedBuilder();
-            embed.Color = new Color(0, 0, 255);
+            embed.Color = g_color;
             embed.Title = "Role Infomation";
 
             embed.AddField(x =>

@@ -237,8 +237,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("logs")]
-        [Summary("----------")]
-        [Remarks("--------")]
+        [Summary("Check status of logchannel and modlogchannel")]
+        [Remarks("(logchannel or modlogchannel) - use ")]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LogAsync(string command)
         {
@@ -278,8 +278,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("logs")]
-        [Summary("----------")]
-        [Remarks("--------")]
+        [Summary("Turn on and off the log and modlog channels.")]
+        [Remarks("(logchannel/modlogchannel toggle - must use the word toggle at end to turn on or off.")]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LogAsync(string command, [Remainder] string name)
         {

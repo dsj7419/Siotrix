@@ -17,7 +17,7 @@ namespace Siotrix.Discord.Moderation
     {
         [Command]
         [Summary("Instantly cleanup past 10 messages in channel.")]
-        [Remarks(" - no additional arguments needed.")]
+        [Remarks("- no additional arguments needed.")]
         public async Task CleanAsync()
         {
             var self = Context.Guild.CurrentUser;

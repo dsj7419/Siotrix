@@ -266,7 +266,7 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("cset")]
-        [Summary("command turn on or off globally or for a channel")]
+        [Summary("Turn a command on or off globally or for a specific channel.")]
         [Remarks("<command> toggle (optional:#Channelname)")]
         public async Task Cset(string command, [Remainder]string str)
         {
@@ -293,6 +293,11 @@ namespace Siotrix.Discord.Admin
             bool is_group_found = _service.Modules.Where(p => p.Aliases.First().Equals(command)).Any();
             Console.WriteLine("********{0}^^^^^^^{1}", is_found, is_group_found);
             if (!is_found && !is_group_found) return;
+            if (command == "cset")
+            {
+                await ReplyAsync($"I'm sorry {Context.User.Mention}, but I cannot turn off cset for obvious reasons.");
+                return;
+            }
             string toggle = str.Substring(0, 6);
             if (str.Length < 7)
             {
