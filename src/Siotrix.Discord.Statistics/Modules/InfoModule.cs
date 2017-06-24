@@ -436,7 +436,7 @@ namespace Siotrix.Discord.Statistics
             else if(id == 2)
             {
                 builder
-                    .WithTitle("Information for Siotrix Bot")
+                    .WithTitle("Information for Siotrix")
                     .WithDescription(g_description)
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField( new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Owner : "), Value = Context.User.Id })
