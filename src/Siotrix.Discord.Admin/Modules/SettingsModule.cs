@@ -12,7 +12,7 @@ using System.Globalization;
 namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]    
-    [Group("settings"), Alias("settings")]
+    [Group("settings")]
     [Summary("Various settings for guild to customize Siotrix with.")]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
@@ -549,7 +549,7 @@ namespace Siotrix.Discord.Admin
         public async Task GuildColorAsync()
         {
             var guild_id = Context.Guild.Id;
-            var regexColorCode = new Regex("^#[a-fA-F0-9]{6}$");
+            var regexColorCode = new Regex("^#[A-Fa-f0-9]{6}$");
             var regexRGBCode = new Regex("^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
             Color currentGColor = GuildEmbedColorExtensions.GetGuildColor(Context);
 
@@ -563,17 +563,23 @@ namespace Siotrix.Discord.Admin
 
             await ReplyAsync($"Give me any value of color (Hex, RGB, or a name) to set your guild color (Example Hex: #FF43A4).\nYour Current Guild Hex Code is: {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
             var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
-            if (response.Content == "cancel") return;
 
+            if (response.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current color.");
+                return;
+            }
             _timer.Start();
 
             if (response.Content == "list")
-            {
-                var colornamelower = HexColorDict.ColorName(currentHexColor); //look up hex in dictionary
+            {                
+                string cleanHex = currentHexColor.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+                var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+
 
                 if (colornamelower == null)
                     colornamelower = "no name found";
-
+                
                 TextInfo text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
 
@@ -591,9 +597,9 @@ namespace Siotrix.Discord.Admin
                     rgbvalue.B = 1;
                 }
 
-                Console.WriteLine($" {currentHexColor} {colorname} {currentHexColor}");
+                var hexcolor = currentHexColor.ToUpper();
 
-                var embed = GetEmbed(currentHexColor, colorname, currentHexColor, rgbvalue);
+                var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);
 
                 return;
