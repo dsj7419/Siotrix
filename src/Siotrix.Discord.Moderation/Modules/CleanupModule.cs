@@ -16,12 +16,12 @@ namespace Siotrix.Discord.Moderation
     public class CleanupModule : ModuleBase<SocketCommandContext>
     {
         [Command]
-        [Summary("Instantly cleanup past 10 messages in channel.")]
+        [Summary("Instantly cleanup a lot of Siotrx's recent messages..")]
         [Remarks("- no additional arguments needed.")]
         public async Task CleanAsync()
         {
             var self = Context.Guild.CurrentUser;
-            var messages = (await GetMessageAsync(10)).Where(x => x.Author.Id == self.Id);
+            var messages = (await GetMessageAsync(100)).Where(x => x.Author.Id == self.Id);
 
             if (self.GetPermissions(Context.Channel as SocketGuildChannel).ManageMessages)
                 await DeleteMessagesAsync(messages);
@@ -29,8 +29,8 @@ namespace Siotrix.Discord.Moderation
                 foreach (var msg in messages)
                     await msg.DeleteAsync();
 
-            await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s).");
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s)");
+            await DelayDeleteMessageAsync(reply);
         }
 
         [Command("all")]
@@ -40,7 +40,9 @@ namespace Siotrix.Discord.Moderation
         {
             var messages = await GetMessageAsync(history);
             await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s).");
+
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s)");
+            await DelayDeleteMessageAsync(reply);
         }
 
         [Command("user")]
@@ -50,7 +52,9 @@ namespace Siotrix.Discord.Moderation
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Author.Id == user.Id);
             await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s) by **{user}.");
+
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s) by **{user}**");
+            await DelayDeleteMessageAsync(reply);
         }
 
         [Command("bots")]
@@ -60,7 +64,9 @@ namespace Siotrix.Discord.Moderation
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Author.IsBot);
             await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s) by bots.");
+
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s) by bots");
+            await DelayDeleteMessageAsync(reply);
         }
 
         [Command("contains")]
@@ -70,7 +76,9 @@ namespace Siotrix.Discord.Moderation
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Content.ToLower().Contains(text.ToLower()));
             await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s) containing '{text}'.");
+
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s) containing `{text}`.");
+            await DelayDeleteMessageAsync(reply);
         }
 
         [Command("attachments")]
@@ -80,7 +88,9 @@ namespace Siotrix.Discord.Moderation
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Attachments.Count() != 0);
             await DeleteMessagesAsync(messages);
-            await ReplyAsync($"Deleted **{messages.Count()}** messages(s) with attachments.");
+
+            var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s) with attachments.");
+            await DelayDeleteMessageAsync(reply);
         }
 
         private Task<IEnumerable<IMessage>> GetMessageAsync(int count)

@@ -388,6 +388,7 @@ namespace Siotrix.Discord.Statistics
             string g_description = GetGuildDescription(id);
             string[] g_footer = GetGuildFooter(id);
             string[] m_count = GetLifeTimeMessages(user);
+            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
 
             System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>{0}", id);
             var builder = new EmbedBuilder()
@@ -443,13 +444,13 @@ namespace Siotrix.Discord.Statistics
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Guilds : "), Value = Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Users : "), Value = Context.Guild.Users.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = "https://discord.gg/saZDC" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = "https://discord.gg/saZDC" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = "https://discord.gg/nXvBxDX" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = "https://www.patreon.com/siotrix" })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Created : "), Value = Math.Round((DateTime.Now - Context.Client.CurrentUser.CreatedAt.DateTime).TotalDays, 0).ToString() + " Days ago." })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Icon : "), Value = Context.Client.CurrentUser.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = GetActiveGuildName() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Uptime : "), Value = GetUptime() })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Contributors : "), Value = Format.Bold("Dan Johnson and Frank Thomas") });
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Contributors : "), Value = Format.Bold($"Dan Johnson and Frank Thomas. See {g_prefix}about for more info!") });
             }
             return ReplyAsync("", embed: builder);
         }
