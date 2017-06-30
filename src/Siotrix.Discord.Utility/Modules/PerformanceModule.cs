@@ -18,9 +18,10 @@ namespace Siotrix.Discord.Utility
     {
         private Process _process;
 
-        protected override void BeforeExecute()
+        protected override void BeforeExecute(CommandInfo info)
         {
             _process = Process.GetCurrentProcess();
+            Console.WriteLine(info.Summary);
         }
 
         private string GetGuildIconUrl(int id)
@@ -70,8 +71,6 @@ namespace Siotrix.Discord.Utility
 
             builder.Color = g_color;
             builder.ThumbnailUrl = g_thumbnail;
-
-            var uptime = (DateTime.Now - _process.StartTime);
 
             var desc = $"**Uptime:** {GetUptime()}\n" +
                        $"**Library:** {GetLibrary()}\n" +

@@ -18,9 +18,10 @@ namespace Siotrix.Discord.Roslyn
     {
         private Stopwatch _timer = new Stopwatch();
 
-        protected override void BeforeExecute()
+        protected override void BeforeExecute(CommandInfo info)
         {
             _timer.Start();
+            Console.WriteLine(info.Summary);
         }
 
         [Command("evaluate", RunMode = RunMode.Async)]

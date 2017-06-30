@@ -13,7 +13,6 @@ namespace Siotrix.Discord.Moderation
     public class FilterService : IService
     {
         private DiscordSocketClient _client;
-        private LogDatabase _db;
 
         public FilterService(DiscordSocketClient client)
         {
@@ -33,7 +32,6 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived -= OnMessageReceivedAsync;
             _client.MessageUpdated -= OnMessageUpdatedAsync;
             _client.GuildMemberUpdated -= OnGuildMemberUpdatedAsync;
-            _db = null;
             await PrettyConsole.LogAsync("Info", "Filter", "Service stopped successfully").ConfigureAwait(false);
         }
 
