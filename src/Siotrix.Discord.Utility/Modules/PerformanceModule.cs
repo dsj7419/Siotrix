@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Collections;
+using System.Linq;
 
 namespace Siotrix.Discord.Utility
 {
@@ -21,16 +23,53 @@ namespace Siotrix.Discord.Utility
             _process = Process.GetCurrentProcess();
         }
 
-        [Command("list")]
+        private string GetGuildIconUrl(int id)
+        {
+            var guild_id = Context.Guild.Id;
+            string iconurl = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
+                    if (val == null || val.ToList().Count <= 0 || id == 2)
+                    {
+                        iconurl = db.Authors.First().AuthorIcon;
+                    }
+                    else
+                    {
+                        iconurl = val.First().Avatar;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return iconurl;
+        }
+
+        [Command, Alias("list")]
         [Summary("Complete list of all performance information.")]
         [Remarks(" - no additional argument needed")]
         public Task PerformanceAsync()
         {
             Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
-            var builder = new EmbedBuilder();
+            string g_icon_url = GetGuildIconUrl(0);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
+
+            var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(g_icon_url)
+                .WithName("Performance Summary for Siotrix Bot")
+                .WithUrl("https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631"))
+            .WithFooter(new EmbedFooterBuilder()
+                .WithIconUrl(Context.User.GetAvatarUrl())
+                .WithText($"{Context.User.Username}#{Context.User.Discriminator}"))
+                .WithTimestamp(DateTime.UtcNow);
+
             builder.Color = g_color;
-            builder.ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl();
-            builder.Title = "Performance Summary";
+            builder.ThumbnailUrl = g_thumbnail;
 
             var uptime = (DateTime.Now - _process.StartTime);
 
@@ -39,7 +78,9 @@ namespace Siotrix.Discord.Utility
                        $"**OS:** {GetOperatingSystem()}\n" +
                        $"**Framework:** {GetFramework()}\n" +
                        $"**Memory Usage:** {GetMemoryUsage()}\n" +
-                       $"**Latency:** {GetLatency()}\n";
+                       $"**Threads Running:** {GetThreads()}\n" +
+                       $"**Latency:** {GetLatency()}\n\n" +
+                       $"**Siotrix Official Discord:** https://discord.gg/e6sku22";
 
             builder.Description = desc;
             return ReplyAsync("", embed: builder);
@@ -75,6 +116,12 @@ namespace Siotrix.Discord.Utility
         public Task MemoryUsageAsync()
             => ReplyAsync(GetMemoryUsage());
 
+        [Command("threadcount"), Alias("threads", "thread")]
+        [Summary("Number of threads in use by Siotrix.")]
+        [Remarks(" - no additional argument needed")]
+        public Task ThreadCountAsync()
+           => ReplyAsync(GetThreads());
+
         [Command("latency"), Alias("lag", "ping")]
         [Summary("Lists current latency response of Siotrix.")]
         [Remarks(" - no additional argument needed")]
@@ -101,5 +148,8 @@ namespace Siotrix.Discord.Utility
 
         public string GetLatency()
             => $"{(Context.Client as DiscordSocketClient).Latency}ms";
+
+        public string GetThreads()
+            => $"{((IEnumerable)_process.Threads).OfType<ProcessThread>().Where(t => t.ThreadState == ThreadState.Running).Count()} / {_process.Threads.Count}";
     }
 }

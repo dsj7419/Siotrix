@@ -17,7 +17,7 @@ namespace Siotrix.Discord.Statistics
         protected override void BeforeExecute()
         {
             _process = Process.GetCurrentProcess();
-        }
+        } 
 
         private string GetAuthorIconUrl()
         {

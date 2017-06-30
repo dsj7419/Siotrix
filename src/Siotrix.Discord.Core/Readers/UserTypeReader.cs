@@ -13,7 +13,7 @@ namespace Siotrix.Discord
     public class UserTypeReader<T> : TypeReader
           where T : class, IUser
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext c, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext c, string input, IServiceProvider services)
         {
             var context = c as SocketCommandContext;
             var results = new Dictionary<ulong, TypeReaderValue>();
