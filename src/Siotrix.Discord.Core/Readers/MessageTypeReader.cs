@@ -2,13 +2,14 @@
 using Discord;
 using System.Globalization;
 using System.Threading.Tasks;
+using System;
 
 namespace Siotrix.Discord
 {
     public class MessageTypeReader<T> : TypeReader
         where T : class, IMessage
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext c, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext c, string input, IServiceProvider services)
         {
             var context = c as CommandContext;
             ulong id;
