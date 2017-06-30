@@ -17,14 +17,14 @@ namespace Siotrix.Discord.Admin
     [RequireContext(ContextType.Guild)]
     public class AnnouncementModule : ModuleBase<SocketCommandContext>
     {
-        private bool GetToggleStatus(int cmd_id)
+        private bool GetToggleOrDMStatus(int cmd_id, int option)
         {
             bool status = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var list = db.Gannouncetoggles.Where(p => p.CommandId == cmd_id && p.GuildId == Context.Guild.Id.ToLong());
+                    var list = db.Gannouncetoggles.Where(p => p.CommandId == cmd_id && p.GuildId == Context.Guild.Id.ToLong() && p.Option == option);
                     if (list.Any())
                     {
                         db.Gannouncetoggles.RemoveRange(list);
@@ -32,9 +32,10 @@ namespace Siotrix.Discord.Admin
                     }
                     else
                     {
-                        var val = new DiscordGuildAnnounceToggle();
+                        var val = new DiscordGuildAnnounceToggleOrDM();
                         val.CommandId = cmd_id;
                         val.GuildId = Context.Guild.Id.ToLong();
+                        val.Option = option;
                         db.Gannouncetoggles.Add(val);
                     }
                     db.SaveChanges();
@@ -99,39 +100,116 @@ namespace Siotrix.Discord.Admin
             return is_success;
         }
 
-        private string GetAnnouncementInfo(long guild_id)
+        private string[] GetAnnouncementInfo(long guild_id)
         {
-            string info = null;
-            string welcome_data = "Welcome Off";
-            string leave_data = "Leave Off";
-            string return_data = "Return Off";
+            string[] data = new string[]{ "Welcome ***On***", "Leave ***On***", "Return ***On***" };
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var list = db.Gannouncetoggles.Where(p => p.GuildId == guild_id);
+                    var list = db.Gannouncetoggles.Where(p => p.GuildId == guild_id && p.Option == 0);
                     if (list.Any())
                     {
                         foreach(var item in list)
                         {
                             if (item.CommandId == 1)
-                                welcome_data = "Welcome On";
+                                data[0] = "Welcome ***Off***";
                             else if (item.CommandId == 2)
-                                leave_data = "Welcome On";
+                                data[1] = "Leave ***Off***";
                             else if (item.CommandId == 3)
-                                return_data = "Return On";
+                                data[2] = "Return ***Off***";
                         }
-                        info = welcome_data + "\n" + leave_data + "\n" + return_data;
                     }
-                    else
-                        info = "No Informations";
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return info;
+            return data;
+        }
+
+        private bool SetAnnounceChannelPerGuild(long guild_id, long channel_id)
+        {
+            bool isSuccess = false;
+            using(var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncechannels.Where(p => p.GuildId == guild_id);
+                    if (list.Any())
+                    {
+                        var data = list.First();
+                        data.ChannelId = channel_id;
+                        db.Gannouncechannels.Update(data);
+                    }
+                    else
+                    {
+                        var record = new DiscordGuildAnnounceChannel();
+                        record.ChannelId = channel_id;
+                        record.GuildId = guild_id;
+                        db.Gannouncechannels.Add(record);
+                    }
+                    db.SaveChanges();
+                    isSuccess = true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return isSuccess;
+        }
+
+        private string GetAnnounceChannel(long guild_id)
+        {
+            string channel_name = null;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncechannels.Where(p => p.GuildId == guild_id);
+                    if (list.Any())
+                    {
+                        channel_name = " : ***#" + Context.Guild.GetChannel(list.First().ChannelId.ToUlong()) + "***";
+                    }
+                        
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return channel_name;
+        }
+
+        private string[] GetDMStatusValues(long guild_id)
+        {
+            string[] data = new string[3];
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncetoggles.Where(x => x.GuildId == guild_id && x.Option == 1);
+                    if (list.Any())
+                    {
+                        foreach (var item in list)
+                        {
+                            if (item.CommandId == 1)
+                                data[0] = " : ***Direct Message***";
+                            else if (item.CommandId == 2)
+                                data[1] = " : ***Direct Message***";
+                            else if (item.CommandId == 3)
+                                data[2] = " : ***Direct Message***";
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return data;
         }
 
         [Command]
@@ -142,6 +220,8 @@ namespace Siotrix.Discord.Admin
         public async Task AnnouncementAsync()
         {
             var info = GetAnnouncementInfo(Context.Guild.Id.ToLong());
+            var channel_name = GetAnnounceChannel(Context.Guild.Id.ToLong());
+            var dm_list = GetDMStatusValues(Context.Guild.Id.ToLong());
             string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
             string g_name = GuildEmbedName.GetGuildName(Context);
             string g_url = GuildEmbedUrl.GetGuildUrl(Context);
@@ -163,7 +243,10 @@ namespace Siotrix.Discord.Admin
            .AddField(x =>
            {
                x.Name = "Announcements Informations";
-               x.Value = info;
+               x.Value =
+                        info[0] + "\n" + "Welcome Channel" + ((dm_list[0] != null) ? dm_list[0] : channel_name) + "\n" +
+                        info[1] + "\n" + "Leave Channel" + ((dm_list[1] != null) ? dm_list[1] : channel_name) + "\n" +
+                        info[2] + "\n" + "Return Channel" + ((dm_list[2] != null) ? dm_list[2] : channel_name);
            });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
@@ -178,7 +261,7 @@ namespace Siotrix.Discord.Admin
             
             if (param.Equals("toggle"))
             {
-                var toggle_on = GetToggleStatus(1);
+                var toggle_on = GetToggleOrDMStatus(1, 0);
                 if (toggle_on)
                     await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
                 else
@@ -201,6 +284,14 @@ namespace Siotrix.Discord.Admin
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
+            else if (param.Equals("dm"))
+            {
+                var dm_on = GetToggleOrDMStatus(1, 1);
+                if (dm_on)
+                    await ReplyAsync($"✖️ : DM unset!");
+                else
+                    await ReplyAsync($"✅ : DM set!");
+            }
         }
 
         [Command("leave")]
@@ -212,11 +303,11 @@ namespace Siotrix.Discord.Admin
         {
             if (param.Equals("toggle"))
             {
-                var toggle_on = GetToggleStatus(2);
+                var toggle_on = GetToggleOrDMStatus(2, 0);
                 if (toggle_on)
-                    await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
+                    await ReplyAsync($"✅ : Toggled ***leave*** command **on** in this guild !");
                 else
-                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **off** in this guild !");
+                    await ReplyAsync($"✖️ : Toggled ***leave*** command **off** in this guild !");
             }
             else if (param.Equals("set"))
             {
@@ -235,6 +326,14 @@ namespace Siotrix.Discord.Admin
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
+            else if (param.Equals("dm"))
+            {
+                var dm_on = GetToggleOrDMStatus(2, 1);
+                if (dm_on)
+                    await ReplyAsync($"✖️ : DM unset!");
+                else
+                    await ReplyAsync($"✅ : DM set!");
+            }
         }
 
         [Command("return")]
@@ -246,11 +345,11 @@ namespace Siotrix.Discord.Admin
         {
             if (param.Equals("toggle"))
             {
-                var toggle_on = GetToggleStatus(3);
+                var toggle_on = GetToggleOrDMStatus(3, 0);
                 if (toggle_on)
-                    await ReplyAsync($"✅ : Toggled ***welcome*** command **on** in this guild !");
+                    await ReplyAsync($"✅ : Toggled ***return*** command **on** in this guild !");
                 else
-                    await ReplyAsync($"✖️ : Toggled ***welcome*** command **off** in this guild !");
+                    await ReplyAsync($"✖️ : Toggled ***return*** command **off** in this guild !");
             }
             else if (param.Equals("set"))
             {
@@ -269,6 +368,33 @@ namespace Siotrix.Discord.Admin
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
             }
+            else if (param.Equals("dm"))
+            {
+                var dm_on = GetToggleOrDMStatus(3, 1);
+                if (dm_on)
+                    await ReplyAsync($"✖️ : DM unset!");
+                else
+                    await ReplyAsync($"✅ : DM set!");
+            }
+        }
+
+        [Command("mount")]
+        [Summary("- mount")]
+        [Remarks(" - need some arguments")]
+        [RequireContext(ContextType.Guild)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
+        public async Task MountAsync(string channel_name)
+        {
+            long channel_id = 0;
+            bool is_setting = false;
+            channel_id = ChannelNameExtensions.GetChannelIdFromName(channel_name, Context);
+            if (channel_id <= 0)
+                await ReplyAsync("📣 : Not exists like that channel!");
+            is_setting = SetAnnounceChannelPerGuild(Context.Guild.Id.ToLong(), channel_id);
+            if (is_setting)
+                await ReplyAsync("👍");
+            else
+                await ReplyAsync("📣 : Not founded announcement channel!");
         }
     }
 }

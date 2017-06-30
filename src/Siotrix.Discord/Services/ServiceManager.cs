@@ -118,6 +118,7 @@ namespace Siotrix.Discord
             _log = new LogService(_client);
 
             await _antispam.StartAsync();
+            await _warning.StartAsync();
             await _filter.StartAsync();
             await _log.StartAsync();
             //await _warning.StartAsync();

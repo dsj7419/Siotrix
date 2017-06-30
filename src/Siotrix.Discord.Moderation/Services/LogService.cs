@@ -279,6 +279,28 @@ namespace Siotrix.Discord.Moderation
             return id;
         }
 
+        private long GetAnnounceChannelId(long guild_id)
+        {
+            long channel_id = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Gannouncechannels.Where(p => p.GuildId == guild_id);
+                    if (list.Any())
+                    {
+                        channel_id = list.First().ChannelId;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return channel_id;
+        }
+
         private string getAction(string str)
         {
             string sentense = null;
@@ -612,7 +634,9 @@ namespace Siotrix.Discord.Moderation
         {
             //var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
+            var announce_channel_id = GetAnnounceChannelId(user.Guild.Id.ToLong());
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var announce_channel = _client.GetChannel(announce_channel_id.ToUlong()) as ISocketMessageChannel;
             var custom_message = GetWecomeMessage(1, user.Guild.Id.ToLong());
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -623,7 +647,7 @@ namespace Siotrix.Discord.Moderation
                 await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
             else
                 await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
-            await log_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
+            await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
         }
 
         private string GetWecomeMessage(int id, long guild_id)
@@ -666,7 +690,10 @@ namespace Siotrix.Discord.Moderation
         private async Task OnUserLeftAsync(SocketGuildUser user)
         {
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
+            var announce_channel_id = GetAnnounceChannelId(user.Guild.Id.ToLong());
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var announce_channel = _client.GetChannel(announce_channel_id.ToUlong()) as ISocketMessageChannel;
+            var custom_message = GetWecomeMessage(2, user.Guild.Id.ToLong());
             var guild_user = _client.GetUser(user.Id);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -677,6 +704,7 @@ namespace Siotrix.Discord.Moderation
                 await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
             else
                 await log_channel.SendMessageAsync("", false, builder.Build());
+            await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
         }
 
         private async Task GuildMemberUpdated_RoleChange(SocketGuildUser b, SocketGuildUser a)

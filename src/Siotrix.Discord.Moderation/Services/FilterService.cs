@@ -25,7 +25,7 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived += OnMessageReceivedAsync;
             _client.MessageUpdated += OnMessageUpdatedAsync;
             _client.GuildMemberUpdated += OnGuildMemberUpdatedAsync;
-            await PrettyConsole.LogAsync("Info", "Log", "Service started successfully").ConfigureAwait(false);
+            await PrettyConsole.LogAsync("Info", "Filter", "Service started successfully").ConfigureAwait(false);
         }
 
         public async Task StopAsync()
@@ -34,21 +34,21 @@ namespace Siotrix.Discord.Moderation
             _client.MessageUpdated -= OnMessageUpdatedAsync;
             _client.GuildMemberUpdated -= OnGuildMemberUpdatedAsync;
             _db = null;
-            await PrettyConsole.LogAsync("Info", "Log", "Service stopped successfully").ConfigureAwait(false);
+            await PrettyConsole.LogAsync("Info", "Filter", "Service stopped successfully").ConfigureAwait(false);
         }
-        
+
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
             int argPos = 0;
             string spec = null;
             var context = new SocketCommandContext(_client, message);
-            var dictionary = GetFilterWords(context.Guild.Id.ToLong());
+            var dictionary = LogChannelExtensions.GetFilterWords(context.Guild.Id.ToLong());
             string[] words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var channel = context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            var badword = ParseMessages(words, dictionary);
-            if(badword != null)
+            var badword = LogChannelExtensions.ParseMessages(words, dictionary);
+            if (badword != null)
             {
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -60,13 +60,13 @@ namespace Siotrix.Discord.Moderation
             }
 
             spec = PrefixExtensions.GetGuildPrefix(context);
-             var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
-             if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
-             {
-                 //run auto delete command function
-                 if (is_found)
-                     await message.DeleteAsync();
-             }
+            var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
+            if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            {
+                //run auto delete command function
+                if (is_found)
+                    await message.DeleteAsync();
+            }
         }
 
         private bool IsUsableAutoDeleteCommand(long guild_id)
@@ -101,50 +101,6 @@ namespace Siotrix.Discord.Moderation
         private bool ContainsFilteredWord(string value)
         {
             return false;
-        }
-
-        private Dictionary<int, string> GetFilterWords(long guild_id)
-        {
-            var dictionary = new Dictionary<int, string>();
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
-                    if (result.Any())
-                    {
-                        int i = 0;
-                        foreach(var item in result)
-                        {
-                            dictionary.Add(i, item.Word);
-                            i++;
-                        }
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return dictionary;
-        }
-
-        private string ParseMessages(string[] msg, Dictionary<int, string> dictionary)
-        {
-            string badword = null;
-            foreach(var msg_item in msg)
-            {
-                foreach(var dic_item in dictionary)
-                {
-                    if (msg_item.ToLower().Equals(dic_item.Value.ToLower()))
-                    {
-                        badword = msg_item;
-                        break;
-                    }
-                }
-            }
-            return badword;
         }
     }
 }

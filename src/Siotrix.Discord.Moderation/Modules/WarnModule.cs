@@ -90,41 +90,44 @@ namespace Siotrix.Discord.Moderation
             return is_success;
         }
 
-        private bool SaveAndUpdateWarningUsers(long user_id, long guild_id, int level, string reason, DateTime time, long mod_id)
+        private bool SaveAndUpdateWarningUsers(long user_id, long guild_id, int point_num, string reason, DateTime time, long mod_id, InfractionType type)
         {
+            string infraction_type = null;
+            switch (type)
+            {
+                case InfractionType.Manual:
+                    infraction_type = "Manual Infraction";
+                    break;
+                case InfractionType.Filter:
+                    infraction_type = "Filter Infraction";
+                    break;
+                case InfractionType.Repeat:
+                    infraction_type = "Repeat Infraction";
+                    break;
+                case InfractionType.Caps:
+                    infraction_type = "Caps Infraction";
+                    break;
+                default:
+                    break;
+            }
+
             bool is_success = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var compare_result = db.Warninginfos.Where(x => x.Level == level);
-                    if (!compare_result.Any())
-                        is_success = false;
-                    else
-                    {
-                        var result = db.Gwarningusers.Where(x => x.UserId == user_id && x.GuildId == guild_id && x.Level == level);
-                        if (!result.Any())
-                        {
-                            var record = new DiscordGuildWarningUser();
-                            record.UserId = user_id;
-                            record.GuildId = guild_id;
-                            record.Level = level;
-                            record.Reason = reason;
-                            record.CreatedAt = time;
-                            record.ModId = mod_id;
-                            db.Gwarningusers.Add(record);
-                        }
-                        else
-                        {
-                            var data = result.First();
-                            data.Reason = reason;
-                            data.CreatedAt = time;
-                            data.ModId = mod_id;
-                            db.Gwarningusers.Update(data);
-                        }
-                        db.SaveChanges();
-                        is_success = true;
-                    }
+                    var record = new DiscordGuildWarningUser();
+                    record.UserId = user_id;
+                    record.GuildId = guild_id;
+                    record.PointNum = point_num;
+                    record.Reason = reason;
+                    record.CreatedAt = time;
+                    record.ModId = mod_id;
+                    record.Type = infraction_type;
+                    record.Index = db.Gwarningusers.Where(x => x.GuildId == guild_id && x.UserId == user_id).Count() + 1;
+                    db.Gwarningusers.Add(record);
+                    db.SaveChanges();
+                    is_success = true;
                 }
                 catch (Exception e)
                 {
@@ -169,9 +172,9 @@ namespace Siotrix.Discord.Moderation
         [Command]
         [Summary(" - user, level, reason")]
         [Remarks(" - user, level, reason")]
-        public async Task WarnAsync(SocketGuildUser user, int level, [Remainder] string reason)
+        public async Task WarnAsync(SocketGuildUser user, int points, [Remainder] string reason)
         {
-            var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), level, reason, DateTime.Now, Context.User.Id.ToLong());
+            var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), points, reason, DateTime.Now, Context.User.Id.ToLong(), InfractionType.Manual);
             System.Console.WriteLine("=========={0}", Context.User.Id);
             if (success)
                 await ReplyAsync("👍");

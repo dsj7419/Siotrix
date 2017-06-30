@@ -59,7 +59,7 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var result = db.Gspams.Where(x => x.GuildId.Equals(Context.Guild.Id.ToLong()));
+                    var result = db.Gspams.Where(x => x.GuildId.Equals(Context.Guild.Id.ToLong())).OrderBy(x => x.Option);
                     if (result.Any())
                     {
                         foreach(var item in result)

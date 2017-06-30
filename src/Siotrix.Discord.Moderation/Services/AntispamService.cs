@@ -28,16 +28,16 @@ namespace Siotrix.Discord.Moderation
             _client = client;
         }
 
-        public Task StartAsync()
+        public async Task StartAsync()
         {
             _client.MessageReceived += OnMessageReceivedAsync;
-            return Task.CompletedTask;
+            await PrettyConsole.LogAsync("Info", "Antispam", "Service started successfully").ConfigureAwait(false);
         }
         
-        public Task StopAsync()
+        public async Task StopAsync()
         {
             _client.MessageReceived -= OnMessageReceivedAsync;
-            return Task.CompletedTask;
+            await PrettyConsole.LogAsync("Info", "Antispam", "Service stopped successfully").ConfigureAwait(false);
         }
 
         private bool IsAllUpper(string input)
@@ -96,15 +96,15 @@ namespace Siotrix.Discord.Moderation
                 {
                     // messages are the same, do what you want
                     number_of_the_same_msg++;
-                    if (number_of_the_same_msg == repeat_spam_value)
+                    if (number_of_the_same_msg == repeat_spam_value - 1)
                     {
                         builder = GetBuilder(context, repeat_spam_value, repeat_spam_value, true);
                         msg = await MessageExtensions.SendMessageSafeAsync(log_channel, "", false, builder.Build());
                         return;
                     }
-                    else if (number_of_the_same_msg > repeat_spam_value)
+                    else if (number_of_the_same_msg > repeat_spam_value - 1)
                     {
-                        if(number_of_the_same_msg == mute_repeat_spam_value)
+                        if(number_of_the_same_msg == mute_repeat_spam_value - 1)
                         {
                             await MuteSpamUser(context.User as IGuildUser, mute_repeat_time_value, context);
                         }
