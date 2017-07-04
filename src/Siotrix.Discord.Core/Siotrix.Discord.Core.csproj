@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Discord.Addons.EmojiTools" Version="2.0.1" />
     <PackageReference Include="Discord.Addons.InteractiveCommands" Version="1.2.4" />
-    <PackageReference Include="Discord.Net" Version="1.0.0" />
+    <PackageReference Include="Discord.Net" Version="1.0.0-rc3-00779" />
     <PackageReference Include="ImageSharp" Version="1.0.0-alpha9-00152" />
   </ItemGroup>
 
