@@ -11,7 +11,7 @@ namespace Siotrix.Discord
     public class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext c, string input, IServiceProvider services)
+        public override async Task<TypeReaderResult> Read(ICommandContext c, string input)
         {
             var context = c as SocketCommandContext;
             if (context.Guild != null)

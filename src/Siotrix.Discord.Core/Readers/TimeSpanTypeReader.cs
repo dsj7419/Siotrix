@@ -8,7 +8,7 @@ namespace Siotrix.Discord
 {
     public class TimeSpanTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
             var times = new Dictionary<string, int>();
 
