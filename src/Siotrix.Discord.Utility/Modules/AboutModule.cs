@@ -9,19 +9,22 @@ namespace Siotrix.Discord.Utility
     [MinPermissions(AccessLevel.User)]
     public class AboutModule : ModuleBase<SocketCommandContext>
     {
-        private Dictionary<ulong, string> _specialThanks = new Dictionary<ulong, string>
-            {
-                {285790360804786186, "My development partner, and someone who I can always count on." }
-         //       {250456837529272331, "Made Siotrix's avatar, and is just a kick ass artist/record label promoter." },
-         //       {209175376293920768, $"ION's head of PR, and realy helpful with ideas for things to be added." }
-            };
+        private readonly Dictionary<ulong, string> _specialThanks = new Dictionary<ulong, string>();       
 
         [Command("about")]
         [Summary("A little information and special thanks surrounding this bot, Siotrix.")]
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.User)]
-        public async Task About()
+
+        async Task ShowAbout()
         {
+            if (_specialThanks.Count <= 0)
+            {
+                _specialThanks.Add(285790360804786186, "My development partner, and someone who I can always count on.");
+                //       {250456837529272331, "Made Siotrix's avatar, and is just a kick ass artist/record label promoter." },
+                //       {209175376293920768, $"ION's head of PR, and realy helpful with ideas for things to be added." }
+            }
+
             string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
             var message = $"A little bit about Siotrx! Siotrix is a discord bot written in C# by {Context.Client.GetUser(173905004661309441).Username}.\n" +
                           $"I was created because a lot of the larger bots seem to miss having a personal touch for each guild. The goal was to make a\n" +
