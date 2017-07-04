@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Statistics
     {
         private Process _process;
 
-        protected override void BeforeExecute(CommandInfo info)
+        protected override void BeforeExecute()
         {
             _process = Process.GetCurrentProcess();
         }
