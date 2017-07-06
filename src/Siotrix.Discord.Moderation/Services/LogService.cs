@@ -37,6 +37,7 @@ namespace Siotrix.Discord.Moderation
             _client.GuildMemberUpdated += UserUpdated_NameChange;
             _client.GuildMemberUpdated += GuildMemberUpdated_NickChange;
             _client.UserLeft += OnUserLeftAsync;
+            _client.UserUpdated += UserNameChangedAsync;
             MuteExtensions.UserMuted += OnMuteReceivedAsync;
             MuteExtensions.UserUnmuted += OnUnMuteReceivedAsync;
             await PrettyConsole.LogAsync("Info", "Log", "Service started successfully").ConfigureAwait(false);
@@ -58,6 +59,7 @@ namespace Siotrix.Discord.Moderation
             _client.GuildMemberUpdated -= GuildMemberUpdated_RoleChange;
             _client.GuildMemberUpdated -= UserUpdated_NameChange;
             _client.GuildMemberUpdated -= GuildMemberUpdated_NickChange;
+            _client.UserUpdated -= UserNameChangedAsync;
             _client.UserLeft -= OnUserLeftAsync;
             MuteExtensions.UserMuted -= OnMuteReceivedAsync;
             MuteExtensions.UserUnmuted -= OnUnMuteReceivedAsync;
@@ -783,6 +785,22 @@ namespace Siotrix.Discord.Moderation
                     .WithColor(new Color(1, 1, 1));
                     await log_channel.SendMessageAsync("", false, builder.Build());
                 }
+            }
+        }
+        
+        private async Task UserNameChangedAsync(SocketUser b, SocketUser a)
+        {
+            if (b.Username == a.Username) return;
+            LogChannelExtensions.IsUsableLogChannel(b.Id.ToLong());
+            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            if (!LogChannelExtensions.is_toggled_log)
+            {
+                var builder = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                .WithIconUrl(b.GetAvatarUrl())
+                .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) changed their username to {a.Username}"))
+                .WithColor(new Color(1, 1, 1));
+                await log_channel.SendMessageAsync("", false, builder.Build());
             }
         }
 

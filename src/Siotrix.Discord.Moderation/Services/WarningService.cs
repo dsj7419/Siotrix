@@ -142,8 +142,8 @@ namespace Siotrix.Discord.Moderation
                 .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
-            value = context.User.Mention + " has been issues **" + warn_count.ToString() + "** warning points for breaking filter rule\n" +
-              "Reason : use of the words ***" + badword + "***\n";
+            value = context.User.Mention + " has been issued **" + warn_count.ToString() + "** warning points for breaking filter rule\n" +
+              "Reason : use of the words : ***" + badword + "***\n";
 
             embed
                 .AddField(x =>
