@@ -96,5 +96,13 @@ namespace Siotrix.Discord
         public static bool UserHasPermission(this IGuildChannel channel, IGuildUser user, ChannelPermission permission)
             => user.GetPermissions(channel).Has(permission);
 
+        public static int number_of_messages = 0;
+        public static ulong userId = 0;
+        public static async Task NumberOfCleanupMessages(int count, ulong user_id)
+        {
+            number_of_messages = count;
+            userId = user_id;
+            await Task.Delay(0);
+        }
     }
 }

@@ -549,23 +549,39 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            var msg = await _db.GetMessageAsync(cachemsg.Id);
-            if (!msg.IsBot)
+            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            EmbedBuilder builder = new EmbedBuilder();
+            var number_of_cleanup_messages = MessageExtensions.number_of_messages;
+            if(number_of_cleanup_messages > 0)
             {
-                LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
-                var oldmsg = await cachemsg.GetOrDownloadAsync();
-                var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-                var user = _client.GetUser(msg.AuthorId.ToUlong());
-                var builder = new EmbedBuilder()
+                var cleanup_user = _client.GetUser(MessageExtensions.userId);
+                builder
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(user.GetAvatarUrl())
-                //.WithName("Message has been deleted by " + user.Username + "#" + user.Discriminator))
-                .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
+                .WithIconUrl(cleanup_user.GetAvatarUrl())
+                .WithName(cleanup_user.Username + "#" + cleanup_user.Discriminator + " has deleted " + number_of_cleanup_messages.ToString() + " messages."))
                 .WithColor(new Color(0, 127, 127));
-                if (LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
-                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                await log_channel.SendMessageAsync("", false, builder.Build());
+                return;
+            }
+            else
+            {
+                var msg = await _db.GetMessageAsync(cachemsg.Id);
+                if (!msg.IsBot)
+                {
+                    LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
+                    var oldmsg = await cachemsg.GetOrDownloadAsync();
+
+                    var user = _client.GetUser(msg.AuthorId.ToUlong());
+                    builder
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(user.GetAvatarUrl())
+                    .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
+                    .WithColor(new Color(0, 127, 127));
+                    if (LogChannelExtensions.is_toggled_log)
+                        await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
+                    else
+                        await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                }
             }
         }
 

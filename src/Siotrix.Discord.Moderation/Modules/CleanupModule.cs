@@ -41,6 +41,7 @@ namespace Siotrix.Discord.Moderation
             var messages = await GetMessageAsync(history);
             await DeleteMessagesAsync(messages);
 
+            await MessageExtensions.NumberOfCleanupMessages(messages.Count(), Context.User.Id);
             var reply = await ReplyAsync($"Deleted **{messages.Count()}** message(s)");
             await DelayDeleteMessageAsync(reply);
         }
