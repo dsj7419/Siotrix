@@ -9,7 +9,7 @@ namespace Siotrix.Discord.Readers
 {
     public class UriTypeReader : TypeReader
     {
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             string cleanInput = input;
 

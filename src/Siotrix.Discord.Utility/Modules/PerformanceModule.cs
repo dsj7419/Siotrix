@@ -18,7 +18,7 @@ namespace Siotrix.Discord.Utility
     {
         private Process _process;
 
-        protected override void BeforeExecute()
+        protected override void BeforeExecute(CommandInfo info)
         {
             _process = Process.GetCurrentProcess();
          //   Console.WriteLine(info.Summary);

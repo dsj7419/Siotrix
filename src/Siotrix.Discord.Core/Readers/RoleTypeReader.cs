@@ -11,7 +11,7 @@ namespace Siotrix.Discord
     public class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override Task<TypeReaderResult> Read(ICommandContext c, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext c, string input, IServiceProvider services)
         {
             var context = c as CommandContext;
             ulong id;
