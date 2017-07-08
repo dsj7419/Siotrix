@@ -186,10 +186,11 @@ namespace Siotrix.Discord.Statistics
             return arr;
         }
 
-        private string GetActivityChannelPerGuild()
+        private long GetActivityChannelPerGuild()
         {
             int cnt = 0;
-            string active_channel = null;
+            //string active_channel = null;
+            long active_channel_id = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -201,7 +202,8 @@ namespace Siotrix.Discord.Statistics
                         if (list.Where(p => p.ChannelId == item.First().ChannelId).ToList().Count > cnt)
                         {
                             cnt = list.Where(p => p.ChannelId == item.First().ChannelId).ToList().Count;
-                            active_channel = item.First().ChannelName;
+                            //active_channel = item.First().ChannelName;
+                            active_channel_id = item.First().ChannelId ?? 0;
                         }
                     }
                 }
@@ -210,14 +212,15 @@ namespace Siotrix.Discord.Statistics
                     Console.WriteLine(e);
                 }
             }
-            if(active_channel == null || active_channel == "")
-            {
-                return "None";
-            }
-            else
-            {
-                return "#" + active_channel;
-            }
+            return active_channel_id;
+            //if(active_channel == null || active_channel == "")
+            //{
+            //    return "None";
+            //}
+            //else
+            //{
+            //    return "#" + active_channel;
+            //}
         }
 
         private int GetDeleteMessagesPerGuild()
@@ -263,19 +266,13 @@ namespace Siotrix.Discord.Statistics
             return count;
         }
 
-        private string[] GetActiveDataOfWeekPerGuild()
+        private long GetActivityChannelOfWeekPerGuild()
         {
-            string[] active_data = new string[2]; 
             int channel_cnt = 0;
-            int date_cnt = 0;
-            int hour_cnt = 0;
-            int active_day = 0;
-            int active_hour = 0;
-            string active_channel_of_week = null;
-            long? active_channel_id = 0;
             DateTime today = DateTime.Now;
             DateTime firstDayOfWeek = DateTimeExtensions.FirstDayOfWeek(today);
             DateTime lastDayOfWeek = DateTimeExtensions.LastDayOfWeek(today); ;
+            long active_channel_id = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -285,19 +282,44 @@ namespace Siotrix.Discord.Statistics
                     var arr = list.GroupBy(p => p.ChannelId).ToList();
                     foreach (var item in arr)
                     {
-                        if (list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count > channel_cnt)
+                        if (list.Where(p => item.First().ChannelId == p.ChannelId && p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count > channel_cnt)
                         {
-                            channel_cnt = list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count;
-                            active_channel_of_week = item.First().ChannelName;
-                            active_channel_id = item.First().ChannelId;
+                            channel_cnt = list.Where(p => item.First().ChannelId == p.ChannelId && p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count;
+                            active_channel_id = item.First().ChannelId ?? 0;
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return active_channel_id;
+        }
+
+        private string GetActiveDataOfWeekPerGuild()
+        {
+            string active_data = null;
+            int date_cnt = 0;
+            int hour_cnt = 0;
+            int active_day = 0;
+            int active_hour = 0;
+            long? active_channel_id = 0;
+            DateTime today = DateTime.Now;
+            DateTime firstDayOfWeek = DateTimeExtensions.FirstDayOfWeek(today);
+            DateTime lastDayOfWeek = DateTimeExtensions.LastDayOfWeek(today); ;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    var list = db.Messages.Where(p => !p.IsBot && p.GuildId == Context.Guild.Id.ToLong()).ToList();
+                    active_channel_id = GetActivityChannelOfWeekPerGuild();
 
                     var data1 = list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek && p.ChannelId == active_channel_id).ToList();
                     var data2 = data1.GroupBy(p => p.CreatedAt.Day);
-                    foreach(var i in data2)
+                    foreach (var i in data2)
                     {
-                        if(i.ToList().Count > date_cnt)
+                        if (i.ToList().Count > date_cnt)
                         {
                             date_cnt = i.ToList().Count;
                             active_day = i.First().CreatedAt.Day;
@@ -306,29 +328,22 @@ namespace Siotrix.Discord.Statistics
 
                     var data3 = data1.Where(p => p.CreatedAt.Day == active_day).ToList();
                     var data4 = data3.GroupBy(p => p.CreatedAt.Hour);
-                    foreach(var ii in data4)
+                    foreach (var ii in data4)
                     {
-                        if(ii.ToList().Count > hour_cnt)
+                        if (ii.ToList().Count > hour_cnt)
                         {
                             hour_cnt = ii.ToList().Count;
                             active_hour = ii.First().CreatedAt.Hour;
                         }
                     }
-                    if(active_channel_of_week == null || active_channel_of_week == "")
-                    {
-                        active_data[0] = "None";
-                    }
-                    else
-                    {
-                        active_data[0] = "#" + active_channel_of_week;
-                    }
+                   
                     if (active_hour <= 12)
                     {
-                        active_data[1] = active_hour.ToString() + " : 00 AM";
+                        active_data = active_hour.ToString() + " : 00 AM";
                     }
                     else
                     {
-                        active_data[1] = (active_hour - 12).ToString() + " : 00 PM";
+                        active_data = (active_hour - 12).ToString() + " : 00 PM";
                     }
                 }
                 catch (Exception e)
@@ -338,6 +353,81 @@ namespace Siotrix.Discord.Statistics
             }
             return active_data;
         }
+        //private string[] GetActiveDataOfWeekPerGuild()
+        //{
+        //    string[] active_data = new string[2]; 
+        //    int channel_cnt = 0;
+        //    int date_cnt = 0;
+        //    int hour_cnt = 0;
+        //    int active_day = 0;
+        //    int active_hour = 0;
+        //    string active_channel_of_week = null;
+        //    long? active_channel_id = 0;
+        //    DateTime today = DateTime.Now;
+        //    DateTime firstDayOfWeek = DateTimeExtensions.FirstDayOfWeek(today);
+        //    DateTime lastDayOfWeek = DateTimeExtensions.LastDayOfWeek(today); ;
+        //    using (var db = new LogDatabase())
+        //    {
+        //        try
+        //        {
+        //            var list = db.Messages.Where(p => !p.IsBot && p.GuildId == Context.Guild.Id.ToLong()).ToList();
+
+        //            var arr = list.GroupBy(p => p.ChannelId).ToList();
+        //            foreach (var item in arr)
+        //            {
+        //                if (list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count > channel_cnt)
+        //                {
+        //                    channel_cnt = list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek).ToList().Count;
+        //                    active_channel_of_week = item.First().ChannelName;
+        //                    active_channel_id = item.First().ChannelId;
+        //                }
+        //            }
+
+        //            var data1 = list.Where(p => p.CreatedAt <= lastDayOfWeek && p.CreatedAt >= firstDayOfWeek && p.ChannelId == active_channel_id).ToList();
+        //            var data2 = data1.GroupBy(p => p.CreatedAt.Day);
+        //            foreach(var i in data2)
+        //            {
+        //                if(i.ToList().Count > date_cnt)
+        //                {
+        //                    date_cnt = i.ToList().Count;
+        //                    active_day = i.First().CreatedAt.Day;
+        //                }
+        //            }
+
+        //            var data3 = data1.Where(p => p.CreatedAt.Day == active_day).ToList();
+        //            var data4 = data3.GroupBy(p => p.CreatedAt.Hour);
+        //            foreach(var ii in data4)
+        //            {
+        //                if(ii.ToList().Count > hour_cnt)
+        //                {
+        //                    hour_cnt = ii.ToList().Count;
+        //                    active_hour = ii.First().CreatedAt.Hour;
+        //                }
+        //            }
+        //            if(active_channel_of_week == null || active_channel_of_week == "")
+        //            {
+        //                active_data[0] = "None";
+        //            }
+        //            else
+        //            {
+        //                active_data[0] = "#" + active_channel_of_week;
+        //            }
+        //            if (active_hour <= 12)
+        //            {
+        //                active_data[1] = active_hour.ToString() + " : 00 AM";
+        //            }
+        //            else
+        //            {
+        //                active_data[1] = (active_hour - 12).ToString() + " : 00 PM";
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Console.WriteLine(e);
+        //        }
+        //    }
+        //    return active_data;
+        //}
 
         private bool CheckBot(SocketUser user)
         {
@@ -647,10 +737,15 @@ namespace Siotrix.Discord.Statistics
             string[] g_footer = GetGuildFooter(0);
             string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
             string[] m_count = GetLifeTimeMessagesPerGuild();
-            string active_channel = GetActivityChannelPerGuild();
+            string active_channel = "None";
+            if (GetActivityChannelPerGuild() > 0)
+                active_channel = "#" + Context.Guild.GetChannel(GetActivityChannelPerGuild().ToUlong()).Name;
             int delete_msg_per_guild = GetDeleteMessagesPerGuild();
             int[] m_stats_count = GetStatsMessagesPerGuild();
-            string[] active_data_of_week = GetActiveDataOfWeekPerGuild();
+            string active_channel_of_week = "None";
+            if (GetActivityChannelOfWeekPerGuild() > 0)
+                active_channel_of_week = "#" + Context.Guild.GetChannel(GetActivityChannelOfWeekPerGuild().ToUlong()).Name;
+            string active_data_of_week = GetActiveDataOfWeekPerGuild();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -673,8 +768,8 @@ namespace Siotrix.Discord.Statistics
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel : "), Value = active_channel })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Lifetime message deletes : "), Value = delete_msg_per_guild })
                 .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Messages this D/W/M : "), Value = m_stats_count[2] + "/" + m_stats_count[1] + "/" + m_stats_count[0] + "messages" })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = active_data_of_week[0] })
-                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Time most active on that day : "), Value = active_data_of_week[1] });
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Channel this week : "), Value = active_channel_of_week })
+                .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Time most active on that day : "), Value = active_data_of_week });
 
             return ReplyAsync("", embed: builder);
         }
