@@ -786,8 +786,16 @@ namespace Siotrix.Discord.Moderation
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
             if (!LogChannelExtensions.is_toggled_log)
             {
-
-                if (a.Nickname == null)
+                if (b.Nickname == null)
+                {
+                    var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                    .WithIconUrl(b.GetAvatarUrl())
+                    .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) has taken on the nickname of {a.Nickname}."))
+                    .WithColor(new Color(1, 1, 1));
+                    await log_channel.SendMessageAsync("", false, builder.Build());
+                }
+                else if (a.Nickname == null)
                 {
                     var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
