@@ -34,7 +34,7 @@ namespace Siotrix.Discord.Moderation
             _client.RoleDeleted += OnRoleDeletedAsync;
             _client.UserUnbanned += OnUserUnBannedAsync;
             _client.GuildMemberUpdated += GuildMemberUpdated_RoleChange;
-            _client.GuildMemberUpdated += UserUpdated_NameChange;
+            //_client.GuildMemberUpdated += UserUpdated_NameChange;
             _client.GuildMemberUpdated += GuildMemberUpdated_NickChange;
             _client.UserLeft += OnUserLeftAsync;
             _client.UserUpdated += UserNameChangedAsync;
@@ -57,7 +57,7 @@ namespace Siotrix.Discord.Moderation
             _client.RoleDeleted -= OnRoleDeletedAsync;
             _client.UserUnbanned -= OnUserUnBannedAsync;
             _client.GuildMemberUpdated -= GuildMemberUpdated_RoleChange;
-            _client.GuildMemberUpdated -= UserUpdated_NameChange;
+            //_client.GuildMemberUpdated -= UserUpdated_NameChange;
             _client.GuildMemberUpdated -= GuildMemberUpdated_NickChange;
             _client.UserUpdated -= UserNameChangedAsync;
             _client.UserLeft -= OnUserLeftAsync;
@@ -389,6 +389,25 @@ namespace Siotrix.Discord.Moderation
             return case_id;
         }
 
+        private bool CheckGuildUser(long userId, long guildId)
+        {
+            bool isFound = false;
+            using(var db = new LogDatabase())
+            {
+                try
+                {
+                    var data = db.Messages.Where(x => x.AuthorId == userId && x.GuildId == guildId);
+                    if (data.Any())
+                        isFound = true;
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return isFound;
+        }
+
         private async Task OnRoleDeletedAsync(SocketRole role)
         {
             var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
@@ -654,12 +673,17 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnUserJoinedAsync(SocketGuildUser user)
         {
+            string custom_message = null;
             //var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
             var announce_channel_id = GetAnnounceChannelId(user.Guild.Id.ToLong());
             var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
             var announce_channel = _client.GetChannel(announce_channel_id.ToUlong()) as ISocketMessageChannel;
-            var custom_message = GetWecomeMessage(1, user.Guild.Id.ToLong());
+            var is_found_user = CheckGuildUser(user.Id.ToLong(), user.Guild.Id.ToLong());
+            if (is_found_user)
+                custom_message = GetWecomeMessage(3, user.Guild.Id.ToLong());
+            else
+                custom_message = GetWecomeMessage(1, user.Guild.Id.ToLong());
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
@@ -763,21 +787,21 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private async Task UserUpdated_NameChange(SocketUser b, SocketUser a)
-        {
-            if (b.Username == a.Username) return;
-            LogChannelExtensions.IsUsableLogChannel(b.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            if (!LogChannelExtensions.is_toggled_log)
-            {
-                var builder = new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(b.GetAvatarUrl())
-                .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) changed their username to {a.Username}"))
-                .WithColor(new Color(1, 1, 1));
-                await log_channel.SendMessageAsync("", false, builder.Build());
-            }
-        }
+        //private async Task UserUpdated_NameChange(SocketUser b, SocketUser a)
+        //{
+        //    if (b.Username == a.Username) return;
+        //    LogChannelExtensions.IsUsableLogChannel(b.Id.ToLong());
+        //    var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+        //    if (!LogChannelExtensions.is_toggled_log)
+        //    {
+        //        var builder = new EmbedBuilder()
+        //        .WithAuthor(new EmbedAuthorBuilder()
+        //        .WithIconUrl(b.GetAvatarUrl())
+        //        .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) changed their username to {a.Username}"))
+        //        .WithColor(new Color(1, 1, 1));
+        //        await log_channel.SendMessageAsync("", false, builder.Build());
+        //    }
+        //}
 
         private async Task GuildMemberUpdated_NickChange(SocketGuildUser b, SocketGuildUser a)
         {
@@ -834,9 +858,10 @@ namespace Siotrix.Discord.Moderation
 
         private string ReplaceInfo(SocketGuildUser user, string message)
         {
-            var edited = message.Replace("{@user}", $"{user.Mention}#{user.Discriminator}");
+            var edited = message.Replace("{user}", $"{user.Mention}#{user.Discriminator}");
             edited = edited.Replace("{server}", $"{user.Guild.Name}");
             edited = edited.Replace("{count}", $"{user.Guild.MemberCount}");
+            edited = edited.Replace("{bot}", $"{_client.CurrentUser}");
             return edited;
         }
     }
