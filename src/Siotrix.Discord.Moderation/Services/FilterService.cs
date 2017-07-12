@@ -51,7 +51,7 @@ namespace Siotrix.Discord.Moderation
                 var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(msg.Author.GetAvatarUrl())
-                .WithName("Founded --" + badword + "-- word from message of " + msg.Author.Username + "#" + msg.Author.Discriminator))
+                .WithName("Found --" + badword + "-- word from message of " + msg.Author.Username + "#" + msg.Author.Discriminator))
                 .WithColor(new Color(255, 0, 0));
                 await channel.SendMessageAsync("", false, builder.Build());
                 await msg.DeleteAsync();

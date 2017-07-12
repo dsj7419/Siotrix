@@ -110,8 +110,8 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png",
-                Url = "https://discord.gg/e6sku22"
+                IconUrl = SiotrixConstants.BOT_AVATAR,
+                Url = SiotrixConstants.DISCORD_INV
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);
@@ -172,8 +172,8 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder()
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png",
-                Url = "https://discord.gg/e6sku22"
+                IconUrl = SiotrixConstants.BOT_AVATAR,
+                Url = SiotrixConstants.DISCORD_INV
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);
@@ -214,7 +214,7 @@ namespace Siotrix.Discord.Developer
                     .WithDescription("Hi, thank you for inviting me to the server. Unfortunately I am not able to stay as you have been added to my banlist.\nReason: " + " ***" + reason + " ***")
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("If you have questions, feel free to join our Discord at : "),
-                        Value = "https://discord.gg/e6sku22"
+                        Value = SiotrixConstants.DISCORD_INV
                     });
                 await ReplyAsync("", embed: builder);
             }

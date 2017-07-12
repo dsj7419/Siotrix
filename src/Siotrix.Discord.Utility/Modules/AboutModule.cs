@@ -31,8 +31,8 @@ namespace Siotrix.Discord.Utility
                           $"bot with all of the great features you love in discord bots, but give it the flexibility to be custom tailored just for your guild!\n" +
                           $"Please use the command **{g_prefix}help** to see the features I can offer!\n\n" +
                           $"I'd love all the help I can get, and bugreports/sugestions are always welcome! you can DM {Context.Client.GetUser(173905004661309441).Username} anytime!\n\n" +
-                           "Support server: <https://discord.gg/nXvBxDX>\n" +
-                           "My patreon page: <https://www.patreon.com/siotrix>\n\n" +
+                           $"Support server: <{SiotrixConstants.DISCORD_INV}>\n" +
+                           $"My patreon page: <{SiotrixConstants.BOT_DONATE}>\n\n" +
                            ":sparkles: **Special Thanks** :sparkles:\n";
             var count = 1;
             foreach (var thanks in _specialThanks)

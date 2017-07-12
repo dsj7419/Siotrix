@@ -15,7 +15,7 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
     {
-        string[] bad_words = new string[] {"shit", "fuck", "nigger", "rape", "sex", "coon", "pig" };
+        string[] bad_words = new string[] {"shit", "fuck", "nigger", "rape", "sex", "coon" };
 
         private bool SaveAndUpdateFilterWord(string word, long guild_id)
         {
@@ -140,7 +140,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateFilterWord(word, Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("remove")]
@@ -150,7 +150,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = RemoveFilterWord(word, Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             else
                 await ReplyAsync("📣 : Not Found like that word!");
         }

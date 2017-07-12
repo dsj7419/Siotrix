@@ -19,7 +19,7 @@ namespace Siotrix.Discord
                     var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        prefix = "!";
+                        prefix = SiotrixConstants.BOT_PREFIX;
                     }
                     else
                     {

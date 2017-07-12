@@ -63,7 +63,7 @@ namespace Siotrix.Discord.Utility
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(g_icon_url)
                 .WithName("Performance Summary for Siotrix Bot")
-                .WithUrl("https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631"))
+                .WithUrl(SiotrixConstants.BOT_INVITE))
             .WithFooter(new EmbedFooterBuilder()
                 .WithIconUrl(Context.User.GetAvatarUrl())
                 .WithText($"{Context.User.Username}#{Context.User.Discriminator}"))
@@ -79,7 +79,7 @@ namespace Siotrix.Discord.Utility
                        $"**Memory Usage:** {GetMemoryUsage()}\n" +
                        $"**Threads Running:** {GetThreads()}\n" +
                        $"**Latency:** {GetLatency()}\n\n" +
-                       $"**Siotrix Official Discord:** https://discord.gg/e6sku22";
+                       $"**Siotrix Official Discord:** " + SiotrixConstants.DISCORD_INV;
 
             builder.Description = desc;
             return ReplyAsync("", embed: builder);

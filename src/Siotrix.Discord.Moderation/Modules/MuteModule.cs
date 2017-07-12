@@ -291,7 +291,7 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("mute list")]
@@ -394,7 +394,7 @@ namespace Siotrix.Discord.Moderation
                 if (is_save)
                 {
                     var case_id = CaseExtensions.GetCaseNumber(Context);
-                    await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+                    await Context.Channel.SendMessageAsync("What is the reason for the mute? Case #" + case_id.ToString());
 
                     CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(), ""); // add save in db
                    // Console.WriteLine("mute ========================={0}", case_id);
@@ -417,7 +417,7 @@ namespace Siotrix.Discord.Moderation
             {
                 await MuteExtensions.UnmuteUser(user, false, Context).ConfigureAwait(false);
                 var case_id = CaseExtensions.GetCaseNumber(Context);
-                await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+                await Context.Channel.SendMessageAsync("What is the reason for the unmute? Case #" + case_id.ToString());
 
                     CaseExtensions.SaveCaseDataAsync("unmute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(), ""); // add save in db
                // Console.WriteLine("unmute ========================={0}", case_id);
@@ -464,7 +464,7 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("mute list")]
@@ -514,7 +514,7 @@ namespace Siotrix.Discord.Moderation
             }
 
             if (users == null)
-                users = "No mute users";
+                users = "No muted users";
 
             builder
             .AddField(x =>

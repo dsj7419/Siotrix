@@ -19,7 +19,7 @@ namespace Siotrix.Discord.Moderation
             int prune = prunedays == -1 ? 0 : prunedays;
             await Context.Guild.AddBanAsync(user, prune);
             var case_id = CaseExtensions.GetCaseNumber(Context);
-            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+            await Context.Channel.SendMessageAsync("What is the reason for ban? Case #" + case_id.ToString());
         }
 
         [Command("tempban")]
@@ -32,7 +32,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = duration.TotalMinutes;
             await Context.Guild.AddBanAsync(user, (int)minutes);
             var case_id = CaseExtensions.GetCaseNumber(Context);
-            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+            await Context.Channel.SendMessageAsync("What is the reason for ban? Case #" + case_id.ToString());
         }
 
         [Command("unban")]
