@@ -175,11 +175,8 @@ namespace Siotrix.Discord.Moderation
         public async Task WarnAsync(SocketGuildUser user, int points, [Remainder] string reason)
         {
             var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), points, reason, DateTime.Now, Context.User.Id.ToLong(), InfractionType.Manual);
-            System.Console.WriteLine("=========={0}", Context.User.Id);
             if (success)
                 await ReplyAsync("👍");
-            else
-                await ReplyAsync("📣 : You can not use this level because no information of this level!"); 
         }
 
         /*[Command("set mutewarn")]
