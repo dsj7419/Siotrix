@@ -298,7 +298,7 @@ namespace Siotrix.Discord.Admin
                 if (channel_id <= 0) return;
                 is_setting = SetLogChannelPerGuild(Context.Guild.Id.ToLong(), command, channel_id);
                 if(is_setting)
-                    await ReplyAsync("👍");
+                    await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             }
         }
     }

@@ -46,9 +46,9 @@ namespace Siotrix.Discord.Moderation
         {
             var success = DeleteWarningUser(user.Id.ToLong(), Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             else
-                await ReplyAsync("Not Found like that person!");
+                await ReplyAsync("That person is not found!");
         }
     }
 }

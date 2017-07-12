@@ -744,7 +744,7 @@ namespace Siotrix.Discord.Moderation
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithIconUrl(user.GetAvatarUrl())
-                .WithName(user.Username + "#" + user.Discriminator + " has been left."))
+                .WithName(user.Username + "#" + user.Discriminator + " has left."))
                 .WithColor(new Color(0, 0, 127));
             if (LogChannelExtensions.is_toggled_log)
                 await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");

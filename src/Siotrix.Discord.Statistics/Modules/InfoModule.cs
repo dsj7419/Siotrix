@@ -132,7 +132,7 @@ namespace Siotrix.Discord.Statistics
                     var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        thumbnail_url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
+                        thumbnail_url = SiotrixConstants.BOT_LOGO;
                     }
                     else
                     {
@@ -164,7 +164,7 @@ namespace Siotrix.Discord.Statistics
                         var val = db.Gdescriptions.Where(p => p.GuildId == guild_id.ToLong());
                         if (val == null || val.ToList().Count <= 0)
                         {
-                            description = "Siotrix: A global bot with a local feel.";
+                            description = SiotrixConstants.BOT_DESC;
                         }
                         else
                         {
@@ -441,11 +441,12 @@ namespace Siotrix.Discord.Statistics
                     .WithDescription(g_description)
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField( new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Owner : "), Value = Context.User.Id })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Bot Version : "), Value = SiotrixConstants.BOT_VERSION })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Guilds : "), Value = Context.Client.Guilds.Count })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Users : "), Value = Context.Guild.Users.Count })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = "https://discord.gg/nXvBxDX" })
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = "https://www.patreon.com/siotrix" })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("invite to guild : "), Value = SiotrixConstants.BOT_INVITE})
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Siotrix Guild : "), Value = SiotrixConstants.DISCORD_INV })
+                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Donate : "), Value = SiotrixConstants.BOT_DONATE })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Created : "), Value = Math.Round((DateTime.Now - Context.Client.CurrentUser.CreatedAt.DateTime).TotalDays, 0).ToString() + " Days ago." })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Icon : "), Value = Context.Client.CurrentUser.GetAvatarUrl() })
                     .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("Most Active Guild This Week : "), Value = GetActiveGuildName() })

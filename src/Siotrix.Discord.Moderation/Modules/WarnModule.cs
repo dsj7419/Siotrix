@@ -177,7 +177,7 @@ namespace Siotrix.Discord.Moderation
             var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), points, reason, DateTime.Now, Context.User.Id.ToLong(), InfractionType.Manual);
             System.Console.WriteLine("=========={0}", Context.User.Id);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             else
                 await ReplyAsync("📣 : You can not use this level because no information of this level!"); 
         }
@@ -190,7 +190,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateWarnData(1, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("set mutetime")]
@@ -202,7 +202,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateWarnData(2, (int)minutes);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("set banwarn")]
@@ -213,7 +213,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateWarnData(3, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("set bantime")]
@@ -225,7 +225,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateWarnData(4, (int)minutes);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("set permban")]
@@ -236,7 +236,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateWarnData(5, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("set falloff")]
@@ -248,7 +248,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateWarnData(6, (int)minutes);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }*/
 
         [Command("set")]
@@ -274,7 +274,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private bool SetMuteTime(TimeSpan time)
@@ -321,7 +321,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private bool SetMuteWarn(int num)

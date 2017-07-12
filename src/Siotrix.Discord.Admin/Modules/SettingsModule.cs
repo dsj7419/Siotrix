@@ -41,7 +41,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+                        url = SiotrixConstants.BOT_FOOTER_ICON;
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildFooter();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.FooterIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+                    val.FooterIcon = SiotrixConstants.BOT_FOOTER_ICON;
                 }
                 else
                 {
@@ -95,7 +95,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildFooters()
@@ -119,8 +119,8 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildFooter();
                         instance.GuildId = id;
-                        instance.FooterIcon = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
-                        instance.FooterText = "A global bot with a local feel.";
+                        instance.FooterIcon = SiotrixConstants.BOT_FOOTER_ICON;
+                        instance.FooterText = SiotrixConstants.BOT_FOOTER_TEXT;
                         db.Gfooters.Add(instance);
                         db.SaveChanges();
                     }
@@ -145,7 +145,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildFooter();
                 if (txt.ToString().Equals("reset"))
                 {
-                    val.FooterText = "A global bot with a local feel.";
+                    val.FooterText = SiotrixConstants.BOT_FOOTER_TEXT;
                 }
                 else
                 {
@@ -171,7 +171,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("gfootertext")]
@@ -190,7 +190,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        txt = "A global bot with a local feel.";
+                        txt = SiotrixConstants.BOT_FOOTER_TEXT;
                     }
                     else
                     {
@@ -221,7 +221,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
+                        url = SiotrixConstants.BOT_LOGO;
                     }
                     else
                     {
@@ -249,7 +249,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildThumbNail();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.ThumbNail = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
+                    val.ThumbNail = SiotrixConstants.BOT_LOGO;
                 }
                 else
                 {
@@ -275,7 +275,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildThumbNails()
@@ -299,7 +299,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildThumbNail();
                         instance.GuildId = id;
-                        instance.ThumbNail = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
+                        instance.ThumbNail = SiotrixConstants.BOT_LOGO;
                         db.Gthumbnails.Add(instance);
                         db.SaveChanges();
                     }
@@ -327,7 +327,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gwebsiteurls.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "https://dsj7419.github.io/Siotrix/";
+                        url = SiotrixConstants.BOT_URL;
                     }
                     else
                     {
@@ -355,7 +355,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildSiteUrl();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.SiteUrl = "https://dsj7419.github.io/Siotrix/";
+                    val.SiteUrl = SiotrixConstants.BOT_URL;
                 }
                 else
                 {
@@ -381,7 +381,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildWebSites()
@@ -405,7 +405,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildSiteUrl();
                         instance.GuildId = id;
-                        instance.SiteUrl = "https://dsj7419.github.io/Siotrix/";
+                        instance.SiteUrl = SiotrixConstants.BOT_URL;
                         db.Gwebsiteurls.Add(instance);
                         db.SaveChanges();
                     }
@@ -433,7 +433,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gdescriptions.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        desc = "Siotrix";
+                        desc = SiotrixConstants.BOT_DESC;
                     }
                     else
                     {
@@ -480,7 +480,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildDescriptions()
@@ -504,7 +504,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildDescription();
                         instance.GuildId = id;
-                        instance.Description = "Siotrix - A global bot with a local feel.";
+                        instance.Description = SiotrixConstants.BOT_DESC;
                         db.Gdescriptions.Add(instance);
                         db.SaveChanges();
                     }
@@ -514,33 +514,7 @@ namespace Siotrix.Discord.Admin
                     }
                 }
             }
-        }       
-
-        [Command("nickname")]
-        [Summary("Lists Siotrix's nickname.")]
-        [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task NicknameAsync()
-               => await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
-
-        [Command("nickname")]
-        [Summary("Sets Siotrix's nickname.")]
-        [Remarks("<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task NicknameAsync([Remainder]string name)
-        {
-            var self = Context.Guild.CurrentUser;
-            if (name.Equals("reset"))
-            {
-                name = "Siotrix";
-            }
-            await self.ModifyAsync(x =>
-            {
-                x.Nickname = name;
-            });
-            await ReplyAsync("👍");
-
-        }
+        }               
        
         [Command("color")]
         [Summary("Set or list your guilds official embed color.")]
@@ -894,7 +868,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("gname")]
@@ -977,7 +951,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
+                        url = SiotrixConstants.BOT_AVATAR;
                     }
                     else
                     {
@@ -1005,7 +979,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildAvatar();
                 if (url.ToString().Equals("reset"))
                 {
-                    val.Avatar = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
+                    val.Avatar = SiotrixConstants.BOT_AVATAR;
                 }
                 else
                 {
@@ -1031,7 +1005,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildAvatars()
@@ -1055,7 +1029,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildAvatar();
                         instance.GuildId = id;
-                        instance.Avatar = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
+                        instance.Avatar = SiotrixConstants.BOT_AVATAR;
                         db.Gavatars.Add(instance);
                         db.SaveChanges();
                     }
@@ -1082,7 +1056,7 @@ namespace Siotrix.Discord.Admin
                 var val = new DiscordGuildPrefix();
                 if (txt.Equals("reset"))
                 {
-                    val.Prefix = "!";
+                    val.Prefix = SiotrixConstants.BOT_PREFIX;
                 }
                 else
                 {
@@ -1108,7 +1082,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("prefix")]
@@ -1127,7 +1101,7 @@ namespace Siotrix.Discord.Admin
                     var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        txt = "!";
+                        txt = SiotrixConstants.BOT_PREFIX;
                     }
                     else
                     {
@@ -1178,7 +1152,7 @@ namespace Siotrix.Discord.Admin
                     {
                         var instance = new DiscordGuildPrefix();
                         instance.GuildId = id;
-                        instance.Prefix = "!";
+                        instance.Prefix = SiotrixConstants.BOT_PREFIX;
                         db.Gprefixs.Add(instance);
                         db.SaveChanges();
                     }
@@ -1290,7 +1264,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync("👍");
+            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private void CheckGuildMotds()

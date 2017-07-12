@@ -19,7 +19,7 @@ namespace Siotrix.Discord.Moderation
         {
             await user.KickAsync();
             var case_id = CaseExtensions.GetCaseNumber(Context);
-            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+            await Context.Channel.SendMessageAsync("What is the reason for the kick? Case #" + case_id.ToString());
         }
 
         [Command]
@@ -34,7 +34,7 @@ namespace Siotrix.Discord.Moderation
             await Context.Guild.AddBanAsync(user, (int)minutes);
          //   await Context.Guild.RemoveBanAsync(user);
             var case_id = CaseExtensions.GetCaseNumber(Context);
-            await Context.Channel.SendMessageAsync("What is reason? Case #" + case_id.ToString());
+            await Context.Channel.SendMessageAsync("What is the reason for the kick? Case #" + case_id.ToString());
         }
     }
 }

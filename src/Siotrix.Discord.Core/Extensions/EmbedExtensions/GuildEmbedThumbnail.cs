@@ -19,7 +19,7 @@ namespace Siotrix.Discord
                     var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        thumbnail_url = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
+                        thumbnail_url = SiotrixConstants.BOT_LOGO;
                     }
                     else
                     {

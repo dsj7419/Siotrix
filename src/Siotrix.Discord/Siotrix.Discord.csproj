@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="173905004661309441.jpg" />
+    <None Remove="BW.173905004661309441.jpg" />
+    <None Remove="POL.173905004661309441.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Siotrix.Discord.Admin\Siotrix.Discord.Admin.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Audio\Siotrix.Discord.Audio.csproj" />
     <ProjectReference Include="..\Siotrix.Discord.Developer\Siotrix.Discord.Developer.csproj" />

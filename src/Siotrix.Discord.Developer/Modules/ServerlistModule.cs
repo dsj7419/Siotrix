@@ -31,7 +31,7 @@ namespace Siotrix.Discord.Developer
             embed.Footer = new EmbedFooterBuilder()
             {
                 Text = $"Total Guilds: {client.Guilds.Count.ToString()}",
-                IconUrl = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png"
+                IconUrl = SiotrixConstants.BOT_AVATAR
             };
 
             await ReplyAsync("", embed: embed);

@@ -152,7 +152,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateSpamData(1, num);
             if(success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("allow capsspam")]
@@ -163,7 +163,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateSpamData(4, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }*/
 
         [Command("allow")]
@@ -186,7 +186,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         /*[Command("makemute repeatspam")]
@@ -197,7 +197,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateSpamData(2, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("makemute capsspam")]
@@ -208,7 +208,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateSpamData(5, num);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }*/
 
         [Command("spammute")]
@@ -231,7 +231,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         /*[Command("mutetime repeatspam")]
@@ -243,7 +243,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateSpamData(3, (int)minutes);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         [Command("mutetime capsspam")]
@@ -255,7 +255,7 @@ namespace Siotrix.Discord.Moderation
             var minutes = time.TotalMinutes;
             var success = SaveAndUpdateSpamData(6, (int)minutes);
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }*/
 
         [Command("mutetime")]
@@ -279,7 +279,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
     }
 }

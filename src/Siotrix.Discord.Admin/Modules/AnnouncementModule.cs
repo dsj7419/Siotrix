@@ -279,7 +279,7 @@ namespace Siotrix.Discord.Admin
                     }
                     var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 1, text);
                     if (success)
-                        await ReplyAsync("👍");
+                        await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
                 }
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
@@ -321,7 +321,7 @@ namespace Siotrix.Discord.Admin
                     }
                     var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 2, text);
                     if (success)
-                        await ReplyAsync("👍");
+                        await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
                 }
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
@@ -363,7 +363,7 @@ namespace Siotrix.Discord.Admin
                     }
                     var success = SaveAndUpdateAnnounceMessage(Context.Guild.Id.ToLong(), 3, text);
                     if (success)
-                        await ReplyAsync("👍");
+                        await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
                 }
                 else
                     await ReplyAsync("📣 : You can not use this command because it has been toggled off in this guild.");
@@ -392,7 +392,7 @@ namespace Siotrix.Discord.Admin
                 await ReplyAsync("📣 : Not exists like that channel!");
             is_setting = SetAnnounceChannelPerGuild(Context.Guild.Id.ToLong(), channel_id);
             if (is_setting)
-                await ReplyAsync("👍");
+                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             else
                 await ReplyAsync("📣 : Not founded announcement channel!");
         }
