@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    public class RoleTypeReader<T> : TypeReader
+   public class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
         public override Task<TypeReaderResult> Read(ICommandContext c, string input, IServiceProvider services)
@@ -44,5 +44,5 @@ namespace Siotrix.Discord
             if (role != null && !results.ContainsKey(role.Id))
                 results.Add(role.Id, new TypeReaderValue(role, score));
         }
-    }
+    } 
 }

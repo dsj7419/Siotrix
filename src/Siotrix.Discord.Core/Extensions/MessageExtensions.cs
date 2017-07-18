@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Discord.Commands;
+using System.Linq;
 
 namespace Siotrix.Discord
 {
@@ -103,6 +105,37 @@ namespace Siotrix.Discord
             number_of_messages = count;
             userId = user_id;
             await Task.Delay(0);
+        }
+
+        public static string JoinNonNullStrings(string joining, params string[] toJoin)
+        {
+            return String.Join(joining, toJoin.Where(x => !String.IsNullOrWhiteSpace(x)));
+        }
+
+        public static string EscapeMarkdown(string str, bool onlyAccentGrave)
+        {
+            str = str.Replace("`", "\\`");
+            return onlyAccentGrave ? str : str.Replace("*", "\\*").Replace("_", "\\_");
+        }
+
+        public static string CaseInsReplace(this string str, string oldValue, string newValue)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            var previousIndex = 0;
+            var index = str.IndexOf(oldValue, StringComparison.OrdinalIgnoreCase);
+            while (index != -1)
+            {
+                sb.Append(str.Substring(previousIndex, index - previousIndex));
+                sb.Append(newValue);
+                index += oldValue.Length;
+
+                previousIndex = index;
+                index = str.IndexOf(oldValue, index, StringComparison.OrdinalIgnoreCase);
+            }
+            sb.Append(str.Substring(previousIndex));
+
+            return sb.ToString();
         }
     }
 }

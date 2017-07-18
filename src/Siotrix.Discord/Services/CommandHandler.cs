@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using Siotrix.Discord.Readers;
 using Discord.Addons.InteractiveCommands;
 using Discord.Commands;
+using System.Collections.Generic;
+
 
 namespace Siotrix.Discord
 {
@@ -54,6 +56,8 @@ namespace Siotrix.Discord
 
             _commands.AddTypeReader(typeof(Uri), new UriTypeReader());
             _commands.AddTypeReader(typeof(TimeSpan), new TimeSpanTypeReader());
+            _commands.AddTypeReader(typeof(IRole), new RoleTypeReader<IRole>());
+            _commands.AddTypeReader(typeof(IUser), new UserTypeReader<IUser>());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
             await _commands.AddModulesAsync(typeof(Entity).GetTypeInfo().Assembly);
 

@@ -4,6 +4,7 @@ using Discord;
 using System;
 using Discord.WebSocket;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Siotrix.Discord.Admin.Modules
 {
@@ -15,8 +16,9 @@ namespace Siotrix.Discord.Admin.Modules
         [Remarks("<role name>")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
-        public async Task RoleInfoAsync(IRole role)
+        public async Task RoleInfoAsync(string rolename)
         {
+            IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             var gld = Context.Guild;
             var chn = Context.Channel;
             var msg = Context.Message;

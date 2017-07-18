@@ -18,7 +18,9 @@ namespace Siotrix.Discord
         public const string BOT_INVITE = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631";
         public const string BOT_DONATE = "https://www.patreon.com/siotrix";
         public const string FAKE_EVERYONE = "@" + ZERO_LENGTH_CHAR + "everyone";
+        public const string FAKE_DISCORD_LINK = "discord" + ZERO_LENGTH_CHAR + ".gg";
         public const string BOT_SUCCESS = "👍";
+        public const int WAIT_TIME = 3;
 
         //bot embed constants
         public const string BOT_FOOTER_TEXT = "A global bot with a local feel.";
@@ -30,7 +32,7 @@ namespace Siotrix.Discord
         public const string BOT_AUTHOR_ICON = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
         public const string BOT_FOOTER_ICON = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
 
-        // 
+        // embeds
         public const int MAX_MESSAGE_LENGTH_LONG = 1900;
         public const int MAX_MESSAGE_LENGTH_SHORT = 750;
         public const int MAX_NICKNAME_LENGTH = 32;
@@ -61,7 +63,7 @@ namespace Siotrix.Discord
         });
         public static ReadOnlyCollection<string> COMMANDS_UNABLE_TO_BE_TURNED_OFF = new ReadOnlyCollection<string>(new List<string>
         {
-            "configurecommands", "help",
+            "cset", "help",
         });
     }
 }
