@@ -14,6 +14,7 @@ namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]
     [Group("announcement")]
+    [Summary("Set Welcome, Return, and Leave messages for guild members.\nVariable keywords are: ")]
     [RequireContext(ContextType.Guild)]
     public class AnnouncementModule : ModuleBase<SocketCommandContext>
     {
@@ -214,7 +215,7 @@ namespace Siotrix.Discord.Admin
 
         [Command]
         [Summary("- welcome")]
-        [Remarks(" - need some arguments")]
+        [Remarks("- need some arguments")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task AnnouncementAsync()
@@ -252,8 +253,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("welcome")]
-        [Summary("- welcome")]
-        [Remarks(" - need some arguments")]
+        [Summary("Welcome message annoucement for new members")]
+        [Remarks("[set|toggle|dm] - Set to set message, toggle to turn on and off, and dm to set to direct message user instead of a channel.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task WelcomeAsync(string param, [Remainder]string text = null)
@@ -295,8 +296,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("leave")]
-        [Summary("- leave")]
-        [Remarks(" - need some arguments")]
+        [Summary("Leave message annoucement for when users leave the guild.")]
+        [Remarks("[set|toggle|dm] - Set to set message, toggle to turn on and off, and dm to set to direct message user instead of a channel.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LeaveAsync(string param, [Remainder]string text = null)
@@ -337,8 +338,8 @@ namespace Siotrix.Discord.Admin
         }
 
         [Command("return")]
-        [Summary("- return")]
-        [Remarks(" - need some arguments")]
+        [Summary("Welcome message annoucement for returning members")]
+        [Remarks("[set|toggle|dm] - Set to set message, toggle to turn on and off, and dm to set to direct message user instead of a channel.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task ReturnAsync(string param, [Remainder]string text = null)
@@ -378,9 +379,9 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        [Command("mount")]
-        [Summary("- mount")]
-        [Remarks(" - need some arguments")]
+        [Command("announcechannel")]
+        [Summary("Set the announcement channel for welcome/leave/return messages.")]
+        [Remarks("(Channel Name) - name of channel you'd like to have all announcements sent.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task MountAsync(string channel_name)
@@ -389,12 +390,12 @@ namespace Siotrix.Discord.Admin
             bool is_setting = false;
             channel_id = ChannelNameExtensions.GetChannelIdFromName(channel_name, Context);
             if (channel_id <= 0)
-                await ReplyAsync("📣 : Not exists like that channel!");
+                await ReplyAsync("📣 : Cannot find valid announcement channel!!");
             is_setting = SetAnnounceChannelPerGuild(Context.Guild.Id.ToLong(), channel_id);
             if (is_setting)
                 await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             else
-                await ReplyAsync("📣 : Not founded announcement channel!");
+                await ReplyAsync("📣 : Cannot find announcement channel!");
         }
     }
 }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    public class TagManager : DbManager<TagDatabase>
+    public class TagManager : DbManager<LogDatabase>
     {
-        public TagManager(TagDatabase db)
+        public TagManager(LogDatabase db)
             : base(db) { }
 
         /// <summary> Get a tag by it's id </summary>
@@ -64,7 +64,7 @@ namespace Siotrix.Discord
         /// <summary> Add a new log for the specified tag </summary>
         public async Task AddLogAsync(Tag tag, SocketCommandContext context)
         {
-            var log = new TagLog((ulong)tag.Id, context);
+            var log = new TagLog((ulong)tag.Id, context.Guild.Id, context.Channel.Id, context.User.Id);
 
             _db.TagsLogs.Add(log);
             await _db.SaveChangesAsync();
@@ -73,7 +73,7 @@ namespace Siotrix.Discord
         /// <summary> Create a new tag </summary>
         public async Task CreateTagAsync(string name, string content, SocketCommandContext context)
         {
-            var tag = new Tag(name, content, context);
+            var tag = new Tag(name, content, context.Guild.Id, context.User.Id);
 
             await _db.Tags.AddAsync(tag);
             await _db.SaveChangesAsync();

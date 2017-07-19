@@ -101,9 +101,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(unmute_data))
                 .WithColor(new Color(127, 255, 127));
-                if (LogChannelExtensions.is_toggled_log)
-                    await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_log)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
                 string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
@@ -144,9 +142,7 @@ namespace Siotrix.Discord.Moderation
                         x.Name = "Case #" + case_id + " | unmute";
                         x.Value = value;
                     });
-                if (LogChannelExtensions.is_toggled_modlog)
-                    await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_modlog)
                 {
                     IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
                     ActionResult.CommandName = "unmute";
@@ -198,9 +194,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(mute_data))
                 .WithColor(new Color(127, 255, 0));
-                if (LogChannelExtensions.is_toggled_log)
-                    await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_log)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
                 string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
@@ -242,9 +236,7 @@ namespace Siotrix.Discord.Moderation
                         x.Name = "Case #" + case_id + " | mute";
                         x.Value = value;
                     });
-                if (LogChannelExtensions.is_toggled_modlog)
-                    await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_modlog)
                 {
                     IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
                     ActionResult.CommandName = "mute";
@@ -423,10 +415,82 @@ namespace Siotrix.Discord.Moderation
         {
             var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
             var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
-            var builder = new EmbedBuilder()
-            .WithAuthor(new EmbedAuthorBuilder()
-            .WithName("Role has been updated."))
-            .WithColor(new Color(255, 127, 255));
+            var builder = new EmbedBuilder();
+            builder.WithColor(new Color(255, 127, 255));
+            if (update_role.Name != role.Name)
+            {
+                builder.WithAuthor(new EmbedAuthorBuilder()
+                .WithName($"{role.Name} role name has been updated to: {update_role.Name}."));
+            }
+            else if(update_role.Color.ToString() != role.Color.ToString())
+            {
+                if (update_role.Color.RawValue is 0)
+                {
+                   builder.WithAuthor(new EmbedAuthorBuilder()
+                  .WithName($"{update_role.Name} role color has been removed(previously: {role.Color.ToString()})"));
+                }
+                else
+                {
+                    var rolecolor = role.Color.ToString();
+                    var updateRoleColor = update_role.Color.ToString();
+
+                    if (rolecolor.Length != 7)
+                    {
+                        rolecolor = rolecolor.Substring(1);
+                        rolecolor = "#" + rolecolor.PadLeft(6, '0');
+                    }
+
+                    if (updateRoleColor.Length != 7)
+                    {
+                        updateRoleColor = updateRoleColor.Substring(1);
+                        updateRoleColor = "#" + updateRoleColor.PadLeft(6, '0');
+                    }
+
+                    builder.WithAuthor(new EmbedAuthorBuilder()
+                   .WithName($"{update_role.Name} role color has been updated from {rolecolor} to {updateRoleColor}."));
+                }
+            }
+            else if (update_role.IsMentionable != role.IsMentionable)
+            {
+                if (update_role.IsMentionable == true)
+                {
+                    builder.WithAuthor(new EmbedAuthorBuilder()
+                   .WithName($"{update_role.Name} role is now mentionable."));
+                }
+                else
+                {
+                    builder.WithAuthor(new EmbedAuthorBuilder()
+                   .WithName($"{update_role.Name} role is no longer mentionable."));
+                }
+            }
+            else if (update_role.IsHoisted != role.IsHoisted)
+            {
+                if (update_role.IsHoisted == true)
+                {
+                    builder.WithAuthor(new EmbedAuthorBuilder()
+                   .WithName($"{update_role.Name} role will now be shown separately from the other roles."));
+                }
+                else
+                {
+                    builder.WithAuthor(new EmbedAuthorBuilder()
+                   .WithName($"{update_role.Name} role is no longer shown separately."));
+                }
+            }
+            else if (update_role.Position != role.Position)
+            {
+                builder.WithAuthor(new EmbedAuthorBuilder()
+               .WithName($"{update_role.Name} role position has been updated from {role.Position} to {update_role.Position}."));
+            }
+            else if (update_role.Permissions.RawValue != role.Permissions.RawValue)
+            {
+                builder.WithAuthor(new EmbedAuthorBuilder()
+               .WithName($"{update_role.Name} role permissions have been updated."));
+            }
+            else
+            {
+                builder.WithAuthor(new EmbedAuthorBuilder()
+                .WithName($"{update_role.Name} role has been updated."));
+            }
             await log_channel.SendMessageAsync("", false, builder.Build());
         }
 
@@ -491,9 +555,7 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user_identifier + " has been " + action + " by " + mod_identifier))
                     .WithColor(action_color);
-                    if (LogChannelExtensions.is_toggled_log)
-                        await channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                    else
+                    if (!LogChannelExtensions.is_toggled_log)
                         await channel.SendMessageAsync(user_mention, false, builder.Build());
 
                     string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
@@ -523,9 +585,7 @@ namespace Siotrix.Discord.Moderation
                                       context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
                                       "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
                         });
-                    if (LogChannelExtensions.is_toggled_modlog)
-                        await mod_channel.SendMessageAsync($"📣 : You can not see mod-log datas because this channel has been **toggled off** !");
-                    else
+                    if (!LogChannelExtensions.is_toggled_modlog)
                     {
                         IUserMessage msg_instance = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, mod_builder.Build());
                         ActionResult.CommandName = words[0];
@@ -561,9 +621,7 @@ namespace Siotrix.Discord.Moderation
                                         "After: " + message.Content)
                     .WithColor(new Color(0, 127, 255));
 
-                    if (LogChannelExtensions.is_toggled_log)
-                        await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                    else
+                    if (!LogChannelExtensions.is_toggled_log)
                         await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
                 
@@ -600,9 +658,7 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
                     .WithColor(new Color(0, 127, 127));
-                    if (LogChannelExtensions.is_toggled_log)
-                        await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                    else
+                    if (!LogChannelExtensions.is_toggled_log)
                         await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
             }
@@ -622,9 +678,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Reaction has been added by " + user.Username + "#" + user.Discriminator))
                 .WithColor(new Color(255, 127, 127));
-                if (LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_log)
                     await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
@@ -643,9 +697,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Reaction has been removed by " + user.Username + "#" + user.Discriminator))
                 .WithColor(new Color(127, 127, 0));
-                if (LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_log)
                     await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
@@ -664,9 +716,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName("Reaction has been cleared by " + user.Username + "#" + user.Discriminator))
                 .WithColor(new Color(0, 127, 127));
-                if (LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-                else
+                if (!LogChannelExtensions.is_toggled_log)
                     await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
@@ -689,9 +739,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(user.Username + "#" + user.Discriminator + " has joined."))
                 .WithColor(new Color(0, 255, 127));
-            if (LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-            else
+            if (!LogChannelExtensions.is_toggled_log)
                 await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
             await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
         }
@@ -727,9 +775,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(user.Id.ToString() + " has been unbanned."))
                 .WithColor(new Color(255, 255, 127));
-            if (LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-            else
+            if (!LogChannelExtensions.is_toggled_log)
                 await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
         }
 
@@ -746,9 +792,7 @@ namespace Siotrix.Discord.Moderation
                 .WithIconUrl(user.GetAvatarUrl())
                 .WithName(user.Username + "#" + user.Discriminator + " has left."))
                 .WithColor(new Color(0, 0, 127));
-            if (LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync($"📣 : You can not see log datas because this channel has been **toggled off** !");
-            else
+            if (!LogChannelExtensions.is_toggled_log)
                 await log_channel.SendMessageAsync("", false, builder.Build());
             await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
         }

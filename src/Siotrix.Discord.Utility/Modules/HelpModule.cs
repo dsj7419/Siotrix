@@ -187,11 +187,11 @@ namespace Siotrix.Discord.Utility
                     summary = $"**{command.Summary}**";
                     if (!has_group)
                     {
-                        remark = $"```Usage : {g_prefix}{command.Name}{command.Remarks}```";
+                        remark = $"```Usage : {g_prefix}{command.Name} {command.Remarks}```";
                     }
                     else
                     {
-                        remark = $"```Usage : {g_prefix}{group_name}{command.Name}{command.Remarks}```";
+                        remark = $"```Usage : {g_prefix}{group_name}{command.Name} {command.Remarks}```";
                     }
                     builder
                         .AddField(x =>
