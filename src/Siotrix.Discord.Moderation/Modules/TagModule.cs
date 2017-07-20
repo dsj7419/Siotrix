@@ -1,5 +1,6 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,11 +40,20 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <content for tag>")]
         public async Task CreateAsync(string name, [Remainder]string content)
         {
+            Console.WriteLine("first", name, content);
+
             var tag = await _manager.GetTagAsync(name, Context.Guild);
+
+            Console.WriteLine("second");
 
             if (Exists(tag, name)) return;
 
+            Console.WriteLine("third");
+
             await _manager.CreateTagAsync(name, content, Context);
+
+            Console.WriteLine("fourth");
+
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 

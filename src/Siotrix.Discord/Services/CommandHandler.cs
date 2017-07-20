@@ -188,11 +188,11 @@ namespace Siotrix.Discord
                         string cmd_name = ele.Name + " ";
                         if (!has_group)
                         {
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{cmd_name}{ele.Remarks}```\n";
+                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{cmd_name} {ele.Remarks}```\n";
                         }
                         else
                         {
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{group_name}{cmd_name}{ele.Remarks}```\n";
+                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" + $"```Usage : {prefix}{group_name}{cmd_name} {ele.Remarks}```\n";
                         }
 
                     }
@@ -208,11 +208,11 @@ namespace Siotrix.Discord
                     summary = $"**{command.Summary}**";
                     if (!has_group)
                     {
-                        remark = $"```Usage : {prefix}{command.Name}{command.Remarks}```";
+                        remark = $"```Usage : {prefix}{command.Name} {command.Remarks}```";
                     }
                     else
                     {
-                        remark = $"```Usage : {prefix}{group_name}{command.Name}{command.Remarks}```";
+                        remark = $"```Usage : {prefix}{group_name}{command.Name} {command.Remarks}```";
                     }
                     builder
                         .AddField(x =>

@@ -21,13 +21,21 @@ namespace Siotrix.Discord.Utility
         [MinPermissions(AccessLevel.User)]
         public async Task SeenAsync(SocketGuildUser target)
         {
-            if(target == null)
+            if(target == null || target.IsBot)
             {
                 await ReplyAsync("Please enter a valid user.");
                     return; 
             }
             
             string last_seen = GetLastMessageTime(target);
+            var name = $"{target.Username} was last seen on {last_seen}";
+
+            if (last_seen == "No recorded message from user in this guild.")
+            {
+                name = $"{target.Username} - {last_seen}";
+            }
+
+
             string join_date = String.Format("{0:dddd, MMMM d, yyyy}", target.JoinedAt?.DateTime ?? DateTime.Now);
             var days_old = Math.Round((DateTime.Now - (target.JoinedAt?.DateTime ?? DateTime.Now)).TotalDays, 0);
             string days_old_concat = null;
@@ -40,10 +48,9 @@ namespace Siotrix.Discord.Utility
             {
                 days_old_concat = join_date + " | " + days_old + " days ago.";
             }
-            var name = $"{target.Username} was last seen on {last_seen}";
             var serverjoined = days_old_concat;
 
-            if (IsSameRoleLevelOrHigher(Context.User as SocketGuildUser, target))
+            if (IsSameRoleLevelOrHigher(Context.User as SocketGuildUser, target) && last_seen != "No recorded message from user in this guild.")
             {
                 string lastmessage = GetLastMessage(target);
                 var channelindex = GetLastChannel(target);
@@ -73,6 +80,10 @@ namespace Siotrix.Discord.Utility
                     {
                         DateTime date = db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).Last().CreatedAt;
                         last = String.Format("{0:dddd, MMMM d, yyyy}", date);
+                    }
+                    else
+                    {
+                        last = "No recorded message from user in this guild.";
                     }
                 }
                 catch (Exception e)
