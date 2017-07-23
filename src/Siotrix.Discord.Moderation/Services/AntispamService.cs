@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Moderation
@@ -45,12 +46,17 @@ namespace Siotrix.Discord.Moderation
 
         private bool IsAllUpper(string input)
         {
-            for (int i = 0; i < input.Length; i++)
+            var regexItem = new Regex("^[a-zA-Z ]*$");
+            if (regexItem.IsMatch(input))
             {
-                if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
-                    return false;
+                for (int i = 0; i < input.Length; i++)
+                {
+                    if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
+                        return false;
+                }
+                return true;
             }
-            return true;
+            return false;
         }
 
         private async Task OnMessageReceivedAsync(SocketMessage s)
