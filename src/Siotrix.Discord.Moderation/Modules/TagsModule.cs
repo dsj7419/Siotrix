@@ -27,7 +27,7 @@ namespace Siotrix.Discord.Moderation
         [Remarks("- No additional input required.")]
         public async Task TagsAsync()
         {
-            var tags = await TagManager.GetTagsAsync(Context.Guild);
+            var tags = await TagExtensions.GetTagsAsync(Context.Guild);
 
             if (!HasTags(Context.Guild, tags)) return;
 
@@ -44,7 +44,7 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<username>")]
         public async Task TagsAsync([Remainder]SocketUser user)
         {
-            var tags = await TagManager.GetTagsAsync(Context.Guild, user);
+            var tags = await TagExtensions.GetTagsAsync(Context.Guild, user);
 
             if (!HasTags(user, tags)) return;
 
@@ -61,12 +61,12 @@ namespace Siotrix.Discord.Moderation
         [Remarks("- No additional input required.")]
         public async Task RandomAsync()
         {
-            var tags = await TagManager.GetTagsAsync(Context.Guild);
+            var tags = await TagExtensions.GetTagsAsync(Context.Guild);
 
             if (!HasTags(Context.Guild, tags)) return;
 
             var selected = SelectRandom(tags);
-            var _ = TagManager.AddLogAsync(selected, Context);
+            var _ = TagExtensions.AddLogAsync(selected, Context);
             await ReplyAsync($"{selected.Name.ToString()}: {selected.Content}");
         }
 
@@ -75,12 +75,12 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<username>")]
         public async Task RandomAsync([Remainder]SocketUser user)
         {
-            var tags = await TagManager.GetTagsAsync(Context.Guild, user);
+            var tags = await TagExtensions.GetTagsAsync(Context.Guild, user);
 
             if (!HasTags(Context.Guild, tags)) return;
 
             var selected = SelectRandom(tags);
-            var _ = TagManager.AddLogAsync(selected, Context);
+            var _ = TagExtensions.AddLogAsync(selected, Context);
             await ReplyAsync($"{selected.Name.ToString()}: {selected.Content}");
         }
 
@@ -89,9 +89,9 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname>")]
         public async Task InfoAsync([Remainder]string name)
         {
-            var tag = await TagManager.GetTagAsync(name, Context.Guild);
+            var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
             var author = Context.Guild.GetUser(tag.OwnerId.ToUlong());
-            var count = await TagManager.CountLogsAsync((ulong)tag.Id);
+            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id);
 
             var builder = new EmbedBuilder()
                 .WithFooter(x => x.Text = "Last Updated")
@@ -114,8 +114,8 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <username>")]
         public async Task InfoAsync(string name, [Remainder]SocketUser user)
         {
-            var tag = await TagManager.GetTagAsync(name, Context.Guild);
-            var count = await TagManager.CountLogsAsync((ulong)tag.Id, user);
+            var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
+            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id, user);
 
             await ReplyAsync($"{tag.Name.ToString()} has been used {count} time(s)");
         }
@@ -125,8 +125,8 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <channelname>")]
         public async Task InfoAsync(string name, [Remainder]SocketChannel channel)
         {
-            var tag = await TagManager.GetTagAsync(name, Context.Guild);
-            var count = await TagManager.CountLogsAsync((ulong)tag.Id, channel);
+            var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
+            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id, channel);
 
             await ReplyAsync($"{tag.Name.ToString()} has been used {count} time(s)");
         }
@@ -136,7 +136,7 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<username>")]
         public async Task InfoAsync([Remainder]SocketUser user)
         {
-            var count = await TagManager.CountLogsAsync(user);
+            var count = await TagExtensions.CountLogsAsync(user);
             await ReplyAsync($"{user} executed tags {count} time(s)");
         }
 
@@ -145,7 +145,7 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<channelname>")]
         public async Task InfoAsync([Remainder]SocketChannel channel)
         {
-            var count = await TagManager.CountLogsAsync(channel);
+            var count = await TagExtensions.CountLogsAsync(channel);
             await ReplyAsync($"{channel} executed tags {count} time(s)");
         }
 

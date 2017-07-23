@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    public static class TagManager
+    public static class TagExtensions
     {
         /// <summary> Get a tag by it's id </summary>
         public static async Task<Tag> GetTagAsync(ulong id)
@@ -56,7 +56,7 @@ namespace Siotrix.Discord
                 {
                     val = await db.Tags.Where(x => x.GuildId == guild.Id.ToLong()).ToListAsync();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
@@ -90,7 +90,7 @@ namespace Siotrix.Discord
             {
                 try
                 {
-                    count =  await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong());
+                    count = await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong());
                 }
                 catch (Exception e)
                 {
