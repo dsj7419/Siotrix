@@ -199,9 +199,7 @@ namespace Siotrix.Discord
 
             var services = new ServiceCollection()
                 .AddSingleton<CommandHandler>()
-             //   .AddSingleton<Random>()
-        //     .AddDbContext<TagDatabase>(ServiceLifetime.Transient)
-                .AddTransient<TagManager>()
+                .AddSingleton<Random>()
                 .AddSingleton(_client)
                 .AddSingleton(config)
                 .AddSingleton(new CommandService(new CommandServiceConfig()

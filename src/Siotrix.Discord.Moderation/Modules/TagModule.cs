@@ -1,4 +1,5 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using System;
 using System.Linq;
@@ -13,25 +14,19 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class TagModule : ModuleBase<SocketCommandContext>
     {
-        private readonly TagManager _manager;
 
-        public TagModule(TagManager manager)
-        {
-            _manager = manager;
-        }
-
-        [Command("name"), Priority(0)]
+        [Command, Priority(0)]
         [Summary("Show the tag associated with the specified name")]
         [Remarks("<tagname> - Name of tag to show.")]
         public async Task TagAsync([Remainder]string name)
         {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
-
-            if (await _manager.IsDupeExecutionAsync((ulong)tag.Id)) return;
+            var tag = await TagManager.GetTagAsync(name, Context.Guild as IGuild);
+            if (await TagManager.IsDupeExecutionAsync((ulong)tag.Id)) return;
             if (NotExists(tag, name)) return;
+            
+            var _ = TagManager.AddLogAsync(tag, Context);
 
-            var _ = _manager.AddLogAsync(tag, Context);
-            await ReplyAsync($"{tag.Aliases.First()}: {tag.Content}");
+            await ReplyAsync($"{tag.Name}: {tag.Content}");
         }
 
         [Priority(10)]
@@ -40,20 +35,11 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <content for tag>")]
         public async Task CreateAsync(string name, [Remainder]string content)
         {
-            Console.WriteLine("first", name, content);
 
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
-
-            Console.WriteLine("second");
-
+            var tag = await TagManager.GetTagAsync(name, Context.Guild);
             if (Exists(tag, name)) return;
 
-            Console.WriteLine("third");
-
-            await _manager.CreateTagAsync(name, content, Context);
-
-            Console.WriteLine("fourth");
-
+            await TagManager.CreateTagAsync(name, content, Context);
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
@@ -63,11 +49,11 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> - Name of tag to delete.")]
         public async Task DeleteAsync(string name)
         {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
+            var tag = await TagManager.GetTagAsync(name, Context.Guild);
 
             if (NotExists(tag, name)) return;
 
-            await _manager.DeleteTagAsync(tag);
+            await TagManager.DeleteTagAsync(tag);
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
@@ -77,11 +63,11 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <edited content for tag>")]
         public async Task ModifyAsync(string name, [Remainder]string content)
         {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
+            var tag = await TagManager.GetTagAsync(name, Context.Guild);
 
             if (NotExists(tag, name) || !IsOwner(tag)) return;
 
-            await _manager.ModifyTagAsync(tag, content);
+            await TagManager.ModifyTagAsync(tag, content);
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
@@ -91,45 +77,17 @@ namespace Siotrix.Discord.Moderation
         [Remarks("<tagname> <usernamae>")]
         public async Task SetOwnerAsync(string name, [Remainder]SocketUser user)
         {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
+            var tag = await TagManager.GetTagAsync(name, Context.Guild);
 
             if (NotExists(tag, name) || !IsOwner(tag)) return;
 
-            await _manager.SetOwnerAsync(tag, user);
+            await TagManager.SetOwnerAsync(tag, user);
             await ReplyAsync(":thumbsup:");
-        }
-
-        [Priority(10)]
-        [Command("alias"), Alias("addalias")]
-        [Summary("Add a new alias to the specified tag")]
-        [Remarks("<tagname> <alias name to add for tag>")]
-        public async Task AddAliasAsync(string name, params string[] aliases)
-        {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
-
-            if (NotExists(tag, name)) return;
-
-            await _manager.AddAliasesAsync(tag, aliases);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
-        }
-
-        [Priority(10)]
-        [Command("unalias"), Alias("removealias")]
-        [Summary("Remove an existing alias from the specified tag")]
-        [Remarks("<tagname> <alias name to remove from tag>")]
-        public async Task RemoveAliasAsync(string name, params string[] aliases)
-        {
-            var tag = await _manager.GetTagAsync(name, Context.Guild);
-
-            if (NotExists(tag, name) || !IsOwner(tag)) return;
-
-            await _manager.RemoveAliasesAsync(tag, aliases);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
         private bool IsOwner(Tag tag)
         {
-            if (tag.OwnerId != Context.User.Id)
+            if (tag.OwnerId.ToUlong() != Context.User.Id)
             {
                 var _ = ReplyAsync("You are not the owner of this tag");
                 return false;
@@ -160,10 +118,10 @@ namespace Siotrix.Discord.Moderation
         private async Task ReplySuggestionsAsync(string name)
         {
             string msg = $"The tag `{name}` does not exist";
-            var tags = await _manager.FindTagsAsync(name, Context.Guild);
+            var tags = await TagManager.FindTagsAsync(name, Context.Guild);
 
             if (tags.Count() != 0)
-                msg += $"\nDid you mean: {string.Join(", ", tags.Select(x => x.Aliases.First()))}";
+                msg += $"\nDid you mean: {string.Join(", ", tags.Select(x => x.Name.First()))}";
 
             await ReplyAsync(msg);
         }

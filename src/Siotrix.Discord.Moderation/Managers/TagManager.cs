@@ -8,53 +8,213 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    public class TagManager : DbManager<LogDatabase>
+    public static class TagManager
     {
-        public TagManager(LogDatabase db)
-            : base(db) { }
-
         /// <summary> Get a tag by it's id </summary>
-        public Task<Tag> GetTagAsync(ulong id)
-            => _db.Tags.FirstOrDefaultAsync(x => (ulong)x.Id == id);
+        public static async Task<Tag> GetTagAsync(ulong id)
+        {
+            Tag val = new Tag();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    val = await db.Tags.FirstOrDefaultAsync(x => x.Id == id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return val;
+        }
+
         /// <summary> Get a tag in the specified guild by name </summary>
-        public Task<Tag> GetTagAsync(string name, IGuild guild)
-            => _db.Tags.FirstOrDefaultAsync(x => x.Aliases.Contains(name.ToLower()) && x.GuildId == guild.Id);
+        public static async Task<Tag> GetTagAsync(string name, IGuild guild)
+        {
+            Tag val = new Tag();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    val = await db.Tags.FirstOrDefaultAsync(x => x.Name.Contains(name.ToLower()) && x.GuildId == guild.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return val;
+        }
 
         /// <summary> Get all tags associated with the specified guild </summary>
-        public async Task<IEnumerable<Tag>> GetTagsAsync(IGuild guild)
-            => await _db.Tags.Where(x => x.GuildId == guild.Id).ToListAsync();
+        public static async Task<IEnumerable<Tag>> GetTagsAsync(IGuild guild)
+        {
+            IEnumerable<Tag> val = new List<Tag>();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    val = await db.Tags.Where(x => x.GuildId == guild.Id.ToLong()).ToListAsync();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return val;
+        }
+
         /// <summary> Get all tags associated with the specified guild and user </summary>
-        public async Task<IEnumerable<Tag>> GetTagsAsync(IGuild guild, IUser user)
-            => await _db.Tags.Where(x => x.GuildId == guild.Id && x.OwnerId == user.Id).ToListAsync();
+        public static async Task<IEnumerable<Tag>> GetTagsAsync(IGuild guild, IUser user)
+        {
+            IEnumerable<Tag> val = new List<Tag>();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    val = await db.Tags.Where(x => x.GuildId == guild.Id.ToLong() && x.OwnerId == user.Id.ToLong()).ToListAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return val;
+        }
 
         /// <summary> Get the total usage of a tag </summary>
-        public Task<int> CountLogsAsync(ulong id)
-            => _db.TagsLogs.CountAsync(x => x.TagId == id);
+        public static async Task<int> CountLogsAsync(ulong id)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count =  await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Get the total usage of a tag for a user </summary>
-        public Task<int> CountLogsAsync(ulong id, IUser user)
-            => _db.TagsLogs.CountAsync(x => x.TagId == id && x.UserId == user.Id);
+        public static async Task<int> CountLogsAsync(ulong id, IUser user)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count = await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong() && x.UserId == user.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Get the total usage of a tag for a channel </summary>
-        public Task<int> CountLogsAsync(ulong id, IChannel channel)
-            => _db.TagsLogs.CountAsync(x => x.TagId == id && x.ChannelId == channel.Id);
+        public static async Task<int> CountLogsAsync(ulong id, IChannel channel)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count = await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong() && x.ChannelId == channel.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Get the total usage of all tags for a user </summary>
-        public Task<int> CountLogsAsync(IUser user)
-            => _db.TagsLogs.CountAsync(x => x.UserId == user.Id);
+        public static async Task<int> CountLogsAsync(IUser user)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count = await db.TagsLogs.CountAsync(x => x.UserId == user.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Get the total usage of all tags for a channel </summary>
-        public Task<int> CountLogsAsync(IChannel channel)
-            => _db.TagsLogs.CountAsync(x => x.ChannelId == channel.Id);
+        public static async Task<int> CountLogsAsync(IChannel channel)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count = await db.TagsLogs.CountAsync(x => x.ChannelId == channel.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Get the total usage of all tags for a guild </summary>
-        public Task<int> CountLogsAsync(IGuild guild)
-            => _db.TagsLogs.CountAsync(x => x.GuildId == guild.Id);
+        public static async Task<int> CountLogsAsync(IGuild guild)
+        {
+            int count = 0;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    count = await db.TagsLogs.CountAsync(x => x.GuildId == guild.Id.ToLong());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            return count;
+        }
+
         /// <summary> Check if the specified tag has been executed recently </summary>
-        public async Task<bool> IsDupeExecutionAsync(ulong id)
-            => await _db.TagsLogs.AnyAsync(x => x.TagId == id && x.Timestamp.AddSeconds(30) >= DateTime.UtcNow);
+        public static async Task<bool> IsDupeExecutionAsync(ulong id)
+        {
+            bool isDupe = false;
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    isDupe = await db.TagsLogs.AnyAsync(x => x.TagId == id.ToLong() && x.Timestamp.AddSeconds(30) >= DateTime.UtcNow);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return isDupe;
+        }
+
 
         /// <summary> Find tags similar to the specified name </summary>
-        public async Task<IEnumerable<Tag>> FindTagsAsync(string name, IGuild guild, int stop = 3, int tolerance = 5)
+        public static async Task<IEnumerable<Tag>> FindTagsAsync(string name, IGuild guild, int stop = 3, int tolerance = 5)
         {
             return (await GetTagsAsync(guild))
-                .ToDictionary(x => x, x => x.Aliases
-                .Select(y => MathHelper.GetStringDistance(y, name))
+                .ToDictionary(x => x, x => x.Name
+                .Select(y => MathHelper.GetStringDistance(x.Name, name))
                 .Sum())
                 .OrderBy(x => x.Value)
                 .Select(x => x.Key)
@@ -62,64 +222,96 @@ namespace Siotrix.Discord
         }
 
         /// <summary> Add a new log for the specified tag </summary>
-        public async Task AddLogAsync(Tag tag, SocketCommandContext context)
+        public static async Task AddLogAsync(Tag tag, SocketCommandContext context)
         {
-            var log = new TagLog((ulong)tag.Id, context.Guild.Id, context.Channel.Id, context.User.Id);
+            var log = new TagLog(tag.Id, context.Guild.Id.ToLong(), context.Channel.Id.ToLong(), context.User.Id.ToLong());
 
-            _db.TagsLogs.Add(log);
-            await _db.SaveChangesAsync();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    await db.TagsLogs.AddAsync(log);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
+            }
         }
 
         /// <summary> Create a new tag </summary>
-        public async Task CreateTagAsync(string name, string content, SocketCommandContext context)
+        public static async Task CreateTagAsync(string name, string content, SocketCommandContext context)
         {
-            var tag = new Tag(name, content, context.Guild.Id, context.User.Id);
+            var tag = new Tag(name, content, context.Guild.Id.ToLong(), context.User.Id.ToLong());
 
-            await _db.Tags.AddAsync(tag);
-            await _db.SaveChangesAsync();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    await db.Tags.AddAsync(tag);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         /// <summary> Delete an existing tag </summary>
-        public async Task DeleteTagAsync(Tag tag)
+        public static async Task DeleteTagAsync(Tag tag)
         {
-            _db.Tags.Remove(tag);
-            await _db.SaveChangesAsync();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Tags.Remove(tag);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         /// <summary> Modify the content of an existing tag </summary>
-        public async Task ModifyTagAsync(Tag tag, string content)
+        public static async Task ModifyTagAsync(Tag tag, string content)
         {
             tag.SetContent(content);
 
-            _db.Tags.Update(tag);
-            await _db.SaveChangesAsync();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Tags.Update(tag);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
 
         /// <summary> Change the owner of a tag </summary>
-        public async Task SetOwnerAsync(Tag tag, IUser user)
+        public static async Task SetOwnerAsync(Tag tag, IUser user)
         {
-            tag.SetOwnerId(user.Id);
+            tag.SetOwnerId(user.Id.ToLong());
 
-            _db.Tags.Update(tag);
-            await _db.SaveChangesAsync();
-        }
-
-        /// <summary> Add a range of aliases to a tag </summary>
-        public async Task AddAliasesAsync(Tag tag, string[] aliases)
-        {
-            tag.AddNames(aliases);
-
-            _db.Tags.Update(tag);
-            await _db.SaveChangesAsync();
-        }
-
-        /// <summary> Remove a range of aliases from a tag </summary>
-        public async Task RemoveAliasesAsync(Tag tag, string[] aliases)
-        {
-            tag.RemoveNames(aliases);
-
-            _db.Tags.Update(tag);
-            await _db.SaveChangesAsync();
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Tags.Update(tag);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }
