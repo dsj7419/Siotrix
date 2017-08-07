@@ -13,6 +13,7 @@ namespace Siotrix.Discord
         public const string BOT_PREFIX = "!";
         public const string BOT_NAME = "Siotrix";
         public const string ZERO_LENGTH_CHAR = "\u180E";
+        public const long BOT_ID = 290393294645624833;
         public const string DISCORD_INV = "https://discord.gg/nXvBxDX";
         public const string BOT_URL = "https://discord.gg/nXvBxDX";
         public const string BOT_INVITE = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631";

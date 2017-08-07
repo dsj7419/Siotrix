@@ -95,6 +95,11 @@ namespace Siotrix.Discord
             }
         }
 
+        public static async Task DMUser(IUser user, string message = "", Embed embed = null)
+        {
+            await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(message, embed: embed);
+        }
+
         public static bool UserHasPermission(this IGuildChannel channel, IGuildUser user, ChannelPermission permission)
             => user.GetPermissions(channel).Has(permission);
 

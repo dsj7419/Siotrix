@@ -34,6 +34,7 @@ namespace Siotrix.Discord
         private MessageService _message;
 
         // Moderation
+        private AntilinkService _antilink;
         private AntispamService _antispam;
         private FilterService _filter;
         private WarningService _warning;
@@ -112,11 +113,13 @@ namespace Siotrix.Discord
         public async Task StartModerationAsync()
         {
             _modules.Moderation = true;
+            _antilink = new AntilinkService(_client);
             _antispam = new AntispamService(_client);
             _filter = new FilterService(_client);
             _warning = new WarningService(_client);
             _log = new LogService(_client);
 
+            await _antilink.StartAsync();
             await _antispam.StartAsync();
             await _warning.StartAsync();
             await _filter.StartAsync();
@@ -170,11 +173,13 @@ namespace Siotrix.Discord
         public async Task StopModerationAsync()
         {
             _modules.Moderation = false;
+            _antilink = null;
             _antispam = null;
             _filter = null;
             _warning = null;
             _log = null;
 
+            await _antilink.StopAsync();
             await _antispam.StopAsync();
             await _filter.StopAsync();
             await _warning.StopAsync();
