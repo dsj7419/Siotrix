@@ -27,12 +27,14 @@ namespace Siotrix.Discord.Moderation
         [Remarks("- No additional input required.")]
         public async Task TagsAsync()
         {
+            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
             var tags = await TagExtensions.GetTagsAsync(Context.Guild);
 
             if (!HasTags(Context.Guild, tags)) return;
 
             var builder = new EmbedBuilder()
                 .WithThumbnailUrl(Context.Guild.IconUrl)
+                .WithColor(g_color)
                 .WithTitle($"Tags for {Context.Guild}")
                 .WithDescription(string.Join(", ", tags.Select(x => x.Name.ToString())));
 
