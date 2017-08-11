@@ -6,36 +6,36 @@ namespace Siotrix.Discord
 {
     public static class LogChannelExtensions
     {
-        public static long modlogchannel_id;
-        public static long logchannel_id;
-        public static bool is_toggled_log;
-        public static bool is_toggled_modlog;
+        public static long ModlogchannelId;
+        public static long LogchannelId;
+        public static bool IsToggledLog;
+        public static bool IsToggledModlog;
 
-        public static void IsUsableLogChannel(long guild_id)
+        public static void IsUsableLogChannel(long guildId)
         {
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var log_list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
-                    var modlog_list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
-                    if (log_list.Count() > 0 || log_list.Any())
+                    var logList = db.Glogchannels.Where(p => p.GuildId.Equals(guildId));
+                    var modlogList = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guildId));
+                    if (logList.Count() > 0 || logList.Any())
                     {
-                        var data = log_list.First();
-                        logchannel_id = data.ChannelId;
+                        var data = logList.First();
+                        LogchannelId = data.ChannelId;
                         if (!data.IsActive)
-                            is_toggled_log = true;
+                            IsToggledLog = true;
                         else
-                            is_toggled_log = false;
+                            IsToggledLog = false;
                     }
-                    if (modlog_list.Count() > 0 || modlog_list.Any())
+                    if (modlogList.Count() > 0 || modlogList.Any())
                     {
-                        var mod_data = modlog_list.First();
-                        modlogchannel_id = mod_data.ChannelId;
-                        if (!mod_data.IsActive)
-                            is_toggled_modlog = true;
+                        var modData = modlogList.First();
+                        ModlogchannelId = modData.ChannelId;
+                        if (!modData.IsActive)
+                            IsToggledModlog = true;
                         else
-                            is_toggled_modlog = false;
+                            IsToggledModlog = false;
                     }
                 }
                 catch (Exception e)
@@ -45,14 +45,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static Dictionary<int, string> GetFilterWords(long guild_id)
+        public static Dictionary<int, string> GetFilterWords(long guildId)
         {
             var dictionary = new Dictionary<int, string>();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
+                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId);
                     if (result.Any())
                     {
                         var i = 0;
@@ -75,11 +75,11 @@ namespace Siotrix.Discord
         public static string ParseMessages(string[] msg, Dictionary<int, string> dictionary)
         {
             string badword = null;
-            foreach (var msg_item in msg)
-            foreach (var dic_item in dictionary)
-                if (msg_item.ToLower().Equals(dic_item.Value.ToLower()))
+            foreach (var msgItem in msg)
+            foreach (var dicItem in dictionary)
+                if (msgItem.ToLower().Equals(dicItem.Value.ToLower()))
                 {
-                    badword = msg_item;
+                    badword = msgItem;
                     break;
                 }
             return badword;

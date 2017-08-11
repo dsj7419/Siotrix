@@ -32,56 +32,56 @@ namespace Siotrix.Discord.Moderation
         [Summary("Give or edit an existing reason for a specified case number.")]
         [Remarks(" <number> (reason)")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task ReasonAsync(long case_number, [Remainder] string reason)
+        public async Task ReasonAsync(long caseNumber, [Remainder] string reason)
         {
-            if (!case_number.Equals(ActionResult.CaseId))
+            if (!caseNumber.Equals(ActionResult.CaseId))
             {
                 await ReplyAsync("Wrong Number. Try again!");
                 return;
             }
 
-            var mod_channel_id = GetModLogChannelId();
-            if (mod_channel_id <= 0) return;
-            var channel = Context.Guild.GetChannel(mod_channel_id.ToUlong()) as ISocketMessageChannel;
+            var modChannelId = GetModLogChannelId();
+            if (modChannelId <= 0) return;
+            var channel = Context.Guild.GetChannel(modChannelId.ToUlong()) as ISocketMessageChannel;
 
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
             string value = null;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
+            var actionUserName = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
             if (ActionResult.CommandName.Equals("mute"))
-                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
+                value = "User : " + actionUserName + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
                         Context.User.Username + "(" + Context.User.Id + ")\n" +
                         "Length : " + ActionResult.TimeLength + "minutes" + "\n" +
                         "Reason : " + reason + " (edited)";
             else
-                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
+                value = "User : " + actionUserName + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
                         Context.User.Username + "(" + Context.User.Id + ")\n" +
                         "Reason : " + reason + " (edited)";
             builder
                 .AddField(x =>
                 {
-                    x.Name = "Case " + "#" + case_number.ToString() + " | " + ActionResult.CommandName;
+                    x.Name = "Case " + "#" + caseNumber.ToString() + " | " + ActionResult.CommandName;
                     x.Value = value;
                 });
             CaseExtensions.SaveCaseDataAsync(ActionResult.CommandName, ActionResult.CaseId, ActionResult.UserId,
                 Context.Guild.Id.ToLong(), reason);
             await ActionResult.Instance.ModifyAsync(x => { x.Embed = builder.Build(); });
-            await ReplyAsync("Case #" + case_number + " has been updated.");
+            await ReplyAsync("Case #" + caseNumber + " has been updated.");
         }
 
         [Command("reason")]
@@ -90,36 +90,36 @@ namespace Siotrix.Discord.Moderation
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task ReasonAsync([Remainder] string reason)
         {
-            var mod_channel_id = GetModLogChannelId();
-            if (mod_channel_id <= 0) return;
-            var channel = Context.Guild.GetChannel(mod_channel_id.ToUlong()) as ISocketMessageChannel;
+            var modChannelId = GetModLogChannelId();
+            if (modChannelId <= 0) return;
+            var channel = Context.Guild.GetChannel(modChannelId.ToUlong()) as ISocketMessageChannel;
 
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
             string value = null;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            var action_user_name = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
+            var actionUserName = Context.Guild.GetUser(ActionResult.UserId.ToUlong()).Mention;
             if (ActionResult.CommandName.Equals("mute"))
-                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
+                value = "User : " + actionUserName + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
                         Context.User.Username + "(" + Context.User.Id + ")\n" +
                         "Length : " + ActionResult.TimeLength + "minutes" + "\n" +
                         "Reason : " + reason + " (edited)";
             else
-                value = "User : " + action_user_name + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
+                value = "User : " + actionUserName + "(" + ActionResult.UserId + ")\n" + "Moderator : " +
                         Context.User.Username + "(" + Context.User.Id + ")\n" +
                         "Reason : " + reason + " (edited)";
             builder

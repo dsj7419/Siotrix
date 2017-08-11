@@ -113,10 +113,10 @@ namespace Siotrix.Discord
 
         public class TableBuilder : IEnumerable<ITextRow>
         {
-            protected string _fmtString;
-            protected List<int> colLength = new List<int>();
+            protected string FmtString;
+            protected List<int> ColLength = new List<int>();
 
-            protected List<ITextRow> rows = new List<ITextRow>();
+            protected List<ITextRow> Rows = new List<ITextRow>();
 
             public TableBuilder()
             {
@@ -135,16 +135,16 @@ namespace Siotrix.Discord
             {
                 get
                 {
-                    if (_fmtString == null)
+                    if (FmtString == null)
                     {
                         var format = "";
                         var i = 0;
-                        foreach (var len in colLength)
+                        foreach (var len in ColLength)
                             format += string.Format("{{{0},-{1}}}{2}", i++, len, Separator);
                         format += "\r\n";
-                        _fmtString = format;
+                        FmtString = format;
                     }
-                    return _fmtString;
+                    return FmtString;
                 }
             }
 
@@ -155,36 +155,36 @@ namespace Siotrix.Discord
                 {
                     var str = o.ToString().Trim();
                     row.Add(str);
-                    if (colLength.Count >= row.Count)
+                    if (ColLength.Count >= row.Count)
                     {
-                        var curLength = colLength[row.Count - 1];
-                        if (str.Length > curLength) colLength[row.Count - 1] = str.Length;
+                        var curLength = ColLength[row.Count - 1];
+                        if (str.Length > curLength) ColLength[row.Count - 1] = str.Length;
                     }
                     else
                     {
-                        colLength.Add(str.Length);
+                        ColLength.Add(str.Length);
                     }
                 }
-                rows.Add(row);
+                Rows.Add(row);
                 return row;
             }
 
             public string Output()
             {
                 var sb = new StringBuilder();
-                foreach (TextRow row in rows)
+                foreach (TextRow row in Rows)
                     row.Output(sb);
                 return sb.ToString();
             }
 
             protected class TextRow : List<string>, ITextRow
             {
-                protected TableBuilder owner;
+                protected TableBuilder Owner;
 
                 public TextRow(TableBuilder Owner)
                 {
-                    owner = Owner;
-                    if (owner == null) throw new ArgumentException("Owner");
+                    this.Owner = Owner;
+                    if (this.Owner == null) throw new ArgumentException("Owner");
                 }
 
                 public string Output()
@@ -196,7 +196,7 @@ namespace Siotrix.Discord
 
                 public void Output(StringBuilder sb)
                 {
-                    sb.AppendFormat(owner.FormatString, ToArray());
+                    sb.AppendFormat(Owner.FormatString, ToArray());
                 }
 
                 public object Tag { get; set; }
@@ -206,12 +206,12 @@ namespace Siotrix.Discord
 
             public IEnumerator<ITextRow> GetEnumerator()
             {
-                return rows.GetEnumerator();
+                return Rows.GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return rows.GetEnumerator();
+                return Rows.GetEnumerator();
             }
 
             #endregion

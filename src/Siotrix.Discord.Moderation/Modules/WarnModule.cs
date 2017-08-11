@@ -13,7 +13,7 @@ namespace Siotrix.Discord.Moderation
     [RequireContext(ContextType.Guild)]
     public class WarnModule : ModuleBase<SocketCommandContext>
     {
-        private string GetWarnData(long guild_id)
+        private string GetWarnData(long guildId)
         {
             string list = null;
             using (var db = new LogDatabase())
@@ -23,27 +23,27 @@ namespace Siotrix.Discord.Moderation
                     var result = db.Gwarns.Where(x => x.GuildId == Context.Guild.Id.ToLong());
                     if (result.Any())
                     {
-                        var mute_warn_num = result.FirstOrDefault(x => x.Option == 1).WarnValue.ToString();
+                        var muteWarnNum = result.FirstOrDefault(x => x.Option == 1).WarnValue.ToString();
                         var time1 = TimeSpan.FromMinutes(result.FirstOrDefault(x => x.Option == 2).WarnValue);
-                        var mute_time_num = string.Format("{0}{1}{2}", time1.Days > 0 ? time1.Days + " days " : null,
+                        var muteTimeNum = string.Format("{0}{1}{2}", time1.Days > 0 ? time1.Days + " days " : null,
                             time1.Hours > 0 ? time1.Hours + " hours " : null,
                             time1.Minutes > 0 ? time1.Minutes + " minutes " : null);
-                        var ban_warn_num = result.FirstOrDefault(x => x.Option == 3).WarnValue.ToString();
+                        var banWarnNum = result.FirstOrDefault(x => x.Option == 3).WarnValue.ToString();
                         var time2 = TimeSpan.FromMinutes(result.FirstOrDefault(x => x.Option == 4).WarnValue);
-                        var ban_time_num = string.Format("{0}{1}{2}", time2.Days > 0 ? time2.Days + " days " : null,
+                        var banTimeNum = string.Format("{0}{1}{2}", time2.Days > 0 ? time2.Days + " days " : null,
                             time2.Hours > 0 ? time2.Hours + " hours " : null,
                             time2.Minutes > 0 ? time2.Minutes + " minutes " : null);
-                        var perm_ban_num = result.FirstOrDefault(x => x.Option == 5).WarnValue.ToString();
+                        var permBanNum = result.FirstOrDefault(x => x.Option == 5).WarnValue.ToString();
                         var time3 = TimeSpan.FromMinutes(result.FirstOrDefault(x => x.Option == 6).WarnValue);
-                        var fall_off_num = string.Format("{0}{1}{2}", time3.Days > 0 ? time3.Days + " days " : null,
+                        var fallOffNum = string.Format("{0}{1}{2}", time3.Days > 0 ? time3.Days + " days " : null,
                             time3.Hours > 0 ? time3.Hours + " hours " : null,
                             time3.Minutes > 0 ? time3.Minutes + " minutes " : null);
-                        list = "``Warning points before a  ``**" + mute_time_num + "**``  mute`` : " + "**" +
-                               mute_warn_num + "**\n" +
-                               "``Warning points before a  ``**" + ban_time_num + "**``  ban`` : " + "**" +
-                               ban_warn_num + "**\n" +
-                               "``Serious offences needed for permenent ban`` : " + "**" + perm_ban_num + "**\n" +
-                               "``Rate at which warning points fall off a member`` : " + "**" + fall_off_num + "**\n";
+                        list = "``Warning points before a  ``**" + muteTimeNum + "**``  mute`` : " + "**" +
+                               muteWarnNum + "**\n" +
+                               "``Warning points before a  ``**" + banTimeNum + "**``  ban`` : " + "**" +
+                               banWarnNum + "**\n" +
+                               "``Serious offences needed for permenent ban`` : " + "**" + permBanNum + "**\n" +
+                               "``Rate at which warning points fall off a member`` : " + "**" + fallOffNum + "**\n";
                     }
                 }
                 catch (Exception e)
@@ -56,7 +56,7 @@ namespace Siotrix.Discord.Moderation
 
         private bool SaveAndUpdateWarnData(int option, int num)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -77,63 +77,63 @@ namespace Siotrix.Discord.Moderation
                         db.Gwarns.Update(data);
                     }
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
-        private bool SaveAndUpdateWarningUsers(long user_id, long guild_id, int point_num, string reason, DateTime time,
-            long mod_id, InfractionType type)
+        private bool SaveAndUpdateWarningUsers(long userId, long guildId, int pointNum, string reason, DateTime time,
+            long modId, InfractionType type)
         {
-            string infraction_type = null;
+            string infractionType = null;
             switch (type)
             {
                 case InfractionType.Manual:
-                    infraction_type = "Manual Infraction";
+                    infractionType = "Manual Infraction";
                     break;
                 case InfractionType.Filter:
-                    infraction_type = "Filter Infraction";
+                    infractionType = "Filter Infraction";
                     break;
                 case InfractionType.Repeat:
-                    infraction_type = "Repeat Infraction";
+                    infractionType = "Repeat Infraction";
                     break;
                 case InfractionType.Caps:
-                    infraction_type = "Caps Infraction";
+                    infractionType = "Caps Infraction";
                     break;
                 default:
                     break;
             }
 
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var record = new DiscordGuildWarningUser();
-                    record.UserId = user_id;
-                    record.GuildId = guild_id;
-                    record.PointNum = point_num;
+                    record.UserId = userId;
+                    record.GuildId = guildId;
+                    record.PointNum = pointNum;
                     record.Reason = reason;
                     record.CreatedAt = time;
-                    record.ModId = mod_id;
-                    record.Type = infraction_type;
-                    record.Index = db.Gwarningusers.Where(x => x.GuildId == guild_id && x.UserId == user_id).Count() +
+                    record.ModId = modId;
+                    record.Type = infractionType;
+                    record.Index = db.Gwarningusers.Where(x => x.GuildId == guildId && x.UserId == userId).Count() +
                                    1;
                     db.Gwarningusers.Add(record);
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
         [Command]
@@ -142,22 +142,22 @@ namespace Siotrix.Discord.Moderation
         public async Task WarnAsync()
         {
             var value = GetWarnData(Context.Guild.Id.ToLong()) ?? "No Setting Warn";
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(g_thumbnail)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
                 .AddField(x =>
@@ -273,7 +273,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         private bool SetMuteTime(TimeSpan time)
@@ -321,7 +321,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         private bool SetMuteWarn(int num)

@@ -16,7 +16,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync()
         {
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             var description = "";
             var title = $"Antilink Information for {Context.Guild.Name}";
 
@@ -30,15 +30,15 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithTitle(title)
-                .WithColor(g_color);
+                .WithColor(gColor);
 
             //  TableExtensions.TableBuilder tb = new TableExtensions.TableBuilder();
             // IEnumerable<Tuple<int, string, bool, bool>> channellist = new[] { Tuple.Create(1, "help", false, false)};
             string isActive = antilink.IsActive ? isActive = "On" : isActive = "Off";
-            string isDMActive = antilink.IsDmMessage ? isDMActive = "On" : isDMActive = "Off";
+            string isDmActive = antilink.IsDmMessage ? isDmActive = "On" : isDmActive = "Off";
             var channelcount = 0;
             description = $"Current Antilink status: **{isActive}**\n";
-            description += $"Current Antilink DM status: **{isDMActive}**\n";
+            description += $"Current Antilink DM status: **{isDmActive}**\n";
             description += $"DM Message: **{antilink.DmMessage}**\n\n";
             // description += String.Format("## | {0, 20} | {1, 28} | {2, 35}\n", "Channel Name", "Is Active", "Is Strict");
             //  tb.AddRow("Num", "Channel Name", "Active?", "Strict Mode");
@@ -46,7 +46,7 @@ namespace Siotrix.Discord
 
             foreach (var channel in Context.Guild.Channels)
             foreach (var user in channel.Users)
-                if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
+                if (user.IsBot && user.Id == SiotrixConstants.BotId)
                 {
                     var antilinkChannel =
                         await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
@@ -111,7 +111,7 @@ namespace Siotrix.Discord
         [Summary("Toggle antilink DM's to users if they break the antilink rule on or off.")]
         [Remarks("- No other argument needed")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task AntilinkDMToggleAsync()
+        public async Task AntilinkDmToggleAsync()
         {
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
@@ -142,7 +142,7 @@ namespace Siotrix.Discord
             "Set the DM message that the bot will send to the user if they use a link in a channel they aren't supposed to.")]
         [Remarks("[message] - no argument will list the current message and reset will restore to default.")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task AntilinkDMMessageAsync([Remainder] string message = null)
+        public async Task AntilinkDmMessageAsync([Remainder] string message = null)
         {
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
@@ -294,7 +294,7 @@ namespace Siotrix.Discord
 
             foreach (var channel in Context.Guild.Channels)
             foreach (var user in channel.Users)
-                if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
+                if (user.IsBot && user.Id == SiotrixConstants.BotId)
                 {
                     channelcount++;
                     var antilinkChannel =
@@ -346,7 +346,7 @@ namespace Siotrix.Discord
             }
 
 
-            if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
+            if (user.IsBot && user.Id == SiotrixConstants.BotId)
             {
                 await ReplyAsync($"You cant authorize me because I control my own fate!");
                 return;
@@ -444,7 +444,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync(SocketGuildUser user)
         {
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             var description = "";
             var title = $"Antilink Information for {user.Username} in {Context.Guild.Name}";
 
@@ -458,7 +458,7 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithTitle(title)
-                .WithColor(g_color);
+                .WithColor(gColor);
 
             string isActive = antilink.IsActive ? isActive = "On" : isActive = "Off";
             var channelcount = 0;

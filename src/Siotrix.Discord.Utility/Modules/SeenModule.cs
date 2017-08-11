@@ -24,25 +24,25 @@ namespace Siotrix.Discord.Utility
                 return;
             }
 
-            var last_seen = GetLastMessageTime(target);
-            var name = $"{target.Username} was last seen on {last_seen}";
+            var lastSeen = GetLastMessageTime(target);
+            var name = $"{target.Username} was last seen on {lastSeen}";
 
-            if (last_seen == "No recorded message from user in this guild.")
-                name = $"{target.Username} - {last_seen}";
+            if (lastSeen == "No recorded message from user in this guild.")
+                name = $"{target.Username} - {lastSeen}";
 
 
-            var join_date = string.Format("{0:dddd, MMMM d, yyyy}", target.JoinedAt?.DateTime ?? DateTime.Now);
-            var days_old = Math.Round((DateTime.Now - (target.JoinedAt?.DateTime ?? DateTime.Now)).TotalDays, 0);
-            string days_old_concat = null;
-            if (days_old < 1) days_old = 1;
-            if (days_old == 1)
-                days_old_concat = join_date + " | " + days_old + " day ago.";
+            var joinDate = string.Format("{0:dddd, MMMM d, yyyy}", target.JoinedAt?.DateTime ?? DateTime.Now);
+            var daysOld = Math.Round((DateTime.Now - (target.JoinedAt?.DateTime ?? DateTime.Now)).TotalDays, 0);
+            string daysOldConcat = null;
+            if (daysOld < 1) daysOld = 1;
+            if (daysOld == 1)
+                daysOldConcat = joinDate + " | " + daysOld + " day ago.";
             else
-                days_old_concat = join_date + " | " + days_old + " days ago.";
-            var serverjoined = days_old_concat;
+                daysOldConcat = joinDate + " | " + daysOld + " days ago.";
+            var serverjoined = daysOldConcat;
 
             if (IsSameRoleLevelOrHigher(Context.User as SocketGuildUser, target) &&
-                last_seen != "No recorded message from user in this guild.")
+                lastSeen != "No recorded message from user in this guild.")
             {
                 var lastmessage = GetLastMessage(target);
                 var channelindex = GetLastChannel(target);
@@ -136,16 +136,16 @@ namespace Siotrix.Discord.Utility
             return false;
         }
 
-        private static EmbedBuilder SeenEmbed(SocketCommandContext Context, string avatar, string name,
+        private static EmbedBuilder SeenEmbed(SocketCommandContext context, string avatar, string name,
             string serverjoined, string description = null)
         {
             //Make the embed builder
-            var g_color = Context.GetGuildColor();
+            var gColor = context.GetGuildColor();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(avatar)
                     .WithName(name));
-            embed.WithColor(g_color);
+            embed.WithColor(gColor);
 
             if (description != null)
                 embed.WithDescription(description);

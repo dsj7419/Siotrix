@@ -16,11 +16,11 @@ namespace Siotrix.Discord.Moderation
     [Summary("Various role commands.")]
     public class RoleModule : InteractiveModuleBase<SocketCommandContext>
     {
-        private readonly InteractiveService Interactive;
+        private readonly InteractiveService _interactive;
 
-        public RoleModule(InteractiveService Inter)
+        public RoleModule(InteractiveService inter)
         {
-            Interactive = Inter;
+            _interactive = inter;
         }
 
 
@@ -40,7 +40,7 @@ namespace Siotrix.Discord.Moderation
             await GiveRole(user, role);
             await ReplyAsync(
                 string.Format("Successfully gave the following role to `{0}`: `{1}`.", user.FormatUser(), role),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("takerole")]
@@ -54,7 +54,7 @@ namespace Siotrix.Discord.Moderation
             await TakeRole(user, role);
             await ReplyAsync(
                 string.Format("Successfully took the following role from `{0}`: `{1}`.", user.FormatUser(), role),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("createrole")]
@@ -68,7 +68,7 @@ namespace Siotrix.Discord.Moderation
             await guild.CreateRoleAsync(rolename, GuildPermissions.None).ConfigureAwait(false);
             await ReplyAsync(
                 string.Format("Successfully created the role `{0}`. No permissions have been set.", rolename),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("softdeleterole")]
@@ -91,7 +91,7 @@ namespace Siotrix.Discord.Moderation
             await ReplyAsync(
                 string.Format(
                     "Successfully removed all permissions from the role `{0}` and removed the role from all users on the guild.",
-                    role.Name), deleteAfter: SiotrixConstants.WAIT_TIME);
+                    role.Name), deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("deleterole")]
@@ -104,13 +104,13 @@ namespace Siotrix.Discord.Moderation
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await role.DeleteAsync().ConfigureAwait(false);
             await ReplyAsync(string.Format("Successfully deleted `{0}`.", role.FormatRole()),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("changeroleposition")]
         [Alias("crp")]
         [Summary("If only a role is input its position will be listed, else moves the role to the given position. " +
-                 SiotrixConstants.FAKE_EVERYONE + " is the first position and starts at zero.")]
+                 SiotrixConstants.FakeEveryone + " is the first position and starts at zero.")]
         [Remarks(" <rolename> [position] - position is optional")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
@@ -127,11 +127,11 @@ namespace Siotrix.Discord.Moderation
                 if (newPos != -1)
                     await ReplyAsync(
                         string.Format("Successfully gave `{0}` the position `{1}`.", role.FormatRole(), newPos),
-                        deleteAfter: SiotrixConstants.WAIT_TIME);
+                        deleteAfter: SiotrixConstants.WaitTime);
                 else
                     await ReplyAsync(
                         string.Format("Failed to give `{0}` the position `{1}`.", role.FormatRole(), position),
-                        deleteAfter: SiotrixConstants.WAIT_TIME);
+                        deleteAfter: SiotrixConstants.WaitTime);
             }
         }
 
@@ -143,19 +143,19 @@ namespace Siotrix.Discord.Moderation
         [RequireUserPermission(GuildPermission.ManageRoles)]
         private async Task DisplayRolePositionsAsync()
         {
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
 
             var desc = string.Join("\n", Context.Guild.Roles.OrderByDescending(x => x.Position).Select(x =>
             {
                 if (x.Id == Context.Guild.EveryoneRole.Id)
-                    return string.Format("`{0}.` {1}", x.Position.ToString("00"), SiotrixConstants.FAKE_EVERYONE);
+                    return string.Format("`{0}.` {1}", x.Position.ToString("00"), SiotrixConstants.FakeEveryone);
                 return string.Format("`{0}.` {1}", x.Position.ToString("00"), x.Name);
             }));
 
 
             var eb = new EmbedBuilder
             {
-                Color = g_color,
+                Color = gColor,
                 Title = $"Roles in {Context.Guild.Name}",
                 Footer = new EmbedFooterBuilder
                 {
@@ -179,7 +179,7 @@ namespace Siotrix.Discord.Moderation
             await role.ModifyAsync(x => x.Name = newname).ConfigureAwait(false);
             await ReplyAsync(
                 string.Format("Successfully changed the name of `{0}` to `{1}`.", role.FormatRole(), newname),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("changerolecolor")]
@@ -192,7 +192,7 @@ namespace Siotrix.Discord.Moderation
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             var currentColor = role.Color;
             var regexColorCode = new Regex("^#[A-Fa-f0-9]{6}$");
-            var regexRGBCode =
+            var regexRgbCode =
                 new Regex(
                     "^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
             var currentHexColor = currentColor.ToString();
@@ -205,7 +205,7 @@ namespace Siotrix.Discord.Moderation
 
             await ReplyAsync(
                 $"Give me any value of color (Hex, RGB, or a name) to set the color for the role: {role.Name} (Example Hex: #FF43A4).\nYour Current Hex Code is: {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
-            var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            var response = await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
 
             if (response.Content == "cancel")
             {
@@ -225,7 +225,7 @@ namespace Siotrix.Discord.Moderation
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
 
-                var rgbvalue = HextoRGB.HexadecimalToRGB(currentHexColor); // convert hex to an RGB value
+                var rgbvalue = HextoRgb.HexadecimalToRgb(currentHexColor); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
                 var blue = Convert.ToString(rgbvalue.B); // Blue property  
@@ -263,7 +263,7 @@ namespace Siotrix.Discord.Moderation
 
                 var hexcolor = colorchoice.ToUpper();
 
-                var rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convert hex to an RGB value
+                var rgbvalue = HextoRgb.HexadecimalToRgb(colorchoice); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
                 var blue = Convert.ToString(rgbvalue.B); // Blue property  
@@ -291,7 +291,7 @@ namespace Siotrix.Discord.Moderation
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colorchoice);
 
-                var rgbvalue = HextoRGB.HexadecimalToRGB(cleanhex); // convert hex to RGB value
+                var rgbvalue = HextoRgb.HexadecimalToRgb(cleanhex); // convert hex to RGB value
 
                 if (colorname == "Black")
                 {
@@ -305,17 +305,17 @@ namespace Siotrix.Discord.Moderation
                 var embed = GetEmbed(role, colorname, colorname, cleanhex, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
-            else if (regexRGBCode.IsMatch(colorchoice))
+            else if (regexRgbCode.IsMatch(colorchoice))
             {
                 var str = colorchoice.Split(new[] {',', ' '},
                     StringSplitOptions.RemoveEmptyEntries); // Split up string of numbers into Red/Green/Blue
                 var red = int.Parse(str[0]); //convert to red int
                 var green = int.Parse(str[1]); //convert to green int
                 var blue = int.Parse(str[2]); // convery to blue int
-                var data = new RGBtoHex.RGB((byte) red, (byte) green,
+                var data = new RgBtoHex.Rgb((byte) red, (byte) green,
                     (byte) blue); // convert broken out ints into a data struct - prep for conversion
 
-                var colorhex = RGBtoHex.RGBToHexadecimal(data); // convert RGB input into hex           
+                var colorhex = RgBtoHex.RgbToHexadecimal(data); // convert RGB input into hex           
 
                 if (!regexColorCode.IsMatch(colorhex))
                 {
@@ -324,7 +324,7 @@ namespace Siotrix.Discord.Moderation
                     var r = (byte) red;
                     var g = (byte) green;
                     var b = (byte) blue;
-                    var rgbvalue = new HextoRGB.RGB(r, g, b);
+                    var rgbvalue = new HextoRgb.Rgb(r, g, b);
                     var embed = GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
@@ -344,7 +344,7 @@ namespace Siotrix.Discord.Moderation
                     var text = new CultureInfo("en-US").TextInfo;
                     var colorname = text.ToTitleCase(colornamelower);
 
-                    var rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
+                    var rgbvalue = HextoRgb.HexadecimalToRgb(colorhex);
 
                     if (colorname == "Black")
                     {
@@ -376,7 +376,7 @@ namespace Siotrix.Discord.Moderation
             await role.ModifyAsync(x => x.Hoist = !role.IsHoisted).ConfigureAwait(false);
             await ReplyAsync(
                 string.Format("Successfully {0} `{1}`.", role.IsHoisted ? "de-hoisted" : "hoisted", role.FormatRole()),
-                deleteAfter: SiotrixConstants.WAIT_TIME);
+                deleteAfter: SiotrixConstants.WaitTime);
         }
 
         [Command("changerolemention")]
@@ -390,18 +390,18 @@ namespace Siotrix.Discord.Moderation
             await role.ModifyAsync(x => x.Mentionable = !role.IsMentionable).ConfigureAwait(false);
             await ReplyAsync(
                 string.Format("Successfully made `{0}` {1}.", role.FormatRole(),
-                    role.IsMentionable ? "unmentionable" : "mentionable"), deleteAfter: SiotrixConstants.WAIT_TIME);
+                    role.IsMentionable ? "unmentionable" : "mentionable"), deleteAfter: SiotrixConstants.WaitTime);
         }
 
         private EmbedBuilder GetEmbed(IRole role, string colorchoice, string colorname, string colorhex,
-            HextoRGB.RGB rgbvalue)
+            HextoRgb.Rgb rgbvalue)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property
             var blue = Convert.ToString(rgbvalue.B); // Blue property

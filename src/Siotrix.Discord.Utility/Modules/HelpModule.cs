@@ -23,20 +23,20 @@ namespace Siotrix.Discord.Utility
 
         private string GetModuleNames()
         {
-            var modules_text = "";
-            var modules = _service.Modules.Where(x => !x.Name.ICEquals("default")).GroupBy(p => p.Name).ToList();
+            var modulesText = "";
+            var modules = _service.Modules.Where(x => !x.Name.IcEquals("default")).GroupBy(p => p.Name).ToList();
             if (modules.Any())
             {
                 foreach (var module in modules)
                 {
                     var tmptxt = $"`` {module.First().Name} `` , ";
-                    modules_text += tmptxt;
+                    modulesText += tmptxt;
                 }
 
-                if (modules_text.TrimEnd().EndsWith(","))
-                    modules_text = modules_text.Truncate(2);
+                if (modulesText.TrimEnd().EndsWith(","))
+                    modulesText = modulesText.Truncate(2);
             }
-            return modules_text;
+            return modulesText;
         }
 
 
@@ -45,24 +45,24 @@ namespace Siotrix.Discord.Utility
         [Remarks(" - no argument needed.")]
         public async Task Help()
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var module_list = GetModuleNames();
-            var g_footer = Context.GetGuildFooter();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var moduleList = GetModuleNames();
+            var gFooter = Context.GetGuildFooter();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
             builder
@@ -70,7 +70,7 @@ namespace Siotrix.Discord.Utility
                 {
                     IsInline = true,
                     Name = Format.Underline("Modules"),
-                    Value = module_list
+                    Value = moduleList
                 });
             await ReplyAsync("", embed: builder);
         }
@@ -80,49 +80,49 @@ namespace Siotrix.Discord.Utility
         [Remarks(" [module] or [command name]")]
         public async Task Help(string predicate)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            string group_commands = null;
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            string groupCommands = null;
             string commands = null;
-            var g_prefix = Context.GetGuildPrefix();
-            string sub_commands = null;
+            var gPrefix = Context.GetGuildPrefix();
+            string subCommands = null;
             string summary = null;
             string remark = null;
-            var has_group = false;
-            string element_summary_remark_list = null;
-            var buffer_data = "";
-            var element_index = 0;
-            var unname_command_index = 0;
-            string unname_commmand_summary_remark_list = null;
+            var hasGroup = false;
+            string elementSummaryRemarkList = null;
+            var bufferData = "";
+            var elementIndex = 0;
+            var unnameCommandIndex = 0;
+            string unnameCommmandSummaryRemarkList = null;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
-            var isMod = _service.Modules.Any(x => x.Name.ICEquals(predicate));
-            var isCommand = _service.Commands.Any(x => x.Name.ICEquals(predicate));
+            var isMod = _service.Modules.Any(x => x.Name.IcEquals(predicate));
+            var isCommand = _service.Commands.Any(x => x.Name.IcEquals(predicate));
 
             if (isMod && !isCommand)
             {
-                var modules = _service.Modules.Where(x => x.Name.ICEquals(predicate));
+                var modules = _service.Modules.Where(x => x.Name.IcEquals(predicate));
                 Console.WriteLine(">>>>>>>>>>{0}======={1}------{2}", isMod, isCommand, modules.Count());
                 foreach (var module in modules)
                 {
-                    var is_group = module.Aliases.First().Any();
-                    if (is_group)
-                        group_commands += $"**• {module.Aliases.First()}**" + $" - {module.Summary}\n";
+                    var isGroup = module.Aliases.First().Any();
+                    if (isGroup)
+                        groupCommands += $"**• {module.Aliases.First()}**" + $" - {module.Summary}\n";
                     else
                         foreach (var cmd in module.Commands.GroupBy(p => p.Name))
                             commands += $"`` {cmd.First().Name} ``" + " , ";
@@ -131,12 +131,12 @@ namespace Siotrix.Discord.Utility
                 if (commands.TrimEnd().EndsWith(","))
                     commands = commands.Truncate(2);
 
-                if (group_commands != null)
+                if (groupCommands != null)
                     builder
                         .AddField(x =>
                         {
                             x.Name = Format.Underline("- Group Commands :");
-                            x.Value = $"{group_commands}";
+                            x.Value = $"{groupCommands}";
                         });
                 builder
                     .AddField(x =>
@@ -148,37 +148,37 @@ namespace Siotrix.Discord.Utility
             else if (!isMod && isCommand)
             {
                 Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
-                var command = _service.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
-                has_group = command.Module.Aliases.First().Any();
-                var group_name = command.Module.Aliases.First() + " ";
+                var command = _service.Commands.Where(x => x.Name.IcEquals(predicate)).FirstOrDefault();
+                hasGroup = command.Module.Aliases.First().Any();
+                var groupName = command.Module.Aliases.First() + " ";
                 var list = command.Module.Commands.Where(p => p.Name.Equals(predicate)).ToList();
                 if (list.Count > 1)
                 {
                     foreach (var ele in list)
                     {
-                        element_index++;
-                        var cmd_name = ele.Name + " ";
-                        if (!has_group)
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {g_prefix}{cmd_name}{ele.Remarks}```\n";
+                        elementIndex++;
+                        var cmdName = ele.Name + " ";
+                        if (!hasGroup)
+                            elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
+                                                           $"```Usage : {gPrefix}{cmdName}{ele.Remarks}```\n";
                         else
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {g_prefix}{group_name}{cmd_name}{ele.Remarks}```\n";
+                            elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
+                                                           $"```Usage : {gPrefix}{groupName}{cmdName}{ele.Remarks}```\n";
                     }
                     builder
                         .AddField(x =>
                         {
                             x.Name = Format.Underline($"{command.Name}");
-                            x.Value = $"{element_summary_remark_list}";
+                            x.Value = $"{elementSummaryRemarkList}";
                         });
                 }
                 else
                 {
                     summary = $"**{command.Summary}**";
-                    if (!has_group)
-                        remark = $"```Usage : {g_prefix}{command.Name} {command.Remarks}```";
+                    if (!hasGroup)
+                        remark = $"```Usage : {gPrefix}{command.Name} {command.Remarks}```";
                     else
-                        remark = $"```Usage : {g_prefix}{group_name}{command.Name} {command.Remarks}```";
+                        remark = $"```Usage : {gPrefix}{groupName}{command.Name} {command.Remarks}```";
                     builder
                         .AddField(x =>
                         {
@@ -191,57 +191,57 @@ namespace Siotrix.Discord.Utility
             {
                 foreach (var item in _service.Modules)
                 {
-                    var exist_group = item.Aliases.First().Any();
-                    if (!exist_group)
+                    var existGroup = item.Aliases.First().Any();
+                    if (!existGroup)
                     {
                     }
                     else
                     {
-                        if (predicate.ICEquals(item.Aliases.First()))
-                            foreach (var sub_cmd in item.Commands)
+                        if (predicate.IcEquals(item.Aliases.First()))
+                            foreach (var subCmd in item.Commands)
                                 //Console.WriteLine("======{0}", sub_cmd.Name);
-                                if (!buffer_data.Equals(sub_cmd.Name))
+                                if (!bufferData.Equals(subCmd.Name))
                                 {
-                                    if (sub_cmd.Name.Length > 5)
+                                    if (subCmd.Name.Length > 5)
                                     {
-                                        var reverse_command_name =
-                                            new string(sub_cmd.Name.ToArray().Reverse().ToArray());
-                                        if (reverse_command_name.Substring(0, 5).Equals("cnysA"))
+                                        var reverseCommandName =
+                                            new string(subCmd.Name.ToArray().Reverse().ToArray());
+                                        if (reverseCommandName.Substring(0, 5).Equals("cnysA"))
                                         {
                                             //Console.WriteLine("~~~~~~~~{0}", sub_cmd.Aliases.First().ToString());
-                                            unname_command_index++;
-                                            unname_commmand_summary_remark_list +=
-                                                $"[Option - {unname_command_index}] " + $"**{sub_cmd.Summary}**\n" +
-                                                $"```Usage : {g_prefix}{sub_cmd.Aliases.First()} {sub_cmd.Remarks}```\n";
+                                            unnameCommandIndex++;
+                                            unnameCommmandSummaryRemarkList +=
+                                                $"[Option - {unnameCommandIndex}] " + $"**{subCmd.Summary}**\n" +
+                                                $"```Usage : {gPrefix}{subCmd.Aliases.First()} {subCmd.Remarks}```\n";
                                             continue;
                                         }
                                     }
-                                    buffer_data = sub_cmd.Name;
-                                    sub_commands += $"``{buffer_data}``" + " , ";
+                                    bufferData = subCmd.Name;
+                                    subCommands += $"``{bufferData}``" + " , ";
                                 }
                     }
                 }
 
-                if (sub_commands == null)
+                if (subCommands == null)
                 {
-                    if (unname_commmand_summary_remark_list != null)
-                        sub_commands = unname_commmand_summary_remark_list;
+                    if (unnameCommmandSummaryRemarkList != null)
+                        subCommands = unnameCommmandSummaryRemarkList;
                     else
-                        sub_commands = "No help data!";
+                        subCommands = "No help data!";
                 }
                 else
                 {
-                    if (sub_commands.TrimEnd().EndsWith(","))
-                        sub_commands = sub_commands.Truncate(2);
-                    if (unname_commmand_summary_remark_list != null)
-                        sub_commands += "\n" + unname_commmand_summary_remark_list;
+                    if (subCommands.TrimEnd().EndsWith(","))
+                        subCommands = subCommands.Truncate(2);
+                    if (unnameCommmandSummaryRemarkList != null)
+                        subCommands += "\n" + unnameCommmandSummaryRemarkList;
                 }
 
                 builder
                     .AddField(x =>
                     {
                         x.Name = Format.Underline($"{predicate}");
-                        x.Value = $"{sub_commands}";
+                        x.Value = $"{subCommands}";
                     });
             }
             await ReplyAsync("", embed: builder);

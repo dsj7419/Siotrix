@@ -8,13 +8,13 @@ namespace Siotrix.Discord
     {
         public static string GetGuildIconUrl(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
+            var guildId = context.Guild.Id;
             string iconurl = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gavatars.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                         iconurl = db.Authors.First().AuthorIcon;
                     else

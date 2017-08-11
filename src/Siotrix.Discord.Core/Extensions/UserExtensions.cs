@@ -26,7 +26,7 @@ namespace Siotrix.Discord
             var created = guildUser.CreatedAt.UtcDateTime;
             var joined = guildUser.JoinedAt.Value.UtcDateTime;
 
-            var IDstr = string.Format("**ID:** `{0}`", guildUser.Id);
+            var dstr = string.Format("**ID:** `{0}`", guildUser.Id);
             var nicknameStr = string.Format("**Nickname:** `{0}`",
                 string.IsNullOrWhiteSpace(guildUser.Nickname)
                     ? "NO NICKNAME"
@@ -37,10 +37,10 @@ namespace Siotrix.Discord
                 DateTimeExtensions.FormatDateTime(guildUser.JoinedAt.Value.UtcDateTime), users.IndexOf(guildUser) + 1);
             var gameStr = FormatGameStr(guildUser);
             var statusStr = string.Format("**Online status:** `{0}`", guildUser.Status);
-            var description = string.Join("\n", IDstr, nicknameStr, createdStr, joinedStr, gameStr, statusStr);
+            var description = string.Join("\n", dstr, nicknameStr, createdStr, joinedStr, gameStr, statusStr);
 
             var color = roles.OrderBy(x => x.Position).LastOrDefault(x => x.Color.RawValue != 0)?.Color;
-            var embed = EmbedExtensions.MakeNewEmbed(null, description, color, thumbnailURL: user.GetAvatarUrl());
+            var embed = EmbedExtensions.MakeNewEmbed(null, description, color, thumbnailUrl: user.GetAvatarUrl());
             if (channels.Count() != 0)
                 embed.AddField("Channels", string.Join(", ", channels));
             if (roles.Count() != 0)
@@ -65,21 +65,21 @@ namespace Siotrix.Discord
             var statusStr = string.Format("**Online status:** `{0}`", user.Status);
             var description = string.Join("\n", ageStr, gameStr, statusStr);
 
-            var embed = EmbedExtensions.MakeNewEmbed(null, description, null, thumbnailURL: user.GetAvatarUrl());
+            var embed = EmbedExtensions.MakeNewEmbed(null, description, null, thumbnailUrl: user.GetAvatarUrl());
             embed.WithAuthor(user.FormatUser(), user.GetAvatarUrl(), user.GetAvatarUrl());
             embed.WithFooter("User Info");
             return embed;
         }
 
-        public static string FormatUser(this IUser user, ulong? userID = 0)
+        public static string FormatUser(this IUser user, ulong? userId = 0)
         {
             if (user != null)
                 return string.Format("'{0}#{1}' ({2})",
                     MessageExtensions.EscapeMarkdown(user.Username, true)
-                        .CaseInsReplace("discord.gg", SiotrixConstants.FAKE_DISCORD_LINK),
+                        .CaseInsReplace("discord.gg", SiotrixConstants.FakeDiscordLink),
                     user.Discriminator,
                     user.Id);
-            return string.Format("Irretrievable User ({0})", userID);
+            return string.Format("Irretrievable User ({0})", userId);
         }
 
         public static string FormatGameStr(IUser user)

@@ -13,20 +13,20 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
     {
-        private readonly string[] bad_words = {"shit", "fuck", "nigger", "rape", "sex", "coon"};
+        private readonly string[] _badWords = {"shit", "fuck", "nigger", "rape", "sex", "coon"};
 
-        private bool SaveAndUpdateFilterWord(string word, long guild_id)
+        private bool SaveAndUpdateFilterWord(string word, long guildId)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guild_id && x.Word.Equals(word));
+                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId && x.Word.Equals(word));
                     if (!result.Any())
                     {
                         var record = new DiscordGuildFilterList();
-                        record.GuildId = guild_id;
+                        record.GuildId = guildId;
                         record.Word = word;
                         db.Gfilterlists.Add(record);
                     }
@@ -37,47 +37,47 @@ namespace Siotrix.Discord.Moderation
                         db.Gfilterlists.Update(data);
                     }
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
-        private bool ImportFilterWord(string[] words, long guild_id)
+        private bool ImportFilterWord(string[] words, long guildId)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
+                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId);
                     if (result.Any())
                         db.Gfilterlists.RemoveRange(result);
                     foreach (var word in words)
                     {
                         var record = new DiscordGuildFilterList();
-                        record.GuildId = guild_id;
+                        record.GuildId = guildId;
                         record.Word = word;
                         db.Gfilterlists.Add(record);
                     }
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
         private bool RemoveFilterWord(string word, long guildId)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -86,7 +86,7 @@ namespace Siotrix.Discord.Moderation
                     if (result.Any())
                     {
                         db.Gfilterlists.RemoveRange(result);
-                        is_success = true;
+                        isSuccess = true;
                     }
                     db.SaveChanges();
                 }
@@ -95,21 +95,21 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
-        private bool DeleteAllFilterWords(long guild_id)
+        private bool DeleteAllFilterWords(long guildId)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
+                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId);
                     if (result.Any())
                     {
                         db.Gfilterlists.RemoveRange(result);
-                        is_success = true;
+                        isSuccess = true;
                     }
                     db.SaveChanges();
                 }
@@ -118,7 +118,7 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
         [Command]
@@ -136,7 +136,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = SaveAndUpdateFilterWord(word, Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("remove")]
@@ -146,7 +146,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = RemoveFilterWord(word, Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
             else
                 await ReplyAsync("📣 : Not Found like that word!");
         }
@@ -161,7 +161,7 @@ namespace Siotrix.Discord.Moderation
             var response = await WaitForMessage(Context.Message.Author, Context.Channel);
             if (response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
             {
-                var success = ImportFilterWord(bad_words, Context.Guild.Id.ToLong());
+                var success = ImportFilterWord(_badWords, Context.Guild.Id.ToLong());
                 if (success)
                     await ReplyAsync("📣 : Siotrix imports filter and confirms with user.");
             }

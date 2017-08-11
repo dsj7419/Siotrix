@@ -19,11 +19,11 @@ namespace Siotrix.Discord
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class MinPermissionsAttribute : PreconditionAttribute
     {
-        private readonly AccessLevel Level;
+        private readonly AccessLevel _level;
 
         public MinPermissionsAttribute(AccessLevel level)
         {
-            Level = level;
+            _level = level;
         }
 
         public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command,
@@ -31,7 +31,7 @@ namespace Siotrix.Discord
         {
             var access = GetPermission(context); // Get the acccesslevel for this context
 
-            if (access >= Level) // If the user's access level is greater than the required level, return success.
+            if (access >= _level) // If the user's access level is greater than the required level, return success.
                 return Task.FromResult(PreconditionResult.FromSuccess());
             return Task.FromResult(PreconditionResult.FromError("Insufficient permissions."));
         }

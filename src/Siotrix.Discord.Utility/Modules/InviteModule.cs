@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Utility
         public async Task Invite()
         {
             var application = await Context.Client.GetApplicationInfoAsync();
-            await ReplyAsync($"Invite me to your server at:{Environment.NewLine}<{SiotrixConstants.BOT_INVITE}>");
+            await ReplyAsync($"Invite me to your server at:{Environment.NewLine}<{SiotrixConstants.BotInvite}>");
         }
     }
 }

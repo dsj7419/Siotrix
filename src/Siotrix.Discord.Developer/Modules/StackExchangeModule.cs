@@ -11,7 +11,7 @@ namespace Siotrix.Discord.Developer
     [Summary("Query any site from Stack Exchange.")]
     public class StackExchangeModule : ModuleBase<SocketCommandContext>
     {
-        private readonly string token = Configuration.Load().Tokens.StackoverflowToken;
+        private readonly string _token = Configuration.Load().Tokens.StackoverflowToken;
 
         [Command("stack")]
         [Summary("Returns top results from a Stack Exchange site.")]
@@ -46,13 +46,13 @@ namespace Siotrix.Discord.Developer
             if (tags == null)
                 tags = "c#";
 
-            var response = await new StackExchangeService().GetStackExchangeResultsAsync(token, phrase, site, tags);
+            var response = await new StackExchangeService().GetStackExchangeResultsAsync(_token, phrase, site, tags);
             var filteredRes = response.Items.Where(x => x.Tags.Contains(tags));
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             foreach (var res in filteredRes.Take(3))
             {
                 var builder = new EmbedBuilder()
-                    .WithColor(g_color)
+                    .WithColor(gColor)
                     .WithTitle($"{res.Score}: {WebUtility.HtmlDecode(res.Title)}")
                     .WithUrl(res.Link);
 
@@ -61,7 +61,7 @@ namespace Siotrix.Discord.Developer
             }
 
             var footer = new EmbedBuilder()
-                .WithColor(g_color)
+                .WithColor(gColor)
                 .WithFooter(
                     new EmbedFooterBuilder().WithText($"tags: {tags} | site: {site}. [site=stackexchange tags=c#]"));
             footer.Build();

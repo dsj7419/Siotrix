@@ -24,13 +24,13 @@ namespace Siotrix.Discord.Utility
 
         private string GetGuildIconUrl(int id)
         {
-            var guild_id = Context.Guild.Id;
+            var guildId = Context.Guild.Id;
             string iconurl = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gavatars.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gavatars.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0 || id == 2)
                         iconurl = db.Authors.First().AuthorIcon;
                     else
@@ -50,22 +50,22 @@ namespace Siotrix.Discord.Utility
         [Remarks(" - no additional argument needed")]
         public Task PerformanceAsync()
         {
-            var g_color = Context.GetGuildColor();
-            var g_icon_url = GetGuildIconUrl(0);
-            var g_thumbnail = Context.GetGuildThumbNail();
+            var gColor = Context.GetGuildColor();
+            var gIconUrl = GetGuildIconUrl(0);
+            var gThumbnail = Context.GetGuildThumbNail();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
+                    .WithIconUrl(gIconUrl)
                     .WithName("Performance Summary for Siotrix Bot")
-                    .WithUrl(SiotrixConstants.BOT_INVITE))
+                    .WithUrl(SiotrixConstants.BotInvite))
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(Context.User.GetAvatarUrl())
                     .WithText($"{Context.User.Username}#{Context.User.Discriminator}"))
                 .WithTimestamp(DateTime.UtcNow);
 
-            builder.Color = g_color;
-            builder.ThumbnailUrl = g_thumbnail;
+            builder.Color = gColor;
+            builder.ThumbnailUrl = gThumbnail;
 
             var desc = $"**Uptime:** {GetUptime()}\n" +
                        $"**Library:** {GetLibrary()}\n" +
@@ -74,7 +74,7 @@ namespace Siotrix.Discord.Utility
                        $"**Memory Usage:** {GetMemoryUsage()}\n" +
                        $"**Threads Running:** {GetThreads()}\n" +
                        $"**Latency:** {GetLatency()}\n\n" +
-                       $"**Siotrix Official Discord:** " + SiotrixConstants.DISCORD_INV;
+                       $"**Siotrix Official Discord:** " + SiotrixConstants.DiscordInv;
 
             builder.Description = desc;
             return ReplyAsync("", embed: builder);

@@ -8,24 +8,24 @@ namespace Siotrix.Discord
     {
         public static string GetGuildThumbNail(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
-            string thumbnail_url = null;
+            var guildId = context.Guild.Id;
+            string thumbnailUrl = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gthumbnails.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gthumbnails.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
-                        thumbnail_url = SiotrixConstants.BOT_LOGO;
+                        thumbnailUrl = SiotrixConstants.BotLogo;
                     else
-                        thumbnail_url = val.First().ThumbNail;
+                        thumbnailUrl = val.First().ThumbNail;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return thumbnail_url;
+            return thumbnailUrl;
         }
     }
 }

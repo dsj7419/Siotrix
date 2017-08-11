@@ -14,7 +14,7 @@ namespace Siotrix.Discord.Moderation
     {
         private bool SaveAndUpdateSpamData(int option, int num)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -36,21 +36,21 @@ namespace Siotrix.Discord.Moderation
                         db.Gspams.Update(data);
                     }
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
-        private string GetSpamData(long guild_id)
+        private string GetSpamData(long guildId)
         {
             string data = null;
             string list = null;
-            string spam_value = null;
+            string spamValue = null;
             using (var db = new LogDatabase())
             {
                 try
@@ -64,32 +64,32 @@ namespace Siotrix.Discord.Moderation
                             {
                                 case 1:
                                     data = "Repeat spam warning";
-                                    spam_value = item.SpamValue.ToString();
+                                    spamValue = item.SpamValue.ToString();
                                     break;
                                 case 2:
                                     data = "Repeat spam mute";
-                                    spam_value = item.SpamValue.ToString();
+                                    spamValue = item.SpamValue.ToString();
                                     break;
                                 case 3:
                                     data = "Spam Mute Time";
                                     var time1 = TimeSpan.FromMinutes(item.SpamValue);
-                                    spam_value = string.Format("{0}{1}{2}",
+                                    spamValue = string.Format("{0}{1}{2}",
                                         time1.Days > 0 ? time1.Days + " days " : null,
                                         time1.Hours > 0 ? time1.Hours + " hours " : null,
                                         time1.Minutes > 0 ? time1.Minutes + " minutes " : null);
                                     break;
                                 case 4:
                                     data = "Caps spam warning";
-                                    spam_value = item.SpamValue.ToString();
+                                    spamValue = item.SpamValue.ToString();
                                     break;
                                 case 5:
                                     data = "Repeat Caps mute";
-                                    spam_value = item.SpamValue.ToString();
+                                    spamValue = item.SpamValue.ToString();
                                     break;
                                 case 6:
                                     data = "Caps Mute Time";
                                     var time2 = TimeSpan.FromMinutes(item.SpamValue);
-                                    spam_value = string.Format("{0}{1}{2}",
+                                    spamValue = string.Format("{0}{1}{2}",
                                         time2.Days > 0 ? time2.Days + " days " : null,
                                         time2.Hours > 0 ? time2.Hours + " hours " : null,
                                         time2.Minutes > 0 ? time2.Minutes + " minutes " : null);
@@ -97,7 +97,7 @@ namespace Siotrix.Discord.Moderation
                                 default:
                                     break;
                             }
-                            list += "``" + data + "``" + " : **" + spam_value + "**\n";
+                            list += "``" + data + "``" + " : **" + spamValue + "**\n";
                         }
                 }
                 catch (Exception e)
@@ -115,22 +115,22 @@ namespace Siotrix.Discord.Moderation
         public async Task GetSpamsAsync()
         {
             var value = GetSpamData(Context.Guild.Id.ToLong());
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(g_thumbnail)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
                 .AddField(x =>
@@ -183,7 +183,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         /*[Command("makemute repeatspam")]
@@ -228,7 +228,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         /*[Command("mutetime repeatspam")]
@@ -276,7 +276,7 @@ namespace Siotrix.Discord.Moderation
                     break;
             }
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
         }
     }
 }

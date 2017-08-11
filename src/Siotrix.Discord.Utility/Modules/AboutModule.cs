@@ -20,15 +20,15 @@ namespace Siotrix.Discord.Utility
                 _specialThanks.Add(285790360804786186,
                     "");
 
-            var g_prefix = Context.GetGuildPrefix();
+            var gPrefix = Context.GetGuildPrefix();
             var message =
                 $"A little bit about Siotrx! Siotrix is a discord bot written in C# by {Context.Client.GetUser(173905004661309441).Username}.\n" +
                 $"I was created because a lot of the larger bots seem to miss having a personal touch for each guild. The goal was to make a\n" +
                 $"bot with all of the great features you love in discord bots, but give it the flexibility to be custom tailored just for your guild!\n" +
-                $"Please use the command **{g_prefix}help** to see the features I can offer!\n\n" +
+                $"Please use the command **{gPrefix}help** to see the features I can offer!\n\n" +
                 $"I'd love all the help I can get, and bugreports/sugestions are always welcome! you can DM {Context.Client.GetUser(173905004661309441).Username} anytime!\n\n" +
-                $"Support server: <{SiotrixConstants.DISCORD_INV}>\n" +
-                $"My patreon page: <{SiotrixConstants.BOT_DONATE}>\n\n" +
+                $"Support server: <{SiotrixConstants.DiscordInv}>\n" +
+                $"My patreon page: <{SiotrixConstants.BotDonate}>\n\n" +
                 ":sparkles: **Special Thanks** :sparkles:\n";
             var count = 1;
             foreach (var thanks in _specialThanks)

@@ -8,13 +8,13 @@ namespace Siotrix.Discord
     {
         public static string[] GetGuildFooter(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
+            var guildId = context.Guild.Id;
             var footer = new string[2];
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gfooters.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gfooters.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
                         footer[0] = db.Bfooters.First().FooterIcon;

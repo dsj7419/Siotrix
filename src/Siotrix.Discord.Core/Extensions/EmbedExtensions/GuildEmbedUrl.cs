@@ -8,13 +8,13 @@ namespace Siotrix.Discord
     {
         public static string GetGuildUrl(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
+            var guildId = context.Guild.Id;
             string url = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gwebsiteurls.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gwebsiteurls.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                         url = db.Authors.First().AuthorUrl;
                     else

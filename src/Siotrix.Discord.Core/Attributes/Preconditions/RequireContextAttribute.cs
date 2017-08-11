@@ -9,7 +9,7 @@ namespace Siotrix.Discord
     public enum ContextType
     {
         Guild = 0x01,
-        DM = 0x02,
+        Dm = 0x02,
         Group = 0x04
     }
 
@@ -31,7 +31,7 @@ namespace Siotrix.Discord
 
             if ((Contexts & ContextType.Guild) != 0)
                 isValid = isValid || context.Channel is IGuildChannel;
-            if ((Contexts & ContextType.DM) != 0)
+            if ((Contexts & ContextType.Dm) != 0)
                 isValid = isValid || context.Channel is IDMChannel;
             if ((Contexts & ContextType.Group) != 0)
                 isValid = isValid || context.Channel is IGroupChannel;

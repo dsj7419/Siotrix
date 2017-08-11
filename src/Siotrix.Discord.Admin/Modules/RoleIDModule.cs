@@ -7,7 +7,7 @@ using Discord.Commands;
 namespace Siotrix.Discord.Admin
 {
     [Name("Admin")]
-    public class RoleIDModule : ModuleBase<SocketCommandContext>
+    public class RoleIdModule : ModuleBase<SocketCommandContext>
     {
         [Command("RoleIDs")]
         [Summary("Gets the ID of all roles in the guild.")]
@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task RoleIDs()
         {
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             /*  string message = null;
               foreach (var role in Context.Guild.Roles)
                   message += $"{role.Name}: {role.Id}\n";
@@ -28,7 +28,7 @@ namespace Siotrix.Discord.Admin
             {
                 var eb = new EmbedBuilder
                 {
-                    Color = g_color,
+                    Color = gColor,
                     Title = $"Roles in {Context.Guild.Name}",
                     Footer = new EmbedFooterBuilder
                     {

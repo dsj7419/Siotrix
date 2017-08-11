@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Utility
         [MinPermissions(AccessLevel.User)]
         public async Task BugAsync([Remainder] string message)
         {
-            var suggestionChannel = Context.Client.GetChannel(SiotrixConstants.BUG_CHANNEL) as IMessageChannel;
+            var suggestionChannel = Context.Client.GetChannel(SiotrixConstants.BugChannel) as IMessageChannel;
 
             if (suggestionChannel == null)
             {

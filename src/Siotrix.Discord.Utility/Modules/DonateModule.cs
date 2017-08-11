@@ -15,7 +15,7 @@ namespace Siotrix.Discord.Utility
         public async Task Donate()
         {
             await ReplyAsync(
-                $"Siotrix is a community bot, and needs your help to support it. All proceeds go back into the bot 100% <{SiotrixConstants.BOT_DONATE}> **Thank You!!!**");
+                $"Siotrix is a community bot, and needs your help to support it. All proceeds go back into the bot 100% <{SiotrixConstants.BotDonate}> **Thank You!!!**");
         }
     }
 }

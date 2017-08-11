@@ -30,11 +30,11 @@ namespace Siotrix.Discord.Developer
         private static Image<Rgba32> _noBgMaskOverlay;
 
         private readonly Stopwatch _timer = new Stopwatch();
-        private readonly InteractiveService Interactive;
+        private readonly InteractiveService _interactive;
 
-        public DansTestModule(InteractiveService Inter)
+        public DansTestModule(InteractiveService inter)
         {
-            Interactive = Inter;
+            _interactive = inter;
         }
 
 
@@ -56,7 +56,7 @@ namespace Siotrix.Discord.Developer
         public async Task ImageTest()
         {
             await ReplyAsync("Give me the url of the image you would like to modify.");
-            var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            var response = await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
             if (response.Content == "cancel") return;
 
             var url = response.Content;
@@ -77,7 +77,7 @@ namespace Siotrix.Discord.Developer
             var stream = DownloadAsync(myUri, filename);
             await ReplyAsync(
                 $"Thank you, {Context.User.Username}! Now, let me know how you would like to manipulate this image (polaroid sepia blackwhite avatar");
-            var manipulate = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+            var manipulate = await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
             if (manipulate.Content == "cancel") return;
 
             if (manipulate.Content == "blackwhite")
@@ -338,7 +338,7 @@ namespace Siotrix.Discord.Developer
             }
         }
 
-        private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRGB.RGB rgbvalue)
+        private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRgb.Rgb rgbvalue)
         {
             _timer.Stop();
             var red = Convert.ToString(rgbvalue.R); // Red Property

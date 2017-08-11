@@ -388,13 +388,13 @@ namespace Siotrix.Discord.Moderation
                 //await MuteUser(user).ConfigureAwait(false); // no parameter
                 await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), (int) minutes, Context, false)
                     .ConfigureAwait(false);
-                var is_save = MuteExtensions.SaveMuteUser(user, (int) minutes);
-                if (is_save)
+                var isSave = MuteExtensions.SaveMuteUser(user, (int) minutes);
+                if (isSave)
                 {
-                    var case_id = Context.GetCaseNumber();
-                    await Context.Channel.SendMessageAsync("What is the reason for the mute? Case #" + case_id);
+                    var caseId = Context.GetCaseNumber();
+                    await Context.Channel.SendMessageAsync("What is the reason for the mute? Case #" + caseId);
 
-                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(),
+                    CaseExtensions.SaveCaseDataAsync("mute", caseId, user.Id.ToLong(), Context.Guild.Id.ToLong(),
                         ""); // add save in db
                     // Console.WriteLine("mute ========================={0}", case_id);
                 }
@@ -415,10 +415,10 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 await user.UnmuteUser(false, Context).ConfigureAwait(false);
-                var case_id = Context.GetCaseNumber();
-                await Context.Channel.SendMessageAsync("What is the reason for the unmute? Case #" + case_id);
+                var caseId = Context.GetCaseNumber();
+                await Context.Channel.SendMessageAsync("What is the reason for the unmute? Case #" + caseId);
 
-                CaseExtensions.SaveCaseDataAsync("unmute", case_id, user.Id.ToLong(), Context.Guild.Id.ToLong(),
+                CaseExtensions.SaveCaseDataAsync("unmute", caseId, user.Id.ToLong(), Context.Guild.Id.ToLong(),
                     ""); // add save in db
                 // Console.WriteLine("unmute ========================={0}", case_id);
             }
@@ -464,7 +464,7 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("mute list")]
@@ -475,22 +475,22 @@ namespace Siotrix.Discord.Moderation
         private async Task MuteList()
         {
             string users = null;
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(g_thumbnail)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
             using (var db = new LogDatabase())

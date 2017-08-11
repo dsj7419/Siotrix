@@ -11,7 +11,7 @@ namespace Siotrix.Discord.Moderation
     {
         private bool DeleteWarningUser(long userId, long guildId)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -20,7 +20,7 @@ namespace Siotrix.Discord.Moderation
                     if (result.Any())
                     {
                         db.Gwarningusers.RemoveRange(result);
-                        is_success = true;
+                        isSuccess = true;
                     }
                     db.SaveChanges();
                 }
@@ -29,7 +29,7 @@ namespace Siotrix.Discord.Moderation
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
         [Command("Forgive")]
@@ -40,7 +40,7 @@ namespace Siotrix.Discord.Moderation
         {
             var success = DeleteWarningUser(user.Id.ToLong(), Context.Guild.Id.ToLong());
             if (success)
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
             else
                 await ReplyAsync("That person is not found!");
         }

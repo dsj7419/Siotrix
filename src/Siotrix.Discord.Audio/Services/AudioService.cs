@@ -12,11 +12,11 @@ namespace Siotrix.Discord.Audio
             new ConcurrentDictionary<ulong, IAudioClient>();
 
         private FfmpegHandler _ffmpeg;
-        private YoutubeDLHandler _ytdl;
+        private YoutubeDlHandler _ytdl;
 
         public async Task StartAsync()
         {
-            _ytdl = new YoutubeDLHandler();
+            _ytdl = new YoutubeDlHandler();
             _ffmpeg = new FfmpegHandler();
 
             await _ytdl.EnsureUpdatedAsync();

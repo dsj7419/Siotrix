@@ -11,8 +11,8 @@ namespace Siotrix.Discord
 {
     public static class MessageExtensions
     {
-        public static int number_of_messages;
-        public static ulong userId;
+        public static int NumberOfMessages;
+        public static ulong UserId;
 
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos)
         {
@@ -44,12 +44,12 @@ namespace Siotrix.Discord
         }
 
         public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text,
-            Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            Func<Exception, Task> handler, bool isTts = false, Embed embed = null, RequestOptions options = null)
         {
             try
             {
                 if (text.Length < 2000)
-                    return await channel.SendMessageAsync(text, isTTS, embed, options);
+                    return await channel.SendMessageAsync(text, isTts, embed, options);
 
                 using (var ms = new MemoryStream())
                 {
@@ -60,7 +60,7 @@ namespace Siotrix.Discord
                     }
                     ms.Position = 0;
                     return await channel.SendFileAsync(ms, "Output.txt",
-                        $"I tried to send a message that was too long!", isTTS, options);
+                        $"I tried to send a message that was too long!", isTts, options);
                 }
             }
             catch (HttpException ex)
@@ -71,9 +71,9 @@ namespace Siotrix.Discord
         }
 
         public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text,
-            bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            bool isTts = false, Embed embed = null, RequestOptions options = null)
         {
-            return await channel.SendMessageSafeAsync(text, null, isTTS, embed, options);
+            return await channel.SendMessageSafeAsync(text, null, isTts, embed, options);
         }
 
         public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func,
@@ -95,14 +95,14 @@ namespace Siotrix.Discord
             await msg.ModifySafeAsync(func, null, options);
         }
 
-        public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTTS = false,
+        public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTts = false,
             Embed embed = null, RequestOptions options = null)
         {
             foreach (var channel in channels)
-                await SendMessageSafeAsync(channel, text, isTTS, embed, options);
+                await SendMessageSafeAsync(channel, text, isTts, embed, options);
         }
 
-        public static async Task DMUser(IUser user, string message = "", Embed embed = null)
+        public static async Task DmUser(IUser user, string message = "", Embed embed = null)
         {
             await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(message, embed: embed);
         }
@@ -114,8 +114,8 @@ namespace Siotrix.Discord
 
         public static async Task NumberOfCleanupMessages(int count, ulong user_id)
         {
-            number_of_messages = count;
-            userId = user_id;
+            NumberOfMessages = count;
+            UserId = user_id;
             await Task.Delay(0);
         }
 

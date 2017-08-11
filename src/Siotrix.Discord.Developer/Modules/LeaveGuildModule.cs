@@ -13,27 +13,27 @@ namespace Siotrix.Discord.Developer
     [MinPermissions(AccessLevel.BotOwner)]
     public class LeaveGuildModule : ModuleBase<SocketCommandContext>
     {
-        private bool SaveLeaveGuild(long guild_id, string reason, string guild_name)
+        private bool SaveLeaveGuild(long guildId, string reason, string guildName)
         {
-            var is_success = false;
+            var isSuccess = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var record = new DiscordBanGuildList();
-                    record.GuildId = guild_id;
+                    record.GuildId = guildId;
                     record.Reason = reason;
-                    record.GuildName = guild_name;
+                    record.GuildName = guildName;
                     db.Banguildlists.Add(record);
                     db.SaveChanges();
-                    is_success = true;
+                    isSuccess = true;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return is_success;
+            return isSuccess;
         }
 
         private string GetBanGuildList()
@@ -66,14 +66,14 @@ namespace Siotrix.Discord.Developer
             return list;
         }
 
-        private string DeleteLeaveGuild(long guild_id)
+        private string DeleteLeaveGuild(long guildId)
         {
             string reason = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Banguildlists.Where(x => x.GuildId == guild_id);
+                    var result = db.Banguildlists.Where(x => x.GuildId == guildId);
                     if (result.Any())
                     {
                         reason = result.First().Reason;
@@ -92,13 +92,13 @@ namespace Siotrix.Discord.Developer
         [Command("guildkick")]
         [Summary("Instructs the bot to leave a Guild specified by a developer.")]
         [Remarks("<GuildID> <text> - include a brief reason why you are making the bot quit that guild.")]
-        public async Task LeaveGuildAsync(ulong ID, [Remainder] string msg)
+        public async Task LeaveGuildAsync(ulong id, [Remainder] string msg)
         {
             if (string.IsNullOrWhiteSpace(msg))
                 throw new Exception("You must provide a reason!");
 
             var client = Context.Client;
-            var gld = Context.Client.GetGuild(ID) as IGuild;
+            var gld = Context.Client.GetGuild(id) as IGuild;
             var ch = await gld.GetDefaultChannelAsync();
 
             var embed = new EmbedBuilder();
@@ -108,8 +108,8 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = SiotrixConstants.BOT_AVATAR,
-                Url = SiotrixConstants.DISCORD_INV
+                IconUrl = SiotrixConstants.BotAvatar,
+                Url = SiotrixConstants.DiscordInv
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);
@@ -125,22 +125,22 @@ namespace Siotrix.Discord.Developer
         public async Task BanGuildAsync()
         {
             var list = GetBanGuildList();
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(g_thumbnail)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
                 .AddField(x =>
@@ -154,14 +154,14 @@ namespace Siotrix.Discord.Developer
         [Command("guildban")]
         [Summary("Bans bot from guild, and makes it quit immediately.")]
         [Remarks("<GuildID> <text> - brief description why the ban is happening.")]
-        public async Task BanGuildAsync(ulong ID, [Remainder] string msg)
+        public async Task BanGuildAsync(ulong id, [Remainder] string msg)
         {
             //TODO: Must do ban code for leaveguild command
             if (string.IsNullOrWhiteSpace(msg))
                 throw new Exception("You must provide a reason!");
 
             var client = Context.Client;
-            var gld = Context.Client.GetGuild(ID) as IGuild;
+            var gld = Context.Client.GetGuild(id) as IGuild;
             var ch = await gld.GetDefaultChannelAsync();
 
             var embed = new EmbedBuilder();
@@ -170,13 +170,13 @@ namespace Siotrix.Discord.Developer
             embed.Author = new EmbedAuthorBuilder
             {
                 Name = "Siotrix - click to join my discord!",
-                IconUrl = SiotrixConstants.BOT_AVATAR,
-                Url = SiotrixConstants.DISCORD_INV
+                IconUrl = SiotrixConstants.BotAvatar,
+                Url = SiotrixConstants.DiscordInv
             };
             await ch.SendMessageAsync("", embed: embed);
             await Task.Delay(5000);
             await gld.LeaveAsync();
-            var success = SaveLeaveGuild(ID.ToLong(), msg, gld.Name);
+            var success = SaveLeaveGuild(id.ToLong(), msg, gld.Name);
             if (success)
                 await ReplyAsync($"Message has been sent and I've left the guild forever! {gld.Name}");
         }
@@ -184,27 +184,27 @@ namespace Siotrix.Discord.Developer
         [Command("guildunban")]
         [Summary("Un-bans bot from guild, allowing guild to re-invite Siotrix.")]
         [Remarks("<Id> - ID number in the ban list of the guild you want to unban.")]
-        public async Task UnbanGuildAsync(ulong guild_id)
+        public async Task UnbanGuildAsync(ulong guildId)
         {
-            var reason = DeleteLeaveGuild(guild_id.ToLong());
+            var reason = DeleteLeaveGuild(guildId.ToLong());
             if (reason != null)
             {
-                var g_icon_url = Context.GetGuildIconUrl();
-                var g_name = Context.GetGuildName();
-                var g_url = Context.GetGuildUrl();
-                var g_thumbnail = Context.GetGuildThumbNail();
-                var g_footer = Context.GetGuildFooter();
-                var g_prefix = Context.GetGuildPrefix();
+                var gIconUrl = Context.GetGuildIconUrl();
+                var gName = Context.GetGuildName();
+                var gUrl = Context.GetGuildUrl();
+                var gThumbnail = Context.GetGuildThumbNail();
+                var gFooter = Context.GetGuildFooter();
+                var gPrefix = Context.GetGuildPrefix();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(g_icon_url)
-                        .WithName(g_name)
-                        .WithUrl(g_url))
+                        .WithIconUrl(gIconUrl)
+                        .WithName(gName)
+                        .WithUrl(gUrl))
                     .WithColor(new Color(255, 0, 0))
-                    .WithThumbnailUrl(g_thumbnail)
+                    .WithThumbnailUrl(gThumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(g_footer[0])
-                        .WithText(g_footer[1]))
+                        .WithIconUrl(gFooter[0])
+                        .WithText(gFooter[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 builder
                     .WithTitle("Unauthorized Guild")
@@ -216,7 +216,7 @@ namespace Siotrix.Discord.Developer
                     {
                         IsInline = true,
                         Name = Format.Underline("If you have questions, feel free to join our Discord at : "),
-                        Value = SiotrixConstants.DISCORD_INV
+                        Value = SiotrixConstants.DiscordInv
                     });
                 await ReplyAsync("", embed: builder);
             }

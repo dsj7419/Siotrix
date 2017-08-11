@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Audio
 {
-    public class YoutubeDLHandler
+    public class YoutubeDlHandler
     {
-        private readonly string appdir = AppContext.BaseDirectory;
+        private readonly string _appdir = AppContext.BaseDirectory;
 
         public Task EnsureUpdatedAsync()
         {
@@ -20,7 +20,7 @@ namespace Siotrix.Discord.Audio
         public Task<string> DownloadAsync(ulong guildId, string url)
         {
             var id = new Random().Next(1000, 1000000);
-            var pathpart = Path.Combine(appdir, $"cache/audio/{guildId}");
+            var pathpart = Path.Combine(_appdir, $"cache/audio/{guildId}");
             var filepart = $"{id}.mp3";
 
             if (!Directory.Exists(pathpart))
@@ -30,7 +30,7 @@ namespace Siotrix.Discord.Audio
 
             var process = Process.Start(new ProcessStartInfo
             {
-                FileName = Path.Combine(appdir, "youtube-dl.exe"),
+                FileName = Path.Combine(_appdir, "youtube-dl.exe"),
                 Arguments = $"-x -q --write-info-json --audio-format mp3 -o \"{path}\" \"{url}\"",
                 UseShellExecute = false
             });

@@ -23,7 +23,7 @@ namespace Siotrix.Discord
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _provider;
-        private int error;
+        private int _error;
 
         // public CommandHandler(DiscordSocketClient client, DependencyMap map)
         public CommandHandler(IServiceProvider provider)
@@ -92,9 +92,9 @@ namespace Siotrix.Discord
             {
                 try
                 {
-                    var is_found_cmd = db.Gtoggles
+                    var isFoundCmd = db.Gtoggles
                         .Where(p => p.CommandName.Equals(cmd) && p.GuildId.Equals(context.Guild.Id.ToLong())).Any();
-                    if (is_found_cmd)
+                    if (isFoundCmd)
                     {
                         val = "all";
                     }
@@ -118,45 +118,45 @@ namespace Siotrix.Discord
 
         private bool CheckInputData(string[] input)
         {
-            var first_param = input[0];
-            var is_found = _commands.Commands.Where(p => p.Name.Equals(first_param)).Any();
-            var is_group_found = _commands.Modules.Where(p => p.Aliases.First().Equals(first_param)).Any();
-            if (!is_found && !is_group_found)
+            var firstParam = input[0];
+            var isFound = _commands.Commands.Where(p => p.Name.Equals(firstParam)).Any();
+            var isGroupFound = _commands.Modules.Where(p => p.Aliases.First().Equals(firstParam)).Any();
+            if (!isFound && !isGroupFound)
                 return true;
             return false;
         }
 
         private string GetHelpModule()
         {
-            var modules_text = "";
-            var modules = _commands.Modules.Where(x => !x.Name.ICEquals("default")).GroupBy(p => p.Name).ToList();
+            var modulesText = "";
+            var modules = _commands.Modules.Where(x => !x.Name.IcEquals("default")).GroupBy(p => p.Name).ToList();
             if (modules.Any())
             {
                 foreach (var module in modules)
                 {
                     var tmptxt = $"`` {module.First().Name} `` , ";
-                    modules_text += tmptxt;
+                    modulesText += tmptxt;
                 }
 
-                if (modules_text.TrimEnd().EndsWith(","))
-                    modules_text = modules_text.Truncate(2);
+                if (modulesText.TrimEnd().EndsWith(","))
+                    modulesText = modulesText.Truncate(2);
             }
-            return modules_text;
+            return modulesText;
         }
 
         public EmbedBuilder GetCommandHelp(string predicate, EmbedBuilder builder, string prefix)
         {
             string commands = null;
-            string sub_commands = null;
+            string subCommands = null;
             string summary = null;
             string remark = null;
-            var has_group = false;
-            string element_summary_remark_list = null;
-            var buffer_data = "";
-            var element_index = 0;
+            var hasGroup = false;
+            string elementSummaryRemarkList = null;
+            var bufferData = "";
+            var elementIndex = 0;
 
-            var isMod = _commands.Modules.Any(x => x.Name.ICEquals(predicate));
-            var isCommand = _commands.Commands.Any(x => x.Name.ICEquals(predicate));
+            var isMod = _commands.Modules.Any(x => x.Name.IcEquals(predicate));
+            var isCommand = _commands.Commands.Any(x => x.Name.IcEquals(predicate));
 
             if (isMod && !isCommand)
             {
@@ -167,42 +167,42 @@ namespace Siotrix.Discord
                         x.Name = Format.Underline("Help");
                         x.Value = $"{commands}";
                     });
-                error = 2;
+                _error = 2;
             }
             else if (!isMod && isCommand)
             {
                 Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
-                var command = _commands.Commands.Where(x => x.Name.ICEquals(predicate)).FirstOrDefault();
-                has_group = command.Module.Aliases.First().Any();
-                var group_name = command.Module.Aliases.First() + " ";
+                var command = _commands.Commands.Where(x => x.Name.IcEquals(predicate)).FirstOrDefault();
+                hasGroup = command.Module.Aliases.First().Any();
+                var groupName = command.Module.Aliases.First() + " ";
                 var list = command.Module.Commands.Where(p => p.Name.Equals(predicate)).ToList();
                 if (list.Count > 1)
                 {
                     foreach (var ele in list)
                     {
-                        element_index++;
-                        var cmd_name = ele.Name + " ";
-                        if (!has_group)
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {prefix}{cmd_name} {ele.Remarks}```\n";
+                        elementIndex++;
+                        var cmdName = ele.Name + " ";
+                        if (!hasGroup)
+                            elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
+                                                           $"```Usage : {prefix}{cmdName} {ele.Remarks}```\n";
                         else
-                            element_summary_remark_list += $"[Option - {element_index}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {prefix}{group_name}{cmd_name} {ele.Remarks}```\n";
+                            elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
+                                                           $"```Usage : {prefix}{groupName}{cmdName} {ele.Remarks}```\n";
                     }
                     builder
                         .AddField(x =>
                         {
                             x.Name = Format.Underline($"{command.Name}");
-                            x.Value = $"{element_summary_remark_list}";
+                            x.Value = $"{elementSummaryRemarkList}";
                         });
                 }
                 else
                 {
                     summary = $"**{command.Summary}**";
-                    if (!has_group)
+                    if (!hasGroup)
                         remark = $"```Usage : {prefix}{command.Name} {command.Remarks}```";
                     else
-                        remark = $"```Usage : {prefix}{group_name}{command.Name} {command.Remarks}```";
+                        remark = $"```Usage : {prefix}{groupName}{command.Name} {command.Remarks}```";
                     builder
                         .AddField(x =>
                         {
@@ -210,34 +210,34 @@ namespace Siotrix.Discord
                             x.Value = $"{summary}\n" + $"{remark}";
                         });
                 }
-                error = 3;
+                _error = 3;
             }
             else // isMod = false && isCommand = false
             {
                 var list = _commands.Modules.Where(p => p.Aliases.First().Equals(predicate));
                 if (list.Any())
                 {
-                    foreach (var sub_command in list.First().Commands)
-                        if (!buffer_data.Equals(sub_command.Name))
+                    foreach (var subCommand in list.First().Commands)
+                        if (!bufferData.Equals(subCommand.Name))
                         {
-                            buffer_data = sub_command.Name;
-                            sub_commands += $"``{buffer_data}``" + " , ";
+                            bufferData = subCommand.Name;
+                            subCommands += $"``{bufferData}``" + " , ";
                         }
-                    error = 4;
+                    _error = 4;
                 }
                 else
                 {
                     predicate = "Help";
-                    sub_commands = GetHelpModule();
-                    error = 1;
+                    subCommands = GetHelpModule();
+                    _error = 1;
                 }
-                if (sub_commands.TrimEnd().EndsWith(","))
-                    sub_commands = sub_commands.Truncate(2);
+                if (subCommands.TrimEnd().EndsWith(","))
+                    subCommands = subCommands.Truncate(2);
                 builder
                     .AddField(x =>
                     {
                         x.Name = Format.Underline($"{predicate}");
-                        x.Value = $"{sub_commands}";
+                        x.Value = $"{subCommands}";
                     });
             }
             return builder;
@@ -319,7 +319,7 @@ namespace Siotrix.Discord
                     ActionResult.IsSuccess = false;
                     var embed = new EmbedBuilder();
                     GetCommandHelp(words[0], embed, spec);
-                    var reason = GetReasonResult(error);
+                    var reason = GetReasonResult(_error);
                     if (result is ExecuteResult r)
                         PrettyConsole.NewLine(r.Exception.ToString());
                     else

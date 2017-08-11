@@ -69,17 +69,17 @@ namespace Siotrix.Discord.Moderation
         }
 
         private async void OnUnMuteReceivedAsync(IGuildUser user, MuteExtensions.MuteType muteType,
-            SocketCommandContext context, bool is_auto)
+            SocketCommandContext context, bool isAuto)
         {
             try
             {
-                long case_id = 0;
+                long caseId = 0;
                 var guild = user.Guild as SocketGuild;
-                string unmute_data = null;
+                string unmuteData = null;
                 LogChannelExtensions.IsUsableLogChannel(guild.Id.ToLong());
-                var channel = guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-                var mod_channel =
-                    guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                var channel = guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+                var modChannel =
+                    guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
                 var unmutes = "";
                 switch (muteType)
@@ -94,62 +94,62 @@ namespace Siotrix.Discord.Moderation
                         unmutes = "all";
                         break;
                 }
-                if (is_auto)
-                    unmute_data = user.Username + "#" + user.Discriminator + " has been auto " + unmutes + " unmuted.";
+                if (isAuto)
+                    unmuteData = user.Username + "#" + user.Discriminator + " has been auto " + unmutes + " unmuted.";
                 else
-                    unmute_data = user.Username + "#" + user.Discriminator + " has been " + unmutes + " unmuted by " +
+                    unmuteData = user.Username + "#" + user.Discriminator + " has been " + unmutes + " unmuted by " +
                                   context.User.Username + "#" + context.User.Discriminator + ".";
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(user.GetAvatarUrl())
-                        .WithName(unmute_data))
+                        .WithName(unmuteData))
                     .WithColor(new Color(127, 255, 127));
-                if (!LogChannelExtensions.is_toggled_log)
+                if (!LogChannelExtensions.IsToggledLog)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
-                var g_icon_url = context.GetGuildIconUrl();
-                var g_name = context.GetGuildName();
-                var g_url = context.GetGuildUrl();
-                var g_thumbnail = context.GetGuildThumbNail();
-                var g_footer = context.GetGuildFooter();
-                var g_prefix = context.GetGuildPrefix();
+                var gIconUrl = context.GetGuildIconUrl();
+                var gName = context.GetGuildName();
+                var gUrl = context.GetGuildUrl();
+                var gThumbnail = context.GetGuildThumbNail();
+                var gFooter = context.GetGuildFooter();
+                var gPrefix = context.GetGuildPrefix();
                 string value = null;
-                var mod_builder = new EmbedBuilder()
+                var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(g_icon_url)
-                        .WithName(g_name)
-                        .WithUrl(g_url))
+                        .WithIconUrl(gIconUrl)
+                        .WithName(gName)
+                        .WithUrl(gUrl))
                     .WithColor(new Color(127, 255, 0))
-                    .WithThumbnailUrl(g_thumbnail)
+                    .WithThumbnailUrl(gThumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(g_footer[0])
-                        .WithText(g_footer[1]))
+                        .WithIconUrl(gFooter[0])
+                        .WithText(gFooter[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = context.GetCaseNumber();
+                caseId = context.GetCaseNumber();
 
-                if (is_auto)
+                if (isAuto)
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.Guild.CurrentUser.Mention + "\n" +
                             "Reason : auto";
                 else
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.User.Username + " (" + context.User.Id + ")" + "\n" +
-                            "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
-                mod_builder
+                            "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
+                modBuilder
                     .AddField(x =>
                     {
-                        x.Name = "Case #" + case_id + " | unmute";
+                        x.Name = "Case #" + caseId + " | unmute";
                         x.Value = value;
                     });
-                if (!LogChannelExtensions.is_toggled_modlog)
+                if (!LogChannelExtensions.IsToggledModlog)
                 {
-                    var msg_instance = await mod_channel.SendMessageSafeAsync("", false, mod_builder.Build());
+                    var msgInstance = await modChannel.SendMessageSafeAsync("", false, modBuilder.Build());
                     ActionResult.CommandName = "unmute";
-                    ActionResult.CaseId = case_id;
+                    ActionResult.CaseId = caseId;
                     ActionResult.UserId = user.Id.ToLong();
-                    ActionResult.Instance = msg_instance;
+                    ActionResult.Instance = msgInstance;
                     ActionResult.IsFoundedCaseNumber = true;
-                    Console.WriteLine("Service-Unmute +++++++++++++++++++++++++++++++{0}", case_id);
+                    Console.WriteLine("Service-Unmute +++++++++++++++++++++++++++++++{0}", caseId);
                 }
             }
             catch (Exception e)
@@ -159,18 +159,18 @@ namespace Siotrix.Discord.Moderation
         }
 
         private async void OnMuteReceivedAsync(IGuildUser user, MuteExtensions.MuteType muteType,
-            SocketCommandContext context, int minutes, bool is_auto)
+            SocketCommandContext context, int minutes, bool isAuto)
         {
             try
             {
-                long case_id = 0;
+                long caseId = 0;
                 var guild = user.Guild as SocketGuild;
-                string mute_data = null;
+                string muteData = null;
                 string value = null;
                 LogChannelExtensions.IsUsableLogChannel(guild.Id.ToLong());
-                var channel = guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-                var mod_channel =
-                    guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                var channel = guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+                var modChannel =
+                    guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
                 var mutes = "";
                 switch (muteType)
@@ -186,39 +186,39 @@ namespace Siotrix.Discord.Moderation
                         break;
                 }
 
-                if (is_auto)
-                    mute_data = user.Username + "#" + user.Discriminator + " has been auto " + mutes + " muted.";
+                if (isAuto)
+                    muteData = user.Username + "#" + user.Discriminator + " has been auto " + mutes + " muted.";
                 else
-                    mute_data = user.Username + "#" + user.Discriminator + " has been " + mutes + " muted by " +
+                    muteData = user.Username + "#" + user.Discriminator + " has been " + mutes + " muted by " +
                                 context.User.Username + "#" + context.User.Discriminator + ".";
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(user.GetAvatarUrl())
-                        .WithName(mute_data))
+                        .WithName(muteData))
                     .WithColor(new Color(127, 255, 0));
-                if (!LogChannelExtensions.is_toggled_log)
+                if (!LogChannelExtensions.IsToggledLog)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
-                var g_icon_url = context.GetGuildIconUrl();
-                var g_name = context.GetGuildName();
-                var g_url = context.GetGuildUrl();
-                var g_thumbnail = context.GetGuildThumbNail();
-                var g_footer = context.GetGuildFooter();
-                var g_prefix = context.GetGuildPrefix();
-                var mod_builder = new EmbedBuilder()
+                var gIconUrl = context.GetGuildIconUrl();
+                var gName = context.GetGuildName();
+                var gUrl = context.GetGuildUrl();
+                var gThumbnail = context.GetGuildThumbNail();
+                var gFooter = context.GetGuildFooter();
+                var gPrefix = context.GetGuildPrefix();
+                var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(g_icon_url)
-                        .WithName(g_name)
-                        .WithUrl(g_url))
+                        .WithIconUrl(gIconUrl)
+                        .WithName(gName)
+                        .WithUrl(gUrl))
                     .WithColor(new Color(127, 255, 0))
-                    .WithThumbnailUrl(g_thumbnail)
+                    .WithThumbnailUrl(gThumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(g_footer[0])
-                        .WithText(g_footer[1]))
+                        .WithIconUrl(gFooter[0])
+                        .WithText(gFooter[1]))
                     .WithTimestamp(DateTime.UtcNow);
-                case_id = context.GetCaseNumber();
+                caseId = context.GetCaseNumber();
 
-                if (is_auto)
+                if (isAuto)
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.Guild.CurrentUser.Mention + "\n" +
                             "Length : " + minutes + "minutes" + "\n" +
@@ -227,22 +227,22 @@ namespace Siotrix.Discord.Moderation
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.User.Username + " (" + context.User.Id + ")" + "\n" +
                             "Length : " + minutes + "minutes" + "\n" +
-                            "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
-                mod_builder
+                            "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
+                modBuilder
                     .AddField(x =>
                     {
-                        x.Name = "Case #" + case_id + " | mute";
+                        x.Name = "Case #" + caseId + " | mute";
                         x.Value = value;
                     });
-                if (!LogChannelExtensions.is_toggled_modlog)
+                if (!LogChannelExtensions.IsToggledModlog)
                 {
-                    var msg_instance = await mod_channel.SendMessageSafeAsync("", false, mod_builder.Build());
+                    var msgInstance = await modChannel.SendMessageSafeAsync("", false, modBuilder.Build());
                     ActionResult.CommandName = "mute";
-                    ActionResult.CaseId = case_id;
+                    ActionResult.CaseId = caseId;
                     ActionResult.UserId = user.Id.ToLong();
                     ActionResult.TimeLength = minutes;
-                    ActionResult.Instance = msg_instance;
-                    Console.WriteLine("Service-Mute ------------------{0}", case_id);
+                    ActionResult.Instance = msgInstance;
+                    Console.WriteLine("Service-Mute ------------------{0}", caseId);
                 }
             }
             catch (Exception e)
@@ -252,14 +252,14 @@ namespace Siotrix.Discord.Moderation
         }
 
 
-        private long GetLogChannelId(long guild_id)
+        private long GetLogChannelId(long guildId)
         {
             long id = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var data = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                    var data = db.Glogchannels.Where(p => p.GuildId.Equals(guildId));
                     if (data.Any() || data.Count() > 0)
                         id = data.First().ChannelId;
                 }
@@ -271,26 +271,26 @@ namespace Siotrix.Discord.Moderation
             return id;
         }
 
-        private long GetAnnounceChannelId(long guild_id)
+        private long GetAnnounceChannelId(long guildId)
         {
-            long channel_id = 0;
+            long channelId = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var list = db.Gannouncechannels.Where(p => p.GuildId == guild_id);
+                    var list = db.Gannouncechannels.Where(p => p.GuildId == guildId);
                     if (list.Any())
-                        channel_id = list.First().ChannelId;
+                        channelId = list.First().ChannelId;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return channel_id;
+            return channelId;
         }
 
-        private string getAction(string str)
+        private string GetAction(string str)
         {
             string sentense = null;
             switch (str)
@@ -313,7 +313,7 @@ namespace Siotrix.Discord.Moderation
             return sentense;
         }
 
-        private Color getActionColor(string str)
+        private Color GetActionColor(string str)
         {
             var color = new Color();
             switch (str)
@@ -357,23 +357,23 @@ namespace Siotrix.Discord.Moderation
 
         private long GetCaseNumberAync(string cmdName, SocketCommandContext context, SocketGuildUser user)
         {
-            long case_id = 0;
+            long caseId = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var data = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()));
                     if (!data.Any())
-                        case_id = 1;
+                        caseId = 1;
                     else
-                        case_id = data.Last().GCaseNum + 1;
+                        caseId = data.Last().GCaseNum + 1;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return case_id;
+            return caseId;
         }
 
         private bool CheckGuildUser(long userId, long guildId)
@@ -397,34 +397,34 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnRoleDeletedAsync(SocketRole role)
         {
-            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var channelId = GetLogChannelId(role.Guild.Id.ToLong());
+            var logChannel = _client.GetChannel(channelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName("Role has been deleted."))
                 .WithColor(new Color(255, 0, 0));
-            await log_channel.SendMessageAsync("", false, builder.Build());
+            await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
-        private async Task OnRoleUpdatedAsync(SocketRole role, SocketRole update_role)
+        private async Task OnRoleUpdatedAsync(SocketRole role, SocketRole updateRole)
         {
-            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var channelId = GetLogChannelId(role.Guild.Id.ToLong());
+            var logChannel = _client.GetChannel(channelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder();
             builder.WithColor(new Color(255, 127, 255));
-            if (update_role.Name != role.Name)
+            if (updateRole.Name != role.Name)
                 builder.WithAuthor(new EmbedAuthorBuilder()
-                    .WithName($"{role.Name} role name has been updated to: {update_role.Name}."));
-            else if (update_role.Color.ToString() != role.Color.ToString())
-                if (update_role.Color.RawValue is 0)
+                    .WithName($"{role.Name} role name has been updated to: {updateRole.Name}."));
+            else if (updateRole.Color.ToString() != role.Color.ToString())
+                if (updateRole.Color.RawValue is 0)
                 {
                     builder.WithAuthor(new EmbedAuthorBuilder()
-                        .WithName($"{update_role.Name} role color has been removed(previously: {role.Color})"));
+                        .WithName($"{updateRole.Name} role color has been removed(previously: {role.Color})"));
                 }
                 else
                 {
                     var rolecolor = role.Color.ToString();
-                    var updateRoleColor = update_role.Color.ToString();
+                    var updateRoleColor = updateRole.Color.ToString();
 
                     if (rolecolor.Length != 7)
                     {
@@ -440,44 +440,44 @@ namespace Siotrix.Discord.Moderation
 
                     builder.WithAuthor(new EmbedAuthorBuilder()
                         .WithName(
-                            $"{update_role.Name} role color has been updated from {rolecolor} to {updateRoleColor}."));
+                            $"{updateRole.Name} role color has been updated from {rolecolor} to {updateRoleColor}."));
                 }
-            else if (update_role.IsMentionable != role.IsMentionable)
-                if (update_role.IsMentionable)
+            else if (updateRole.IsMentionable != role.IsMentionable)
+                if (updateRole.IsMentionable)
                     builder.WithAuthor(new EmbedAuthorBuilder()
-                        .WithName($"{update_role.Name} role is now mentionable."));
+                        .WithName($"{updateRole.Name} role is now mentionable."));
                 else
                     builder.WithAuthor(new EmbedAuthorBuilder()
-                        .WithName($"{update_role.Name} role is no longer mentionable."));
-            else if (update_role.IsHoisted != role.IsHoisted)
-                if (update_role.IsHoisted)
+                        .WithName($"{updateRole.Name} role is no longer mentionable."));
+            else if (updateRole.IsHoisted != role.IsHoisted)
+                if (updateRole.IsHoisted)
                     builder.WithAuthor(new EmbedAuthorBuilder()
-                        .WithName($"{update_role.Name} role will now be shown separately from the other roles."));
+                        .WithName($"{updateRole.Name} role will now be shown separately from the other roles."));
                 else
                     builder.WithAuthor(new EmbedAuthorBuilder()
-                        .WithName($"{update_role.Name} role is no longer shown separately."));
-            else if (update_role.Position != role.Position)
+                        .WithName($"{updateRole.Name} role is no longer shown separately."));
+            else if (updateRole.Position != role.Position)
                 builder.WithAuthor(new EmbedAuthorBuilder()
                     .WithName(
-                        $"{update_role.Name} role position has been updated from {role.Position} to {update_role.Position}."));
-            else if (update_role.Permissions.RawValue != role.Permissions.RawValue)
+                        $"{updateRole.Name} role position has been updated from {role.Position} to {updateRole.Position}."));
+            else if (updateRole.Permissions.RawValue != role.Permissions.RawValue)
                 builder.WithAuthor(new EmbedAuthorBuilder()
-                    .WithName($"{update_role.Name} role permissions have been updated."));
+                    .WithName($"{updateRole.Name} role permissions have been updated."));
             else
                 builder.WithAuthor(new EmbedAuthorBuilder()
-                    .WithName($"{update_role.Name} role has been updated."));
-            await log_channel.SendMessageAsync("", false, builder.Build());
+                    .WithName($"{updateRole.Name} role has been updated."));
+            await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnRoleCreatedAsync(SocketRole role)
         {
-            var channel_id = GetLogChannelId(role.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(channel_id.ToUlong()) as ISocketMessageChannel;
+            var channelId = GetLogChannelId(role.Guild.Id.ToLong());
+            var logChannel = _client.GetChannel(channelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName("Role has been created."))
                 .WithColor(new Color(127, 255, 0));
-            await log_channel.SendMessageAsync("", false, builder.Build());
+            await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnMessageReceivedAsync(SocketMessage message)
@@ -490,13 +490,13 @@ namespace Siotrix.Discord.Moderation
                 var argPos = 0;
                 string spec = null;
                 string content = null;
-                long case_id = 0;
+                long caseId = 0;
 
                 LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
                 var channel =
-                    context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-                var mod_channel =
-                    context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                    context.Guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+                var modChannel =
+                    context.Guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
                 spec = context.GetGuildPrefix();
                 if (message.Author.IsBot
@@ -514,60 +514,60 @@ namespace Siotrix.Discord.Moderation
                 if (msg.HasStringPrefix(spec, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
                 {
                     var words = content.Split(' ');
-                    var action = getAction(words[0]);
+                    var action = GetAction(words[0]);
                     if (action == null)
                         return; // If action is not kick or ban or mute command, not display log information.
                     var id = MentionUtils.ParseUser(words[1]);
                     var user = _client.GetUser(id);
-                    var user_identifier = user.Username + "#" + user.Discriminator;
-                    var user_mention = user.Mention;
-                    var mod_identifier = context.User.Username + "#" + context.User.Discriminator;
+                    var userIdentifier = user.Username + "#" + user.Discriminator;
+                    var userMention = user.Mention;
+                    var modIdentifier = context.User.Username + "#" + context.User.Discriminator;
 
-                    var action_color = getActionColor(words[0]);
+                    var actionColor = GetActionColor(words[0]);
 
                     var builder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
                             .WithIconUrl(user.GetAvatarUrl())
-                            .WithName(user_identifier + " has been " + action + " by " + mod_identifier))
-                        .WithColor(action_color);
-                    if (!LogChannelExtensions.is_toggled_log)
-                        await channel.SendMessageAsync(user_mention, false, builder.Build());
+                            .WithName(userIdentifier + " has been " + action + " by " + modIdentifier))
+                        .WithColor(actionColor);
+                    if (!LogChannelExtensions.IsToggledLog)
+                        await channel.SendMessageAsync(userMention, false, builder.Build());
 
-                    var g_icon_url = context.GetGuildIconUrl();
-                    var g_name = context.GetGuildName();
-                    var g_url = context.GetGuildUrl();
-                    var g_thumbnail = context.GetGuildThumbNail();
-                    var g_footer = context.GetGuildFooter();
-                    var g_prefix = context.GetGuildPrefix();
-                    var mod_builder = new EmbedBuilder()
+                    var gIconUrl = context.GetGuildIconUrl();
+                    var gName = context.GetGuildName();
+                    var gUrl = context.GetGuildUrl();
+                    var gThumbnail = context.GetGuildThumbNail();
+                    var gFooter = context.GetGuildFooter();
+                    var gPrefix = context.GetGuildPrefix();
+                    var modBuilder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(g_icon_url)
-                            .WithName(g_name)
-                            .WithUrl(g_url))
-                        .WithColor(action_color)
-                        .WithThumbnailUrl(g_thumbnail)
+                            .WithIconUrl(gIconUrl)
+                            .WithName(gName)
+                            .WithUrl(gUrl))
+                        .WithColor(actionColor)
+                        .WithThumbnailUrl(gThumbnail)
                         .WithFooter(new EmbedFooterBuilder()
-                            .WithIconUrl(g_footer[0])
-                            .WithText(g_footer[1]))
+                            .WithIconUrl(gFooter[0])
+                            .WithText(gFooter[1]))
                         .WithTimestamp(DateTime.UtcNow);
                     //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
-                    case_id = context.GetCaseNumber();
-                    mod_builder
+                    caseId = context.GetCaseNumber();
+                    modBuilder
                         .AddField(x =>
                         {
-                            x.Name = "Case #" + case_id + " | " + words[0];
+                            x.Name = "Case #" + caseId + " | " + words[0];
                             x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" +
                                       "Moderator : " +
                                       context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
-                                      "Reason : Type " + g_prefix + "reason " + case_id + "<reason> to add it.";
+                                      "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
                         });
-                    if (!LogChannelExtensions.is_toggled_modlog)
+                    if (!LogChannelExtensions.IsToggledModlog)
                     {
-                        var msg_instance = await mod_channel.SendMessageSafeAsync("", false, mod_builder.Build());
+                        var msgInstance = await modChannel.SendMessageSafeAsync("", false, modBuilder.Build());
                         ActionResult.CommandName = words[0];
-                        ActionResult.CaseId = case_id;
+                        ActionResult.CaseId = caseId;
                         ActionResult.UserId = user.Id.ToLong();
-                        ActionResult.Instance = msg_instance;
+                        ActionResult.Instance = msgInstance;
                     }
                 }
             }
@@ -586,8 +586,8 @@ namespace Siotrix.Discord.Moderation
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
                 LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
                 var oldmsg = await cachemsg.GetOrDownloadAsync();
-                var log_channel =
-                    _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var logChannel =
+                    _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 if (!oldmsg.Content.Equals(message.Content))
                 {
@@ -600,27 +600,27 @@ namespace Siotrix.Discord.Moderation
                                          "After: " + message.Content)
                         .WithColor(new Color(0, 127, 255));
 
-                    if (!LogChannelExtensions.is_toggled_log)
-                        await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                    if (!LogChannelExtensions.IsToggledLog)
+                        await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
             }
         }
 
         private async Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder();
-            var number_of_cleanup_messages = MessageExtensions.number_of_messages;
-            if (number_of_cleanup_messages > 0)
+            var numberOfCleanupMessages = MessageExtensions.NumberOfMessages;
+            if (numberOfCleanupMessages > 0)
             {
-                var cleanup_user = _client.GetUser(MessageExtensions.userId);
+                var cleanupUser = _client.GetUser(MessageExtensions.UserId);
                 builder
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(cleanup_user.GetAvatarUrl())
-                        .WithName(cleanup_user.Username + "#" + cleanup_user.Discriminator + " has deleted " +
-                                  number_of_cleanup_messages + " messages."))
+                        .WithIconUrl(cleanupUser.GetAvatarUrl())
+                        .WithName(cleanupUser.Username + "#" + cleanupUser.Discriminator + " has deleted " +
+                                  numberOfCleanupMessages + " messages."))
                     .WithColor(new Color(0, 127, 127));
-                await log_channel.SendMessageAsync("", false, builder.Build());
+                await logChannel.SendMessageAsync("", false, builder.Build());
             }
             else
             {
@@ -636,8 +636,8 @@ namespace Siotrix.Discord.Moderation
                             .WithIconUrl(user.GetAvatarUrl())
                             .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
                         .WithColor(new Color(0, 127, 127));
-                    if (!LogChannelExtensions.is_toggled_log)
-                        await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                    if (!LogChannelExtensions.IsToggledLog)
+                        await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
             }
         }
@@ -650,16 +650,16 @@ namespace Siotrix.Discord.Moderation
             {
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
                 LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
-                var log_channel =
-                    _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var logChannel =
+                    _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(user.GetAvatarUrl())
                         .WithName("Reaction has been added by " + user.Username + "#" + user.Discriminator))
                     .WithColor(new Color(255, 127, 127));
-                if (!LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                if (!LogChannelExtensions.IsToggledLog)
+                    await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
 
@@ -671,16 +671,16 @@ namespace Siotrix.Discord.Moderation
             {
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
                 LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
-                var log_channel =
-                    _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var logChannel =
+                    _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(user.GetAvatarUrl())
                         .WithName("Reaction has been removed by " + user.Username + "#" + user.Discriminator))
                     .WithColor(new Color(127, 127, 0));
-                if (!LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                if (!LogChannelExtensions.IsToggledLog)
+                    await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
 
@@ -692,50 +692,50 @@ namespace Siotrix.Discord.Moderation
             {
                 //var channel_id = GetLogChannelId(msg.GuildId.Value);
                 LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
-                var log_channel =
-                    _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                var logChannel =
+                    _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
                 var user = _client.GetUser(msg.AuthorId.ToUlong());
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(user.GetAvatarUrl())
                         .WithName("Reaction has been cleared by " + user.Username + "#" + user.Discriminator))
                     .WithColor(new Color(0, 127, 127));
-                if (!LogChannelExtensions.is_toggled_log)
-                    await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+                if (!LogChannelExtensions.IsToggledLog)
+                    await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
             }
         }
 
         private async Task OnUserJoinedAsync(SocketGuildUser user)
         {
-            string custom_message = null;
+            string customMessage = null;
             //var channel_id = GetLogChannelId(user.Guild.Id.ToLong());
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
-            var announce_channel_id = GetAnnounceChannelId(user.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            var announce_channel = _client.GetChannel(announce_channel_id.ToUlong()) as ISocketMessageChannel;
-            var is_found_user = CheckGuildUser(user.Id.ToLong(), user.Guild.Id.ToLong());
-            if (is_found_user)
-                custom_message = GetWecomeMessage(3, user.Guild.Id.ToLong());
+            var announceChannelId = GetAnnounceChannelId(user.Guild.Id.ToLong());
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+            var announceChannel = _client.GetChannel(announceChannelId.ToUlong()) as ISocketMessageChannel;
+            var isFoundUser = CheckGuildUser(user.Id.ToLong(), user.Guild.Id.ToLong());
+            if (isFoundUser)
+                customMessage = GetWecomeMessage(3, user.Guild.Id.ToLong());
             else
-                custom_message = GetWecomeMessage(1, user.Guild.Id.ToLong());
+                customMessage = GetWecomeMessage(1, user.Guild.Id.ToLong());
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Username + "#" + user.Discriminator + " has joined."))
                 .WithColor(new Color(0, 255, 127));
-            if (!LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
-            await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
+            if (!LogChannelExtensions.IsToggledLog)
+                await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+            await announceChannel.SendMessageAsync(ReplaceInfo(user, customMessage));
         }
 
-        private string GetWecomeMessage(int id, long guild_id)
+        private string GetWecomeMessage(int id, long guildId)
         {
             string msg = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var list = db.Gannouncemessages.Where(p => p.MessageId == id && p.GuildId == guild_id);
+                    var list = db.Gannouncemessages.Where(p => p.MessageId == id && p.GuildId == guildId);
                     if (list.Any())
                         msg = list.First().Message;
                     else
@@ -753,43 +753,43 @@ namespace Siotrix.Discord.Moderation
         {
             //var channel_id = GetLogChannelId(guild.Id.ToLong());
             LogChannelExtensions.IsUsableLogChannel(guild.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Id + " has been unbanned."))
                 .WithColor(new Color(255, 255, 127));
-            if (!LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync(user.Mention, false, builder.Build());
+            if (!LogChannelExtensions.IsToggledLog)
+                await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
         }
 
         private async Task OnUserLeftAsync(SocketGuildUser user)
         {
             LogChannelExtensions.IsUsableLogChannel(user.Guild.Id.ToLong());
-            var announce_channel_id = GetAnnounceChannelId(user.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            var announce_channel = _client.GetChannel(announce_channel_id.ToUlong()) as ISocketMessageChannel;
-            var custom_message = GetWecomeMessage(2, user.Guild.Id.ToLong());
-            var guild_user = _client.GetUser(user.Id);
+            var announceChannelId = GetAnnounceChannelId(user.Guild.Id.ToLong());
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+            var announceChannel = _client.GetChannel(announceChannelId.ToUlong()) as ISocketMessageChannel;
+            var customMessage = GetWecomeMessage(2, user.Guild.Id.ToLong());
+            var guildUser = _client.GetUser(user.Id);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Username + "#" + user.Discriminator + " has left."))
                 .WithColor(new Color(0, 0, 127));
-            if (!LogChannelExtensions.is_toggled_log)
-                await log_channel.SendMessageAsync("", false, builder.Build());
-            await announce_channel.SendMessageAsync(ReplaceInfo(user, custom_message));
+            if (!LogChannelExtensions.IsToggledLog)
+                await logChannel.SendMessageAsync("", false, builder.Build());
+            await announceChannel.SendMessageAsync(ReplaceInfo(user, customMessage));
         }
 
         private async Task GuildMemberUpdated_RoleChange(SocketGuildUser b, SocketGuildUser a)
         {
             if (b.Roles == a.Roles) return;
             LogChannelExtensions.IsUsableLogChannel(b.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             //  var guild = (_client.GetChannel(log_channel) as SocketGuildChannel).Guild;
             if (b.Roles.Count() > a.Roles.Count())
             {
-                if (!LogChannelExtensions.is_toggled_log)
+                if (!LogChannelExtensions.IsToggledLog)
                 {
                     var role = b.Roles.Except(a.Roles).FirstOrDefault();
                     var builder = new EmbedBuilder()
@@ -798,12 +798,12 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has lost role: {role.Name}"))
                         .WithColor(new Color(255, 67, 164));
-                    await log_channel.SendMessageAsync("", false, builder.Build());
+                    await logChannel.SendMessageAsync("", false, builder.Build());
                 }
             }
             else
             {
-                if (!LogChannelExtensions.is_toggled_log)
+                if (!LogChannelExtensions.IsToggledLog)
                 {
                     var role = a.Roles.Except(b.Roles).FirstOrDefault();
                     var builder = new EmbedBuilder()
@@ -812,7 +812,7 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has gained role: {role.Name}"))
                         .WithColor(new Color(67, 255, 164));
-                    await log_channel.SendMessageAsync("", false, builder.Build());
+                    await logChannel.SendMessageAsync("", false, builder.Build());
                 }
             }
         }
@@ -837,8 +837,8 @@ namespace Siotrix.Discord.Moderation
         {
             if (b.Nickname == a.Nickname) return;
             LogChannelExtensions.IsUsableLogChannel(b.Guild.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            if (!LogChannelExtensions.is_toggled_log)
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+            if (!LogChannelExtensions.IsToggledLog)
                 if (b.Nickname == null)
                 {
                     var builder = new EmbedBuilder()
@@ -847,7 +847,7 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Username}#{b.Discriminator} ({b.Id}) has taken on the nickname of {a.Nickname}."))
                         .WithColor(new Color(1, 1, 1));
-                    await log_channel.SendMessageAsync("", false, builder.Build());
+                    await logChannel.SendMessageAsync("", false, builder.Build());
                 }
                 else if (a.Nickname == null)
                 {
@@ -857,7 +857,7 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Username}#{b.Discriminator} ({b.Nickname}) ({b.Id}) removed their nickname."))
                         .WithColor(new Color(1, 1, 1));
-                    await log_channel.SendMessageAsync("", false, builder.Build());
+                    await logChannel.SendMessageAsync("", false, builder.Build());
                 }
                 else
                 {
@@ -867,7 +867,7 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) changed their nickname to {a.Nickname}"))
                         .WithColor(new Color(1, 1, 1));
-                    await log_channel.SendMessageAsync("", false, builder.Build());
+                    await logChannel.SendMessageAsync("", false, builder.Build());
                 }
         }
 
@@ -875,15 +875,15 @@ namespace Siotrix.Discord.Moderation
         {
             if (b.Username == a.Username) return;
             LogChannelExtensions.IsUsableLogChannel(b.Id.ToLong());
-            var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
-            if (!LogChannelExtensions.is_toggled_log)
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+            if (!LogChannelExtensions.IsToggledLog)
             {
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(b.GetAvatarUrl())
                         .WithName($"{b.Username}#{b.Discriminator} ({b.Id}) changed their username to {a.Username}"))
                     .WithColor(new Color(1, 1, 1));
-                await log_channel.SendMessageAsync("", false, builder.Build());
+                await logChannel.SendMessageAsync("", false, builder.Build());
             }
         }
 

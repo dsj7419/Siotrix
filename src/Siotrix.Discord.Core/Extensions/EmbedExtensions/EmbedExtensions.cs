@@ -6,34 +6,34 @@ namespace Siotrix.Discord
     public static class EmbedExtensions
     {
         public static EmbedBuilder MakeNewEmbed(string title = null, string description = null, Color? color = null,
-            string imageURL = null, string URL = null, string thumbnailURL = null)
+            string imageUrl = null, string url = null, string thumbnailUrl = null)
         {
             //Make the embed builder
             var embed = new EmbedBuilder().WithColor(1, 1, 1);
 
             //Validate the URLs
-            imageURL = ValidateURL(imageURL) ? imageURL : null;
-            URL = ValidateURL(URL) ? URL : null;
-            thumbnailURL = ValidateURL(thumbnailURL) ? thumbnailURL : null;
+            imageUrl = ValidateUrl(imageUrl) ? imageUrl : null;
+            url = ValidateUrl(url) ? url : null;
+            thumbnailUrl = ValidateUrl(thumbnailUrl) ? thumbnailUrl : null;
 
             //Add in the properties
             if (title != null)
-                embed.WithTitle(title.Substring(0, Math.Min(SiotrixConstants.MAX_TITLE_LENGTH, title.Length)));
+                embed.WithTitle(title.Substring(0, Math.Min(SiotrixConstants.MaxTitleLength, title.Length)));
             if (description != null)
                 embed.WithDescription(description);
             if (color != null)
                 embed.WithColor(color.Value);
-            if (imageURL != null)
-                embed.WithImageUrl(imageURL);
-            if (URL != null)
-                embed.WithUrl(URL);
-            if (thumbnailURL != null)
-                embed.WithThumbnailUrl(thumbnailURL);
+            if (imageUrl != null)
+                embed.WithImageUrl(imageUrl);
+            if (url != null)
+                embed.WithUrl(url);
+            if (thumbnailUrl != null)
+                embed.WithThumbnailUrl(thumbnailUrl);
 
             return embed;
         }
 
-        public static bool ValidateURL(string input)
+        public static bool ValidateUrl(string input)
         {
             if (input == null)
                 return false;

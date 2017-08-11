@@ -38,7 +38,7 @@ namespace Siotrix.Discord.Moderation
             if (Exists(tag, name)) return;
 
             await TagExtensions.CreateTagAsync(name, content, Context);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Priority(10)]
@@ -53,7 +53,7 @@ namespace Siotrix.Discord.Moderation
             if (NotExists(tag, name)) return;
 
             await TagExtensions.DeleteTagAsync(tag);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Priority(10)]
@@ -68,7 +68,7 @@ namespace Siotrix.Discord.Moderation
             if (NotExists(tag, name) || !IsOwner(tag)) return;
 
             await TagExtensions.ModifyTagAsync(tag, content);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Priority(10)]

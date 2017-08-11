@@ -219,7 +219,7 @@ namespace Siotrix.Discord
         {
             return (await GetTagsAsync(guild))
                 .ToDictionary(x => x, x => x.Name
-                    .Select(y => MathHelper.GetStringDistance(x.Name, name))
+                    .Select(y => Levenshtein.GetDistance(x.Name, name))
                     .Sum())
                 .OrderBy(x => x.Value)
                 .Select(x => x.Key)

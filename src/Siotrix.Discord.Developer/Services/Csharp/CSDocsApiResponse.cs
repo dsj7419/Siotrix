@@ -2,13 +2,13 @@
 
 namespace Siotrix.Discord.Developer
 {
-    public class CSDocsApiResponse
+    public class CsDocsApiResponse
     {
-        public List<CSDocsMember> Results { get; set; } = new List<CSDocsMember>();
+        public List<CsDocsMember> Results { get; set; } = new List<CsDocsMember>();
         public int Count { get; set; }
     }
 
-    public class CSDocsMember
+    public class CsDocsMember
     {
         public string DisplayName { get; set; }
         public string Url { get; set; }

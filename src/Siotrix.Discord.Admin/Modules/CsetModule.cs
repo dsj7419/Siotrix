@@ -69,25 +69,25 @@ namespace Siotrix.Discord.Admin
             return status;
         }
 
-        private int GetToggleChannelStatus(string channel_name, string command)
+        private int GetToggleChannelStatus(string channelName, string command)
         {
             var status = 0;
-            var get_channel_id = channel_name.GetChannelIdFromName(Context);
-            if (get_channel_id < 0) return -1;
+            var getChannelId = channelName.GetChannelIdFromName(Context);
+            if (getChannelId < 0) return -1;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var is_found_cmd = db.Gtoggles
+                    var isFoundCmd = db.Gtoggles
                         .Where(p => p.CommandName.Equals(command) && p.GuildId.Equals(Context.Guild.Id.ToLong())).Any();
-                    if (is_found_cmd)
+                    if (isFoundCmd)
                     {
                         status = 1;
                     }
                     else
                     {
                         var result =
-                            db.Gtogglechannels.Where(p => p.ChannelId.Equals(get_channel_id) &&
+                            db.Gtogglechannels.Where(p => p.ChannelId.Equals(getChannelId) &&
                                                           p.CommandName.Equals(command) &&
                                                           p.GuildId.Equals(Context.Guild.Id.ToLong()));
                         Console.WriteLine("------{0}++++++{1}", result.Count(), result.Any());
@@ -99,7 +99,7 @@ namespace Siotrix.Discord.Admin
                         else
                         {
                             var record = new DiscordGuildToggleChannel();
-                            record.ChannelId = get_channel_id;
+                            record.ChannelId = getChannelId;
                             record.GuildId = Context.Guild.Id.ToLong();
                             record.CommandName = command;
                             db.Gtogglechannels.Add(record);
@@ -118,34 +118,34 @@ namespace Siotrix.Discord.Admin
 
         private string GetDisableCommmands()
         {
-            string cmd_list = null;
+            string cmdList = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var guild_data = db.Gtoggles.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
-                    var channel_data = db.Gtogglechannels.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
-                    Console.WriteLine("----{0}++++++{1}", guild_data.Count(), guild_data.Any());
-                    if (guild_data.Count() > 0 || guild_data.Any())
+                    var guildData = db.Gtoggles.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
+                    var channelData = db.Gtogglechannels.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
+                    Console.WriteLine("----{0}++++++{1}", guildData.Count(), guildData.Any());
+                    if (guildData.Count() > 0 || guildData.Any())
                     {
-                        cmd_list = "- " + Format.Underline("In this guild\n");
-                        foreach (var item in guild_data)
-                            cmd_list += $"``{item.CommandName}``" + " , ";
-                        if (cmd_list.TrimEnd().EndsWith(","))
-                            cmd_list = cmd_list.Truncate(2);
+                        cmdList = "- " + Format.Underline("In this guild\n");
+                        foreach (var item in guildData)
+                            cmdList += $"``{item.CommandName}``" + " , ";
+                        if (cmdList.TrimEnd().EndsWith(","))
+                            cmdList = cmdList.Truncate(2);
                     }
-                    if (channel_data.Count() > 0 || channel_data.Any())
+                    if (channelData.Count() > 0 || channelData.Any())
                     {
-                        var channel_list = channel_data.GroupBy(p => p.ChannelId);
-                        foreach (var channel in channel_list)
+                        var channelList = channelData.GroupBy(p => p.ChannelId);
+                        foreach (var channel in channelList)
                         {
-                            cmd_list += "\n- " + Format.Underline("In #" + Context.Guild.Channels
+                            cmdList += "\n- " + Format.Underline("In #" + Context.Guild.Channels
                                                                       .Where(p => p.Id.ToLong().Equals(channel.First()
                                                                           .ChannelId)).First().Name + " channel\n");
                             foreach (var element in channel)
-                                cmd_list += $"``{element.CommandName}``" + " , ";
-                            if (cmd_list.TrimEnd().EndsWith(","))
-                                cmd_list = cmd_list.Truncate(2);
+                                cmdList += $"``{element.CommandName}``" + " , ";
+                            if (cmdList.TrimEnd().EndsWith(","))
+                                cmdList = cmdList.Truncate(2);
                         }
                     }
                 }
@@ -154,71 +154,71 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            return cmd_list;
+            return cmdList;
         }
 
         private string GetToggledCommands()
         {
-            string cmd_list = null;
+            string cmdList = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var guild_data = db.Gtoggles.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
-                    var channel_data = db.Gtogglechannels.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
+                    var guildData = db.Gtoggles.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
+                    var channelData = db.Gtogglechannels.Where(p => p.GuildId.Equals(Context.Guild.Id.ToLong()));
                     //ArrayList myArr = new ArrayList();
                     var arr = new List<string>();
-                    Console.WriteLine("----{0}++++++{1}", guild_data.Count(), guild_data.Any());
-                    foreach (var a in channel_data)
+                    Console.WriteLine("----{0}++++++{1}", guildData.Count(), guildData.Any());
+                    foreach (var a in channelData)
                         arr.Add(a.CommandName);
                     var distinct = arr.Distinct().ToList();
-                    Console.WriteLine("++++++{0}---{1}==={2}", arr.Count, guild_data.Count(), guild_data.Any());
-                    if (guild_data.Count() > 0 || guild_data.Any())
+                    Console.WriteLine("++++++{0}---{1}==={2}", arr.Count, guildData.Count(), guildData.Any());
+                    if (guildData.Count() > 0 || guildData.Any())
                     {
-                        foreach (var item in guild_data)
-                            cmd_list += $"``{item.CommandName}``" + " , ";
-                        foreach (var i in guild_data.ToList())
-                        foreach (var j in channel_data.ToList())
+                        foreach (var item in guildData)
+                            cmdList += $"``{item.CommandName}``" + " , ";
+                        foreach (var i in guildData.ToList())
+                        foreach (var j in channelData.ToList())
                             if (i.CommandName.Equals(j.CommandName))
                                 distinct.Remove(j.CommandName);
                     }
-                    Console.WriteLine("======={0}*********{1}", distinct.Count, cmd_list);
+                    Console.WriteLine("======={0}*********{1}", distinct.Count, cmdList);
 
                     if (distinct != null || distinct.Count > 0)
                         foreach (var element in distinct)
-                            cmd_list += $"``{element}``" + " , ";
-                    if (cmd_list.TrimEnd().EndsWith(","))
-                        cmd_list = cmd_list.Truncate(2);
+                            cmdList += $"``{element}``" + " , ";
+                    if (cmdList.TrimEnd().EndsWith(","))
+                        cmdList = cmdList.Truncate(2);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return cmd_list;
+            return cmdList;
         }
 
-        private string GetGroupCommandContents(string cmd, bool is_group_command)
+        private string GetGroupCommandContents(string cmd, bool isGroupCommand)
         {
-            string toggle_found = null;
+            string toggleFound = null;
             string summary = null;
             string channels = null;
-            if (is_group_command)
+            if (isGroupCommand)
                 summary = _service.Modules.Where(p => p.Aliases.First().Equals(cmd)).First().Summary;
             else
                 summary = _service.Commands.Where(p => p.Name.Equals(cmd)).First().Summary;
 
-            toggle_found = "***- Summary*** : " + summary + "\n";
+            toggleFound = "***- Summary*** : " + summary + "\n";
 
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var is_found_cmd = db.Gtoggles
+                    var isFoundCmd = db.Gtoggles
                         .Where(p => p.CommandName.Equals(cmd) && p.GuildId.Equals(Context.Guild.Id.ToLong())).Any();
-                    if (is_found_cmd)
+                    if (isFoundCmd)
                     {
-                        toggle_found += "***- Status*** : " + "**Toggled off** in this guild";
+                        toggleFound += "***- Status*** : " + "**Toggled off** in this guild";
                     }
                     else
                     {
@@ -232,11 +232,11 @@ namespace Siotrix.Discord.Admin
                                             "`` and ";
                             if (channels.TrimEnd().EndsWith("and"))
                                 channels = channels.Truncate(4);
-                            toggle_found += "***- Status*** : " + "**Toggled off** in " + channels;
+                            toggleFound += "***- Status*** : " + "**Toggled off** in " + channels;
                         }
                         else
                         {
-                            toggle_found += "***- Status*** : " + "**Toggled on** in this guild";
+                            toggleFound += "***- Status*** : " + "**Toggled on** in this guild";
                         }
                     }
                 }
@@ -245,7 +245,7 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            return toggle_found;
+            return toggleFound;
         }
 
         [Command("cset")]
@@ -253,29 +253,29 @@ namespace Siotrix.Discord.Admin
         [Remarks("<command> toggle (optional:#Channelname)")]
         public async Task Cset(string command, [Remainder] string str)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
-            var is_found = _service.Commands.Where(p => p.Name.Equals(command)).Any();
-            var is_group_found = _service.Modules.Where(p => p.Aliases.First().Equals(command)).Any();
-            Console.WriteLine("********{0}^^^^^^^{1}", is_found, is_group_found);
-            if (!is_found && !is_group_found) return;
+            var isFound = _service.Commands.Where(p => p.Name.Equals(command)).Any();
+            var isGroupFound = _service.Modules.Where(p => p.Aliases.First().Equals(command)).Any();
+            Console.WriteLine("********{0}^^^^^^^{1}", isFound, isGroupFound);
+            if (!isFound && !isGroupFound) return;
             if (command == "cset")
             {
                 await ReplyAsync($"I'm sorry {Context.User.Mention}, but I cannot turn off cset for obvious reasons.");
@@ -286,9 +286,9 @@ namespace Siotrix.Discord.Admin
             {
                 if (toggle.Equals("toggle"))
                 {
-                    var toggle_on = GetToggleStatus(command);
-                    Console.WriteLine("========{0}", toggle_on);
-                    if (toggle_on)
+                    var toggleOn = GetToggleStatus(command);
+                    Console.WriteLine("========{0}", toggleOn);
+                    if (toggleOn)
                         await ReplyAsync($"✅ : Toggled ***{command}*** command **on** in this guild !");
                     else
                         await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in this guild !");
@@ -298,25 +298,25 @@ namespace Siotrix.Discord.Admin
             {
                 if (str.Length <= 13)
                     return;
-                var toggle_channel = str.Substring(0, 13);
-                if (toggle_channel.Equals("togglechannel") && str.Substring(13, 1).Equals(" ")
+                var toggleChannel = str.Substring(0, 13);
+                if (toggleChannel.Equals("togglechannel") && str.Substring(13, 1).Equals(" ")
                 ) // at least, must include one backspace after togglechannel
                 {
-                    var channel_name = str.Substring(13, str.Length - 13).Trim();
-                    Console.WriteLine("-----{0}====={1}++++{2}", str.Length, channel_name.Length,
-                        str.Length - toggle_channel.Length - channel_name.Length);
+                    var channelName = str.Substring(13, str.Length - 13).Trim();
+                    Console.WriteLine("-----{0}====={1}++++{2}", str.Length, channelName.Length,
+                        str.Length - toggleChannel.Length - channelName.Length);
 
-                    if (str.Length - toggle_channel.Length - channel_name.Length > 0) // must include backspace
+                    if (str.Length - toggleChannel.Length - channelName.Length > 0) // must include backspace
                     {
-                        var toggle_channel_status = GetToggleChannelStatus(channel_name, command);
-                        Console.WriteLine("========{0}", toggle_channel_status);
-                        if (toggle_channel_status == 1)
+                        var toggleChannelStatus = GetToggleChannelStatus(channelName, command);
+                        Console.WriteLine("========{0}", toggleChannelStatus);
+                        if (toggleChannelStatus == 1)
                             await ReplyAsync(
                                 $"📣 : ***{command}*** command **toggled off** in this guild. Please toggle on globally first!");
-                        else if (toggle_channel_status == 2)
-                            await ReplyAsync($"✅ : Toggled ***{command}*** command **on** in {channel_name}!");
-                        else if (toggle_channel_status == 3)
-                            await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in {channel_name}!");
+                        else if (toggleChannelStatus == 2)
+                            await ReplyAsync($"✅ : Toggled ***{command}*** command **on** in {channelName}!");
+                        else if (toggleChannelStatus == 3)
+                            await ReplyAsync($"✖️ : Toggled ***{command}*** command **off** in {channelName}!");
                         //await ReplyAsync("✅✖️✔️📪📣🔥🌿🍃🌱⚡❄☁💧💦⭕🐛🌟💫✨💢🎵🔇🔊🐼");
                     }
                 }
@@ -328,20 +328,20 @@ namespace Siotrix.Discord.Admin
         [Remarks("toggled - must be that word exactly.")]
         public async Task Cset(string param)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             string result = null;
             EmbedBuilder builder = null;
 
-            var is_found = _service.Commands.Where(p => p.Name.Equals(param)).Any();
-            var is_group_found = _service.Modules.Where(p => p.Aliases.First().Equals(param)).Any();
-            Console.WriteLine("______{0}_ _ _ _ _{1}", is_found, is_group_found);
-            if (!is_found && !is_group_found)
+            var isFound = _service.Commands.Where(p => p.Name.Equals(param)).Any();
+            var isGroupFound = _service.Modules.Where(p => p.Aliases.First().Equals(param)).Any();
+            Console.WriteLine("______{0}_ _ _ _ _{1}", isFound, isGroupFound);
+            if (!isFound && !isGroupFound)
             {
                 if (param.Equals("toggled"))
                 {
@@ -356,23 +356,23 @@ namespace Siotrix.Discord.Admin
                         });
                     builder
                         .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(g_icon_url)
-                            .WithName(g_name)
-                            .WithUrl(g_url))
-                        .WithColor(g_color)
-                        .WithThumbnailUrl(g_thumbnail)
+                            .WithIconUrl(gIconUrl)
+                            .WithName(gName)
+                            .WithUrl(gUrl))
+                        .WithColor(gColor)
+                        .WithThumbnailUrl(gThumbnail)
                         .WithFooter(new EmbedFooterBuilder()
-                            .WithIconUrl(g_footer[0])
-                            .WithText(g_footer[1]))
+                            .WithIconUrl(gFooter[0])
+                            .WithText(gFooter[1]))
                         .WithTimestamp(DateTime.UtcNow);
                 }
             }
             else
             {
-                if (!is_found && !is_group_found) return;
-                if (!is_found && is_group_found)
+                if (!isFound && !isGroupFound) return;
+                if (!isFound && isGroupFound)
                     result = GetGroupCommandContents(param, true);
-                else if (is_found && !is_group_found)
+                else if (isFound && !isGroupFound)
                     result = GetGroupCommandContents(param, false);
                 builder = new EmbedBuilder();
                 builder
@@ -383,14 +383,14 @@ namespace Siotrix.Discord.Admin
                     });
                 builder
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(g_icon_url)
-                        .WithName(g_name)
-                        .WithUrl(g_url))
-                    .WithColor(g_color)
-                    .WithThumbnailUrl(g_thumbnail)
+                        .WithIconUrl(gIconUrl)
+                        .WithName(gName)
+                        .WithUrl(gUrl))
+                    .WithColor(gColor)
+                    .WithThumbnailUrl(gThumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(g_footer[0])
-                        .WithText(g_footer[1]))
+                        .WithIconUrl(gFooter[0])
+                        .WithText(gFooter[1]))
                     .WithTimestamp(DateTime.UtcNow);
             }
             await ReplyAsync("", embed: builder);

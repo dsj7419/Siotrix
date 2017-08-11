@@ -8,49 +8,49 @@ namespace Siotrix.Discord
     {
         public static long GetCaseNumber(this SocketCommandContext context)
         {
-            long case_num = 0;
+            long caseNum = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var list = db.Casenums.Where(x => x.GuildId.Equals(context.Guild.Id.ToLong()));
                     if (!list.Any())
-                        case_num = 1;
+                        caseNum = 1;
                     else
-                        case_num = list.Last().GCaseNum + 1;
+                        caseNum = list.Last().GCaseNum + 1;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return case_num;
+            return caseNum;
         }
 
-        public static async void SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id,
+        public static async void SaveCaseDataAsync(string cmdName, long caseNum, long userId, long guildId,
             string reason)
         {
-            Console.WriteLine("================================================{0}", case_num);
+            Console.WriteLine("================================================{0}", caseNum);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var exist_data =
-                        db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) &&
-                                               x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
-                    if (exist_data.Any())
+                    var existData =
+                        db.Casenums.Where(x => x.GuildId.Equals(guildId) && x.GCaseNum.Equals(caseNum) &&
+                                               x.UserId.Equals(userId) && x.CmdName.Equals(cmdName));
+                    if (existData.Any())
                     {
-                        var data = exist_data.First();
+                        var data = existData.First();
                         data.Reason = reason;
                         db.Casenums.Update(data);
                     }
                     else
                     {
                         var record = new DiscordCaseNum();
-                        record.GCaseNum = case_num;
-                        record.GuildId = guild_id;
-                        record.UserId = user_id;
-                        record.CmdName = cmd_name;
+                        record.GCaseNum = caseNum;
+                        record.GuildId = guildId;
+                        record.UserId = userId;
+                        record.CmdName = cmdName;
                         record.Reason = reason;
                         db.Casenums.Add(record);
                     }

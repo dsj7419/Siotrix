@@ -7,7 +7,7 @@ namespace Siotrix.Discord.Developer
 {
     [Name("Developer")]
     [Summary("A .Net reference utility for Siotrix Developers.")]
-    public class CSDocsModule : ModuleBase<SocketCommandContext>
+    public class CsDocsModule : ModuleBase<SocketCommandContext>
     {
         [Command("csdocs")]
         [Summary("Shows class/method reference from the new unified .Net reference.")]
@@ -15,8 +15,8 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task GetDocumentationAsync([Remainder] string term)
         {
-            var response = await new CSDocsService().GetDocumentationResultsAsync(term);
-            var g_color = Context.GetGuildColor();
+            var response = await new CsDocsService().GetDocumentationResultsAsync(term);
+            var gColor = Context.GetGuildColor();
             var embedCount = 0;
 
             foreach (var res in response.Results.Take(3).OrderBy(x => x.DisplayName))
@@ -24,7 +24,7 @@ namespace Siotrix.Discord.Developer
                 embedCount++;
 
                 var builder = new EmbedBuilder()
-                    .WithColor(g_color)
+                    .WithColor(gColor)
                     .WithTitle($"{res.ItemKind}: {res.DisplayName}")
                     .WithUrl(res.Url)
                     .WithDescription(res.Description);

@@ -8,15 +8,15 @@ namespace Siotrix.Discord
     {
         public static string GetGuildPrefix(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
+            var guildId = context.Guild.Id;
             string prefix = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gprefixs.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gprefixs.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
-                        prefix = SiotrixConstants.BOT_PREFIX;
+                        prefix = SiotrixConstants.BotPrefix;
                     else
                         prefix = val.First().Prefix;
                 }

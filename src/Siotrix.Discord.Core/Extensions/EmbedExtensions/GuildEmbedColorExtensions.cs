@@ -9,24 +9,24 @@ namespace Siotrix.Discord
     {
         public static Color GetGuildColor(this SocketCommandContext context)
         {
-            var SIOTRIX_COLOR = "0x010101";
-            var guild_id = context.Guild.Id;
+            var siotrixColor = "0x010101";
+            var guildId = context.Guild.Id;
             string colorHex = null;
 
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gcolors.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
                         db.Gcolors.Add(new DiscordColor
                         {
-                            ColorHex = SIOTRIX_COLOR,
-                            GuildId = guild_id.ToLong()
+                            ColorHex = siotrixColor,
+                            GuildId = guildId.ToLong()
                         });
                         db.SaveChanges();
-                        colorHex = SIOTRIX_COLOR;
+                        colorHex = siotrixColor;
                     }
                     else
                     {

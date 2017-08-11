@@ -37,7 +37,7 @@ namespace Siotrix.Discord.Moderation
                 new Regex(@"<?(https?:\/\/)?(www\.)?(discord\.gg|discordapp\.com\/invite)\b([-a-zA-Z0-9/]*)>?");
             var regexDiscordMe = new Regex(@"<?(https?:\/\/)?(www\.)?(discord\.me\/)\b([-a-zA-Z0-9/]*)>?");
             var regexDiscordEmojis = new Regex(@"<?([a-zA-Z]+):([0-9]+)>?");
-            var RegexUrl =
+            var regexUrl =
                 new Regex(
                     @"(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_=]*)?");
 
@@ -69,8 +69,8 @@ namespace Siotrix.Discord.Moderation
             var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(context.Guild.Id, user.Id, channel.Id);
 
             if (regexItem.IsMatch(message.Content) || regexDiscordMe.IsMatch(message.Content) ||
-                RegexUrl.IsMatch(message.Content) && antilinkChannel.IsStrict)
-                if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
+                regexUrl.IsMatch(message.Content) && antilinkChannel.IsStrict)
+                if (user.IsBot && user.Id == SiotrixConstants.BotId)
                 {
                 }
                 else if (user.GetPermissions(channel).ManageMessages)
@@ -87,7 +87,7 @@ namespace Siotrix.Discord.Moderation
                 {
                     LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
                     var channelLog =
-                        context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                        context.Guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
                     var builder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
                             .WithIconUrl(msg.Author.GetAvatarUrl())
@@ -98,7 +98,7 @@ namespace Siotrix.Discord.Moderation
                     await channelLog.SendMessageAsync("", false, builder.Build());
 
                     if (antilink.IsDmMessage)
-                        await MessageExtensions.DMUser(user, antilink.DmMessage);
+                        await MessageExtensions.DmUser(user, antilink.DmMessage);
 
                     await msg.DeleteAsync();
                 }

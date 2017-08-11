@@ -19,7 +19,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task BlacklistListAsync()
         {
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             var title = $"Blacklistk Information for {Context.Guild.Name}";
 
             var blacklist = await BlacklistExtensions.GetBlacklistUsersAsync(Context.Guild);
@@ -34,7 +34,7 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithThumbnailUrl(Context.Guild.IconUrl)
-                .WithColor(g_color)
+                .WithColor(gColor)
                 .WithTitle($"Users blacklisted in {Context.Guild}")
                 .WithDescription(string.Join(", ", blacklist.Select(x => x.Username)));
 
@@ -48,7 +48,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task BlacklistAddAsync(SocketGuildUser user)
         {
-            if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
+            if (user.IsBot && user.Id == SiotrixConstants.BotId)
             {
                 await ReplyAsync($"You cannot add me to the blacklist.");
                 return;

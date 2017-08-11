@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Utility
         [MinPermissions(AccessLevel.User)]
         public async Task SuggestAsync([Remainder] string message)
         {
-            var suggestionChannel = Context.Client.GetChannel(SiotrixConstants.SUGGESTION_CHANNEL) as IMessageChannel;
+            var suggestionChannel = Context.Client.GetChannel(SiotrixConstants.SuggestionChannel) as IMessageChannel;
 
             if (suggestionChannel == null)
             {

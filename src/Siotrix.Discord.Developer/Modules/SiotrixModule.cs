@@ -30,7 +30,7 @@ namespace Siotrix.Discord.Developer
         public async Task AvatarAsync(Uri url)
         {
             if (url.ToString().Equals("reset"))
-                url = new Uri(SiotrixConstants.BOT_AVATAR);
+                url = new Uri(SiotrixConstants.BotAvatar);
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             using (var client = new HttpClient())
@@ -40,7 +40,7 @@ namespace Siotrix.Discord.Developer
 
                 var self = Context.Client.CurrentUser;
                 await self.ModifyAsync(x => { x.Avatar = new Image(stream); });
-                await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
             }
         }
 
@@ -57,14 +57,14 @@ namespace Siotrix.Discord.Developer
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
                     {
-                        url = SiotrixConstants.BOT_AUTHOR_ICON;
+                        url = SiotrixConstants.BotAuthorIcon;
                     }
                     else
                     {
                         url = db.Authors.First().AuthorIcon;
                         if (url == null || url == "")
                         {
-                            url = SiotrixConstants.BOT_AUTHOR_ICON;
+                            url = SiotrixConstants.BotAuthorIcon;
                             var data = db.Authors.First();
                             data.AuthorIcon = url;
                             db.Authors.Update(data);
@@ -91,7 +91,7 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordAuthor();
                 if (url.ToString().Equals("reset"))
-                    val.AuthorIcon = SiotrixConstants.BOT_AUTHOR_ICON;
+                    val.AuthorIcon = SiotrixConstants.BotAuthorIcon;
                 else
                     val.AuthorIcon = url.ToString();
                 try
@@ -113,7 +113,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("authorurl")]
@@ -185,7 +185,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("authorname")]
@@ -221,7 +221,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("authorname")]
@@ -272,7 +272,7 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Binfos == null || db.Binfos.ToList().Count <= 0)
-                        str = SiotrixConstants.BOT_DESC;
+                        str = SiotrixConstants.BotDesc;
                     else
                         str = db.Binfos.First().BotInfo;
                 }
@@ -313,7 +313,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("website")]
@@ -328,7 +328,7 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bwebsiteurls == null || db.Bwebsiteurls.ToList().Count <= 0)
-                        url = SiotrixConstants.BOT_URL;
+                        url = SiotrixConstants.BotUrl;
                     else
                         url = db.Bwebsiteurls.First().SiteUrl;
                 }
@@ -369,7 +369,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("footericon")]
@@ -384,7 +384,7 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                        url = SiotrixConstants.BOT_FOOTER_ICON;
+                        url = SiotrixConstants.BotFooterIcon;
                     else
                         url = db.Bfooters.First().FooterIcon;
                 }
@@ -406,7 +406,7 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordSiotrixFooter();
                 if (url.ToString().Equals("reset"))
-                    val.FooterIcon = SiotrixConstants.BOT_FOOTER_ICON;
+                    val.FooterIcon = SiotrixConstants.BotFooterIcon;
                 else
                     val.FooterIcon = url.ToString();
                 try
@@ -428,7 +428,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("footertext")]
@@ -460,7 +460,7 @@ namespace Siotrix.Discord.Developer
                     Console.WriteLine(e);
                 }
             }
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("footertext")]
@@ -475,7 +475,7 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                        txt = SiotrixConstants.BOT_FOOTER_TEXT;
+                        txt = SiotrixConstants.BotFooterText;
                     else
                         txt = db.Bfooters.First().FooterText;
                 }
@@ -504,7 +504,7 @@ namespace Siotrix.Discord.Developer
         {
             var self = Context.Client.CurrentUser;
             await self.ModifyAsync(x => { x.Username = name; });
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("activity")]
@@ -523,7 +523,7 @@ namespace Siotrix.Discord.Developer
         public async Task ActivityAsync([Remainder] string activity)
         {
             await Context.Client.SetGameAsync(activity);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("status")]
@@ -543,7 +543,7 @@ namespace Siotrix.Discord.Developer
         {
             var self = Context.Client.CurrentUser;
             await Context.Client.SetStatusAsync(status);
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("nickname")]
@@ -564,9 +564,9 @@ namespace Siotrix.Discord.Developer
         {
             var self = Context.Guild.CurrentUser;
             if (name.Equals("reset"))
-                name = SiotrixConstants.BOT_NAME;
+                name = SiotrixConstants.BotName;
             await self.ModifyAsync(x => { x.Nickname = name; });
-            await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Siotrix.Discord.Moderation
             var words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var channel =
-                context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                context.Guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
             {
@@ -57,20 +57,20 @@ namespace Siotrix.Discord.Moderation
             }
 
             spec = context.GetGuildPrefix();
-            var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
+            var isFound = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
             if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
-                if (is_found)
+                if (isFound)
                     await message.DeleteAsync();
         }
 
-        private bool IsUsableAutoDeleteCommand(long guild_id)
+        private bool IsUsableAutoDeleteCommand(long guildId)
         {
             var isFound = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var data = db.Gautodeletes.Where(x => x.GuildId == guild_id);
+                    var data = db.Gautodeletes.Where(x => x.GuildId == guildId);
                     if (data.Any())
                         isFound = true;
                 }

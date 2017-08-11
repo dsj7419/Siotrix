@@ -10,10 +10,10 @@ namespace Siotrix.Discord.Moderation
     public class WarningService : IService
     {
         private readonly DiscordSocketClient _client;
-        private string bad_words;
-        private EmbedBuilder builder;
-        private int count;
-        private IUserMessage log_msg;
+        private string _badWords;
+        private EmbedBuilder _builder;
+        private int _count;
+        private IUserMessage _logMsg;
 
         public WarningService(DiscordSocketClient client)
         {
@@ -42,12 +42,12 @@ namespace Siotrix.Discord.Moderation
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
             {
-                count++;
-                bad_words += badword + " ";
-                var warn_count = GetWarnValue(context.Guild.Id.ToLong(), 1);
-                var warn_mute_time = GetWarnValue(context.Guild.Id.ToLong(), 2);
-                var mod_channel =
-                    context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                _count++;
+                _badWords += badword + " ";
+                var warnCount = GetWarnValue(context.Guild.Id.ToLong(), 1);
+                var warnMuteTime = GetWarnValue(context.Guild.Id.ToLong(), 2);
+                var modChannel =
+                    context.Guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
                 //if (count == warn_count)
                 //{
@@ -62,38 +62,38 @@ namespace Siotrix.Discord.Moderation
                 //    await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                 //    return;
                 //}
-                if (count == 1)
+                if (_count == 1)
                 {
-                    builder = GetBuilder(context, 1, badword);
-                    log_msg = await mod_channel.SendMessageSafeAsync("", false, builder.Build());
+                    _builder = GetBuilder(context, 1, badword);
+                    _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());
                 }
                 else
                 {
-                    if (count > warn_count)
-                        await MuteWarnUser(context.User as IGuildUser, warn_mute_time, context);
-                    builder = GetBuilder(context, count, bad_words);
-                    await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
+                    if (_count > warnCount)
+                        await MuteWarnUser(context.User as IGuildUser, warnMuteTime, context);
+                    _builder = GetBuilder(context, _count, _badWords);
+                    await _logMsg.ModifyAsync(x => { x.Embed = _builder.Build(); });
                 }
             }
         }
 
-        private int GetWarnValue(long guild_id, int option_value)
+        private int GetWarnValue(long guildId, int optionValue)
         {
-            var warn_value = 0;
+            var warnValue = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var result = db.Gwarns.Where(p => p.GuildId.Equals(guild_id) && p.Option.Equals(option_value));
+                    var result = db.Gwarns.Where(p => p.GuildId.Equals(guildId) && p.Option.Equals(optionValue));
                     if (result.Any())
-                        warn_value = result.First().WarnValue;
+                        warnValue = result.First().WarnValue;
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return warn_value;
+            return warnValue;
         }
 
         private async Task MuteWarnUser(IGuildUser user, int minutes, SocketCommandContext context)
@@ -103,11 +103,11 @@ namespace Siotrix.Discord.Moderation
                 if (!user.IsBot)
                     await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true)
                         .ConfigureAwait(false);
-                var is_save = MuteExtensions.SaveMuteUser(user, minutes);
-                if (is_save)
+                var isSave = MuteExtensions.SaveMuteUser(user, minutes);
+                if (isSave)
                 {
-                    var case_id = context.GetCaseNumber();
-                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(),
+                    var caseId = context.GetCaseNumber();
+                    CaseExtensions.SaveCaseDataAsync("mute", caseId, user.Id.ToLong(), context.Guild.Id.ToLong(),
                         "auto");
                 }
             }
@@ -117,28 +117,28 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private EmbedBuilder GetBuilder(SocketCommandContext context, int warn_count, string badword)
+        private EmbedBuilder GetBuilder(SocketCommandContext context, int warnCount, string badword)
         {
             string value = null;
-            var g_icon_url = context.GetGuildIconUrl();
-            var g_name = context.GetGuildName();
-            var g_url = context.GetGuildUrl();
-            var g_thumbnail = context.GetGuildThumbNail();
-            var g_footer = context.GetGuildFooter();
-            var g_prefix = context.GetGuildPrefix();
+            var gIconUrl = context.GetGuildIconUrl();
+            var gName = context.GetGuildName();
+            var gUrl = context.GetGuildUrl();
+            var gThumbnail = context.GetGuildThumbNail();
+            var gFooter = context.GetGuildFooter();
+            var gPrefix = context.GetGuildPrefix();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithColor(new Color(255, 0, 0))
-                .WithThumbnailUrl(g_thumbnail)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
-            value = context.User.Mention + " has been issued **" + warn_count +
+            value = context.User.Mention + " has been issued **" + warnCount +
                     "** warning points for breaking filter rule\n" +
                     "Reason : use of the words : ***" + badword + "***\n";
 

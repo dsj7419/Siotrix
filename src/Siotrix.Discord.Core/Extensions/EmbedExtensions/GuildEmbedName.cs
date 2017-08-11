@@ -8,13 +8,13 @@ namespace Siotrix.Discord
     {
         public static string GetGuildName(this SocketCommandContext context)
         {
-            var guild_id = context.Guild.Id;
+            var guildId = context.Guild.Id;
             string name = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gnames.Where(p => p.GuildId == guild_id.ToLong());
+                    var val = db.Gnames.Where(p => p.GuildId == guildId.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                         name = context.Guild.Name;
                     else

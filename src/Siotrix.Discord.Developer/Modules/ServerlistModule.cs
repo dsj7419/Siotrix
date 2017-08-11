@@ -15,7 +15,7 @@ namespace Siotrix.Discord.Developer
         {
             var client = Context.Client;
             var embed = new EmbedBuilder();
-            var g_color = Context.GetGuildColor();
+            var gColor = Context.GetGuildColor();
             foreach (var guild in client.Guilds)
                 embed.AddField(x =>
                 {
@@ -24,11 +24,11 @@ namespace Siotrix.Discord.Developer
                     x.IsInline = true;
                 });
             embed.Title = "=== Server List ===";
-            embed.Color = g_color;
+            embed.Color = gColor;
             embed.Footer = new EmbedFooterBuilder
             {
                 Text = $"Total Guilds: {client.Guilds.Count}",
-                IconUrl = SiotrixConstants.BOT_AVATAR
+                IconUrl = SiotrixConstants.BotAvatar
             };
 
             await ReplyAsync("", embed: embed);

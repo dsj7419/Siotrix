@@ -39,24 +39,24 @@ namespace Siotrix.Discord.Statistics
                     var data = list.Where(p => p.CreatedAt <= lastDayOfMonth && p.CreatedAt >= firstDayOfMonth);
                     if (isAll)
                     {
-                        var list_per_user = list.GroupBy(p => p.AuthorId);
+                        var listPerUser = list.GroupBy(p => p.AuthorId);
                         var index = 0;
-                        var cnt_arr = new int[list_per_user.ToList().Count];
-                        foreach (var item in list_per_user)
+                        var cntArr = new int[listPerUser.ToList().Count];
+                        foreach (var item in listPerUser)
                         {
-                            cnt_arr[index] = item.ToList().Count;
-                            Console.WriteLine(">>>>>>>>>>>{0}", cnt_arr[index]);
+                            cntArr[index] = item.ToList().Count;
+                            Console.WriteLine(">>>>>>>>>>>{0}", cntArr[index]);
                             index++;
                         }
-                        Array.Sort(cnt_arr);
-                        Array.Reverse(cnt_arr);
+                        Array.Sort(cntArr);
+                        Array.Reverse(cntArr);
                         var loop = 0;
-                        foreach (var x1 in cnt_arr)
+                        foreach (var x1 in cntArr)
                         {
                             Console.WriteLine("*******{0}", x1);
                             if (loop > 25)
                                 break;
-                            foreach (var x2 in list_per_user)
+                            foreach (var x2 in listPerUser)
                                 if (x1 == x2.ToList().Count)
                                 {
                                     result.Add(x2.First().AuthorId);
@@ -66,24 +66,24 @@ namespace Siotrix.Discord.Statistics
                     }
                     else
                     {
-                        var list_per_user = data.GroupBy(p => p.AuthorId);
+                        var listPerUser = data.GroupBy(p => p.AuthorId);
                         var index = 0;
-                        var cnt_arr = new int[list_per_user.ToList().Count];
-                        foreach (var item in list_per_user)
+                        var cntArr = new int[listPerUser.ToList().Count];
+                        foreach (var item in listPerUser)
                         {
-                            cnt_arr[index] = item.ToList().Count;
-                            Console.WriteLine("~~~~~~~~~~{0}", cnt_arr[index]);
+                            cntArr[index] = item.ToList().Count;
+                            Console.WriteLine("~~~~~~~~~~{0}", cntArr[index]);
                             index++;
                         }
-                        Array.Sort(cnt_arr);
-                        Array.Reverse(cnt_arr);
+                        Array.Sort(cntArr);
+                        Array.Reverse(cntArr);
                         var loop = 0;
-                        foreach (var x1 in cnt_arr)
+                        foreach (var x1 in cntArr)
                         {
                             Console.WriteLine("========{0}", x1);
                             if (loop > 25)
                                 break;
-                            foreach (var x2 in list_per_user)
+                            foreach (var x2 in listPerUser)
                                 if (x1 == x2.ToList().Count)
                                 {
                                     result.Add(x2.First().AuthorId);
@@ -141,39 +141,39 @@ namespace Siotrix.Discord.Statistics
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync()
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
             var list = GetLeaderBoardDatasPerGuild(false);
-            var get_values = new string[2];
+            var getValues = new string[2];
             var index = 0;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithDescription($"Last 30 days")
-                .WithColor(g_color)
-                .WithTitle("Current Leaderboard for " + g_name)
+                .WithColor(gColor)
+                .WithTitle("Current Leaderboard for " + gName)
                 //  .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
             foreach (var element in list)
             {
                 index++;
-                get_values = GetTopUsers(element, false);
+                getValues = GetTopUsers(element, false);
                 builder
                     .AddField(new EmbedFieldBuilder
                     {
                         IsInline = true,
-                        Name = index + ") " + get_values[0],
-                        Value = get_values[1] + " messages"
+                        Name = index + ") " + getValues[0],
+                        Value = getValues[1] + " messages"
                     });
             }
             return ReplyAsync("", embed: builder);
@@ -187,41 +187,41 @@ namespace Siotrix.Discord.Statistics
         [MinPermissions(AccessLevel.User)]
         public Task StatsAsync(string alltime)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
             var list = GetLeaderBoardDatasPerGuild(true);
-            var get_values = new string[2];
+            var getValues = new string[2];
             var index = 0;
 
             if (!alltime.Equals("alltime"))
                 return ReplyAsync($"Input Error");
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
                 .WithDescription($"All Time")
-                .WithColor(g_color)
-                .WithTitle("Current Leaderboard for " + g_name)
+                .WithColor(gColor)
+                .WithTitle("Current Leaderboard for " + gName)
                 //     .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTimestamp(DateTime.UtcNow);
             foreach (var element in list)
             {
                 index++;
-                get_values = GetTopUsers(element, true);
+                getValues = GetTopUsers(element, true);
                 builder
                     .AddField(new EmbedFieldBuilder
                     {
                         IsInline = true,
-                        Name = index + ") " + get_values[0],
-                        Value = get_values[1] + " messages"
+                        Name = index + ") " + getValues[0],
+                        Value = getValues[1] + " messages"
                     });
             }
             return ReplyAsync("", embed: builder);

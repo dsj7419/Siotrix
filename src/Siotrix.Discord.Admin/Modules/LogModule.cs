@@ -20,7 +20,7 @@ namespace Siotrix.Discord.Admin
             _map = map;
         }
 
-        private string[] GetLogChannelPerGuild(long guild_id, string cmd)
+        private string[] GetLogChannelPerGuild(long guildId, string cmd)
         {
             var result = new string[9];
             var isModLog = -1;
@@ -34,7 +34,7 @@ namespace Siotrix.Discord.Admin
                 {
                     if (isModLog == 0)
                     {
-                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() > 0 || list.Any())
                         {
                             result[0] = "LogChannel Information :";
@@ -55,7 +55,7 @@ namespace Siotrix.Discord.Admin
                     }
                     if (isModLog == 1)
                     {
-                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() > 0 || list.Any())
                         {
                             result[0] = "ModLogChannel Information :";
@@ -83,7 +83,7 @@ namespace Siotrix.Discord.Admin
             return result;
         }
 
-        private bool SetLogChannelPerGuild(long guild_id, string command, long channel_id)
+        private bool SetLogChannelPerGuild(long guildId, string command, long channelId)
         {
             var isSuccess = false;
             var result = new string[9];
@@ -98,12 +98,12 @@ namespace Siotrix.Discord.Admin
                 {
                     if (isModLog == 0)
                     {
-                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() > 0 || list.Any())
                         {
                             var data = list.First();
-                            data.ChannelId = channel_id;
-                            data.GuildId = guild_id;
+                            data.ChannelId = channelId;
+                            data.GuildId = guildId;
                             data.IsActive = false;
                             data.UserId = Context.User.Id.ToLong();
                             db.Glogchannels.Update(data);
@@ -111,8 +111,8 @@ namespace Siotrix.Discord.Admin
                         else
                         {
                             var record = new DiscordGuildLogChannel();
-                            record.ChannelId = channel_id;
-                            record.GuildId = guild_id;
+                            record.ChannelId = channelId;
+                            record.GuildId = guildId;
                             record.IsActive = false;
                             record.UserId = Context.User.Id.ToLong();
                             db.Glogchannels.Add(record);
@@ -120,12 +120,12 @@ namespace Siotrix.Discord.Admin
                     }
                     if (isModLog == 1)
                     {
-                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() > 0 || list.Any())
                         {
                             var data = list.First();
-                            data.ChannelId = channel_id;
-                            data.GuildId = guild_id;
+                            data.ChannelId = channelId;
+                            data.GuildId = guildId;
                             data.IsActive = false;
                             data.UserId = Context.User.Id.ToLong();
                             data.ModeratorId = Context.User.Id.ToLong();
@@ -134,8 +134,8 @@ namespace Siotrix.Discord.Admin
                         else
                         {
                             var record = new DiscordGuildModLogChannel();
-                            record.ChannelId = channel_id;
-                            record.GuildId = guild_id;
+                            record.ChannelId = channelId;
+                            record.GuildId = guildId;
                             record.IsActive = false;
                             record.UserId = Context.User.Id.ToLong();
                             record.ModeratorId = Context.User.Id.ToLong();
@@ -153,9 +153,9 @@ namespace Siotrix.Discord.Admin
             return isSuccess;
         }
 
-        private int CheckToggleStatus(long guild_id, string command)
+        private int CheckToggleStatus(long guildId, string command)
         {
-            var is_active = 0;
+            var isActive = 0;
             var isModLog = -1;
             if (command.Equals("modlogchannel"))
                 isModLog = 1;
@@ -167,37 +167,37 @@ namespace Siotrix.Discord.Admin
                 {
                     if (isModLog == 0)
                     {
-                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Glogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() <= 0 || !list.Any()) return 0;
 
                         var data = list.First();
                         if (data.IsActive)
                         {
                             data.IsActive = false;
-                            is_active = 1;
+                            isActive = 1;
                         }
                         else
                         {
                             data.IsActive = true;
-                            is_active = 2;
+                            isActive = 2;
                         }
                         db.Glogchannels.Update(data);
                     }
                     if (isModLog == 1)
                     {
-                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guild_id));
+                        var list = db.Gmodlogchannels.Where(p => p.GuildId.Equals(guildId));
                         if (list.Count() <= 0 || !list.Any()) return 0;
 
                         var data = list.First();
                         if (data.IsActive)
                         {
                             data.IsActive = false;
-                            is_active = 3;
+                            isActive = 3;
                         }
                         else
                         {
                             data.IsActive = true;
-                            is_active = 4;
+                            isActive = 4;
                         }
                         db.Gmodlogchannels.Update(data);
                     }
@@ -208,13 +208,13 @@ namespace Siotrix.Discord.Admin
                     Console.WriteLine(e);
                 }
             }
-            return is_active;
+            return isActive;
         }
 
-        private string PrintToggleStatus(int active_value)
+        private string PrintToggleStatus(int activeValue)
         {
             string status = null;
-            switch (active_value)
+            switch (activeValue)
             {
                 case 1:
                     status = "✖️ : ``logchannel`` has been **Toggled off** !";
@@ -240,24 +240,24 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LogAsync(string command)
         {
-            var g_icon_url = Context.GetGuildIconUrl();
-            var g_name = Context.GetGuildName();
-            var g_url = Context.GetGuildUrl();
-            var g_color = Context.GetGuildColor();
-            var g_thumbnail = Context.GetGuildThumbNail();
-            var g_footer = Context.GetGuildFooter();
-            var g_prefix = Context.GetGuildPrefix();
+            var gIconUrl = Context.GetGuildIconUrl();
+            var gName = Context.GetGuildName();
+            var gUrl = Context.GetGuildUrl();
+            var gColor = Context.GetGuildColor();
+            var gThumbnail = Context.GetGuildThumbNail();
+            var gFooter = Context.GetGuildFooter();
+            var gPrefix = Context.GetGuildPrefix();
             var data = GetLogChannelPerGuild(Context.Guild.Id.ToLong(), command);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
-                .WithColor(g_color)
-                .WithThumbnailUrl(g_thumbnail)
+                    .WithIconUrl(gIconUrl)
+                    .WithName(gName)
+                    .WithUrl(gUrl))
+                .WithColor(gColor)
+                .WithThumbnailUrl(gThumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                    .WithIconUrl(gFooter[0])
+                    .WithText(gFooter[1]))
                 .WithTitle(data[0])
                 .WithTimestamp(DateTime.UtcNow);
 
@@ -304,22 +304,22 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LogAsync(string command, [Remainder] string name)
         {
-            long channel_id = 0;
-            var is_setting = false;
+            long channelId = 0;
+            var isSetting = false;
 
             if (name.Equals("toggle"))
             {
-                var active_value = CheckToggleStatus(Context.Guild.Id.ToLong(), command);
-                var status = PrintToggleStatus(active_value);
+                var activeValue = CheckToggleStatus(Context.Guild.Id.ToLong(), command);
+                var status = PrintToggleStatus(activeValue);
                 await ReplyAsync(status);
             }
             else
             {
-                channel_id = name.GetChannelIdFromName(Context);
-                if (channel_id <= 0) return;
-                is_setting = SetLogChannelPerGuild(Context.Guild.Id.ToLong(), command, channel_id);
-                if (is_setting)
-                    await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
+                channelId = name.GetChannelIdFromName(Context);
+                if (channelId <= 0) return;
+                isSetting = SetLogChannelPerGuild(Context.Guild.Id.ToLong(), command, channelId);
+                if (isSetting)
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
             }
         }
     }
