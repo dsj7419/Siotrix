@@ -1,6 +1,6 @@
-﻿using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Utility
 {
@@ -8,8 +8,8 @@ namespace Siotrix.Discord.Utility
     [MinPermissions(AccessLevel.User)]
     public class InviteModule : ModuleBase<SocketCommandContext>
     {
-
-        [Command("invite"), Alias("join")]
+        [Command("invite")]
+        [Alias("join")]
         [Summary("Returns the OAuth2 Invite URL of the bot")]
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.User)]

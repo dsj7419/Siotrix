@@ -1,9 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
-using System;
 
 namespace Siotrix.Discord.Developer
 {
@@ -40,9 +39,11 @@ namespace Siotrix.Discord.Developer
 
             foreach (var guild in guilds)
             {
-                var dmChannel = (IDMChannel)Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == guild.Owner.Id) ??
-                    await guild.Owner.GetOrCreateDMChannelAsync();
-                await dmChannel.SendMessageSafeAsync($"This announcement was sent to you because you are the owner of the {guild.Name} server, which I am also on.", embed: builder.Build());
+                var dmChannel = Context.Client.DMChannels.SingleOrDefault(c => c.Recipient.Id == guild.Owner.Id) ??
+                                await guild.Owner.GetOrCreateDMChannelAsync();
+                await dmChannel.SendMessageSafeAsync(
+                    $"This announcement was sent to you because you are the owner of the {guild.Name} server, which I am also on.",
+                    embed: builder.Build());
             }
 
             await Task.Delay(20000);

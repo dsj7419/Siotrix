@@ -1,17 +1,18 @@
-﻿using System.Threading.Tasks;
-using Discord.Commands;
-using Discord;
-using System;
-using Discord.WebSocket;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Admin.Modules
 {
     [Name("Admin")]
     public class RoleInfoModule : ModuleBase<SocketCommandContext>
     {
-        [Command("roleinfo"), Alias("RI")]
+        [Command("roleinfo")]
+        [Alias("RI")]
         [Summary("Displays information about given Role")]
         [Remarks("<role name>")]
         [RequireContext(ContextType.Guild)]
@@ -26,8 +27,8 @@ namespace Siotrix.Discord.Admin.Modules
             if (grp == null)
                 throw new ArgumentException("You must supply a role.");
             var grl = grp as SocketRole;
-            var gls = gld as SocketGuild;
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var gls = gld;
+            var g_color = Context.GetGuildColor();
 
             var embed = new EmbedBuilder();
             embed.Color = g_color;

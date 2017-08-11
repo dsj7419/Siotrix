@@ -1,12 +1,11 @@
-﻿using Discord;
+﻿using System.Threading.Tasks;
 using Discord.WebSocket;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Statistics
 {
     public class MembershipService : IService
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
         private LogDatabase _db;
 
         public MembershipService(DiscordSocketClient client)

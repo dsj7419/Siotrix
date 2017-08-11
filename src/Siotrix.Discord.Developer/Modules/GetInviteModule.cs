@@ -1,6 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using System.Threading.Tasks;
 using Discord.Commands;
-using System.Threading.Tasks;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Developer
 {
@@ -11,12 +11,11 @@ namespace Siotrix.Discord.Developer
         [Summary("Makes an invite to the specified guild")]
         [Remarks("<Guild ID> eg. 123456789987654321")]
         [MinPermissions(AccessLevel.BotOwner)]
-        public async Task GetInviteAsync([Summary("Target guild id")]ulong guild)
+        public async Task GetInviteAsync([Summary("Target guild id")] ulong guild)
         {
-            var channel = Context.Client.GetChannel((Context.Client.GetGuild(guild)).DefaultChannel.Id);
+            var channel = Context.Client.GetChannel(Context.Client.GetGuild(guild).DefaultChannel.Id);
             var invite = await (channel as SocketGuildChannel).CreateInviteAsync();
             await ReplyAsync(invite.Url);
-
         }
     }
 }

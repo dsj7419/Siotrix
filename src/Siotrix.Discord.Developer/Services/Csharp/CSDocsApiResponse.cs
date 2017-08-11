@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Siotrix.Discord.Developer
 {
@@ -23,7 +21,7 @@ namespace Siotrix.Discord.Developer
     {
         Type,
         Namespace,
-        Member,
+        Member
     }
 
     public enum Kind

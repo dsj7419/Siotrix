@@ -1,9 +1,7 @@
-﻿using Discord.Commands;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Readers
 {
@@ -11,7 +9,7 @@ namespace Siotrix.Discord.Readers
     {
         public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
-            string cleanInput = input;
+            var cleanInput = input;
 
             var firstChar = input.First();
             if (firstChar == '<')
@@ -19,8 +17,8 @@ namespace Siotrix.Discord.Readers
 
             if (Uri.TryCreate(cleanInput, UriKind.RelativeOrAbsolute, out Uri site))
                 return Task.FromResult(TypeReaderResult.FromSuccess(site));
-            else
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"`{cleanInput}` is not a valid url"));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                $"`{cleanInput}` is not a valid url"));
         }
     }
 }

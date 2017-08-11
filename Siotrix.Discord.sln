@@ -1,11 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.12
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Discord", "src\Siotrix.Discord\Siotrix.Discord.csproj", "{69E2D1D1-E745-41B1-8E11-3222EDC63175}"
 	ProjectSection(ProjectDependencies) = postProject
 		{821EA31B-26C3-408C-95C6-2ABF3E79A093} = {821EA31B-26C3-408C-95C6-2ABF3E79A093}
+		{7D9BAF6F-8F7E-4924-99A6-0DCC9D16D2C5} = {7D9BAF6F-8F7E-4924-99A6-0DCC9D16D2C5}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Discord.Core", "src\Siotrix.Discord.Core\Siotrix.Discord.Core.csproj", "{821EA31B-26C3-408C-95C6-2ABF3E79A093}"

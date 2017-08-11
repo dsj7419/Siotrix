@@ -1,8 +1,8 @@
-﻿using Discord.Commands;
-using Discord;
+﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using System;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {

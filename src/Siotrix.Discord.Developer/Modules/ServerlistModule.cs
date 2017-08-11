@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 
 namespace Siotrix.Discord.Developer
 {
@@ -14,23 +13,21 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task ServerlistAsync()
         {
-            var client = Context.Client as DiscordSocketClient;
+            var client = Context.Client;
             var embed = new EmbedBuilder();
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
-            foreach (SocketGuild guild in client.Guilds)
-            {
+            var g_color = Context.GetGuildColor();
+            foreach (var guild in client.Guilds)
                 embed.AddField(x =>
                 {
                     x.Name = $"{guild.Name} || {guild.Id}";
-                    x.Value = $"Guild Owner: { guild.Owner} || { guild.OwnerId}\nGuild Members: {guild.MemberCount}";
+                    x.Value = $"Guild Owner: {guild.Owner} || {guild.OwnerId}\nGuild Members: {guild.MemberCount}";
                     x.IsInline = true;
                 });
-            }
             embed.Title = "=== Server List ===";
             embed.Color = g_color;
-            embed.Footer = new EmbedFooterBuilder()
+            embed.Footer = new EmbedFooterBuilder
             {
-                Text = $"Total Guilds: {client.Guilds.Count.ToString()}",
+                Text = $"Total Guilds: {client.Guilds.Count}",
                 IconUrl = SiotrixConstants.BOT_AVATAR
             };
 

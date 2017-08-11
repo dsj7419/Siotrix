@@ -1,12 +1,13 @@
-﻿using Discord.Commands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Developer
 {
     [Name("Developer")]
     public class PowerDownModule : ModuleBase<SocketCommandContext>
     {
-        [Command("powerdown"), Alias("pd")]
+        [Command("powerdown")]
+        [Alias("pd")]
         [Summary("Shuts down Siotrix.")]
         [Remarks(" - no additional arguments needed")]
         [MinPermissions(AccessLevel.BotOwner)]

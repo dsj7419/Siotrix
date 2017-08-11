@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Discord.Audio;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
+using Discord.Audio;
 
 namespace Siotrix.Discord.Audio
 {
@@ -12,7 +12,7 @@ namespace Siotrix.Discord.Audio
         {
             return Task.CompletedTask;
         }
-        
+
         public async Task SendAsync(IAudioClient client, string path)
         {
             var process = CreateProcess(path);

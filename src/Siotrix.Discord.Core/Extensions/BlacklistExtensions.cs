@@ -1,11 +1,11 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
@@ -48,12 +48,13 @@ namespace Siotrix.Discord
 
         public static async Task<DiscordGuildBlacklist> GetBlacklistAsync(ulong guildId, ulong userId)
         {
-            DiscordGuildBlacklist val = new DiscordGuildBlacklist();
+            var val = new DiscordGuildBlacklist();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.Blacklist.FirstOrDefaultAsync(x => x.GuildId == guildId.ToLong() && x.UserId == userId.ToLong());
+                    val = await db.Blacklist.FirstOrDefaultAsync(
+                        x => x.GuildId == guildId.ToLong() && x.UserId == userId.ToLong());
                 }
                 catch (Exception e)
                 {

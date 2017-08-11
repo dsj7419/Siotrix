@@ -1,7 +1,5 @@
-﻿using Discord;
+﻿using System.Threading.Tasks;
 using Discord.Commands;
-using System;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord.Admin
 {
@@ -14,7 +12,7 @@ namespace Siotrix.Discord.Admin
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task Leave()
-        {     
+        {
             await ReplyAsync("Leaving~");
             await Context.Guild.LeaveAsync();
         }

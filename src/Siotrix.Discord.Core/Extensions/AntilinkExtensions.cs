@@ -1,11 +1,8 @@
-﻿using Discord;
+﻿using System;
+using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
@@ -14,7 +11,7 @@ namespace Siotrix.Discord
         /// <summary> Get antilink record by Id  </summary>
         public static async Task<DiscordGuildAntilink> GetAntilinkAsync(ulong id)
         {
-            DiscordGuildAntilink val = new DiscordGuildAntilink();
+            var val = new DiscordGuildAntilink();
             using (var db = new LogDatabase())
             {
                 try
@@ -31,7 +28,8 @@ namespace Siotrix.Discord
 
         public static async Task CreateAntilinkAsync(SocketCommandContext context)
         {
-            var antilink = new DiscordGuildAntilink(context.Guild.Id.ToLong(), false, false, $"{context.Guild.Name.ToUpper()} does not allow that link in the channel.");
+            var antilink = new DiscordGuildAntilink(context.Guild.Id.ToLong(), false, false,
+                $"{context.Guild.Name.ToUpper()} does not allow that link in the channel.");
 
             using (var db = new LogDatabase())
             {
@@ -40,7 +38,7 @@ namespace Siotrix.Discord
                     await db.Antilink.AddAsync(antilink);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
@@ -58,7 +56,7 @@ namespace Siotrix.Discord
                     db.Antilink.Update(antilink);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
@@ -102,14 +100,16 @@ namespace Siotrix.Discord
         }
 
         // Get channel Guild stored DiscordGuildAntilinkChannelList, and return object
-        public static async Task<DiscordGuildAntilinkChannelList> GetAntilinkChanneListAsync(ulong id, SocketChannel channel)
+        public static async Task<DiscordGuildAntilinkChannelList> GetAntilinkChanneListAsync(ulong id,
+            SocketChannel channel)
         {
-            DiscordGuildAntilinkChannelList val = new DiscordGuildAntilinkChannelList();
+            var val = new DiscordGuildAntilinkChannelList();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.AntilinkChannels.FirstOrDefaultAsync(x => x.GuildId == id.ToLong() && x.ChannelId == channel.Id.ToLong());
+                    val = await db.AntilinkChannels.FirstOrDefaultAsync(
+                        x => x.GuildId == id.ToLong() && x.ChannelId == channel.Id.ToLong());
                 }
                 catch (Exception e)
                 {
@@ -119,9 +119,11 @@ namespace Siotrix.Discord
             return val;
         }
 
-        public static async Task CreateAntilinkChannelAsync(SocketCommandContext context, DiscordGuildAntilink antilink, SocketChannel channel)
+        public static async Task CreateAntilinkChannelAsync(SocketCommandContext context, DiscordGuildAntilink antilink,
+            SocketChannel channel)
         {
-            var antilinkChannel = new DiscordGuildAntilinkChannelList(antilink.Id, context.Guild.Id.ToLong(), channel.Id.ToLong(), false, false);
+            var antilinkChannel = new DiscordGuildAntilinkChannelList(antilink.Id, context.Guild.Id.ToLong(),
+                channel.Id.ToLong(), false, false);
 
             using (var db = new LogDatabase())
             {
@@ -174,14 +176,17 @@ namespace Siotrix.Discord
         }
 
         // Get channel Guild stored DiscordGuildAntilinkChannelList, and return object
-        public static async Task<DiscordGuildAntilinkUserList> GetAntilinkUserListAsync(ulong guildId, ulong userId, ulong channelId)
+        public static async Task<DiscordGuildAntilinkUserList> GetAntilinkUserListAsync(ulong guildId, ulong userId,
+            ulong channelId)
         {
-            DiscordGuildAntilinkUserList val = new DiscordGuildAntilinkUserList();
+            var val = new DiscordGuildAntilinkUserList();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.Antilinkusers.FirstOrDefaultAsync(x => x.GuildId == guildId.ToLong() && x.ChannelId.Equals(channelId.ToLong()) && x.UserId.Equals(userId.ToLong()));
+                    val = await db.Antilinkusers.FirstOrDefaultAsync(
+                        x => x.GuildId == guildId.ToLong() && x.ChannelId.Equals(channelId.ToLong()) &&
+                             x.UserId.Equals(userId.ToLong()));
                 }
                 catch (Exception e)
                 {
@@ -191,9 +196,11 @@ namespace Siotrix.Discord
             return val;
         }
 
-        public static async Task CreateUserAntilinkAsync(SocketCommandContext context, DiscordGuildAntilink antilink, SocketChannel channel, SocketGuildUser user, bool isOneTime)
+        public static async Task CreateUserAntilinkAsync(SocketCommandContext context, DiscordGuildAntilink antilink,
+            SocketChannel channel, SocketGuildUser user, bool isOneTime)
         {
-            var antilinkUser = new DiscordGuildAntilinkUserList(antilink.Id, context.Guild.Id.ToLong(), channel.Id.ToLong(), user.Id.ToLong(), isOneTime);
+            var antilinkUser = new DiscordGuildAntilinkUserList(antilink.Id, context.Guild.Id.ToLong(),
+                channel.Id.ToLong(), user.Id.ToLong(), isOneTime);
 
             using (var db = new LogDatabase())
             {

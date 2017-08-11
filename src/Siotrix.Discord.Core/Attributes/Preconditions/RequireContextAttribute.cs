@@ -1,7 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -13,20 +13,21 @@ namespace Siotrix.Discord
         Group = 0x04
     }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireContextAttribute : PreconditionAttribute
     {
-        public ContextType Contexts { get; }
-        
         public RequireContextAttribute(ContextType contexts)
         {
             Contexts = contexts;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IServiceProvider map)
+        public ContextType Contexts { get; }
+
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command,
+            IServiceProvider map)
         {
             var context = icontext as SocketCommandContext;
-            bool isValid = false;
+            var isValid = false;
 
             if ((Contexts & ContextType.Guild) != 0)
                 isValid = isValid || context.Channel is IGuildChannel;
@@ -37,8 +38,8 @@ namespace Siotrix.Discord
 
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());
-            else
-                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
+            return Task.FromResult(
+                PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
         }
     }
 }

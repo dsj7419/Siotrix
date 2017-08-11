@@ -1,16 +1,15 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Linq;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
-
-    public static partial class GuildEmbedColorExtensions
+    public static class GuildEmbedColorExtensions
     {
         public static Color GetGuildColor(this SocketCommandContext context)
         {
-            string SIOTRIX_COLOR = "0x010101";
+            var SIOTRIX_COLOR = "0x010101";
             var guild_id = context.Guild.Id;
             string colorHex = null;
 
@@ -21,7 +20,7 @@ namespace Siotrix.Discord
                     var val = db.Gcolors.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
                     {
-                        db.Gcolors.Add(new DiscordColor()
+                        db.Gcolors.Add(new DiscordColor
                         {
                             ColorHex = SIOTRIX_COLOR,
                             GuildId = guild_id.ToLong()
@@ -32,10 +31,8 @@ namespace Siotrix.Discord
                     else
                     {
                         colorHex = val.First().ColorHex;
-                        if(colorHex == "0x000000")
-                        {
+                        if (colorHex == "0x000000")
                             colorHex = "0x010101";
-                        }
                     }
                 }
                 catch (Exception e)
@@ -43,7 +40,7 @@ namespace Siotrix.Discord
                     Console.WriteLine(e);
                 }
             }
-              return new Color(Convert.ToUInt32(colorHex, 16));
+            return new Color(Convert.ToUInt32(colorHex, 16));
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿using Discord;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
@@ -22,7 +19,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task BlacklistListAsync()
         {
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var g_color = Context.GetGuildColor();
             var title = $"Blacklistk Information for {Context.Guild.Name}";
 
             var blacklist = await BlacklistExtensions.GetBlacklistUsersAsync(Context.Guild);
@@ -31,11 +28,9 @@ namespace Siotrix.Discord
             foreach (var user in blacklist)
             {
                 var currentUser = Context.Guild.GetUser(user.UserId.ToUlong());
-                if(currentUser != null && currentUser.Username != user.Username)
-                {
+                if (currentUser != null && currentUser.Username != user.Username)
                     await BlacklistExtensions.SetBlacklistNameAsync(user, currentUser);
-                }
-            }            
+            }
 
             var builder = new EmbedBuilder()
                 .WithThumbnailUrl(Context.Guild.IconUrl)
@@ -61,15 +56,15 @@ namespace Siotrix.Discord
 
             var blacklistedUser = await BlacklistExtensions.GetBlacklistAsync(Context.Guild.Id, user.Id);
 
-            if(blacklistedUser != null)
+            if (blacklistedUser != null)
             {
                 await ReplyAsync($"I cannot add {user.Mention} because they are already on the blacklist.");
                 return;
             }
 
             await BlacklistExtensions.CreateBlacklistUserAsync(Context, user);
-            await ReplyAsync($"{user.Mention} has officially been blacklisted from using Siotrix commands in {Context.Guild.Name}.");
-
+            await ReplyAsync(
+                $"{user.Mention} has officially been blacklisted from using Siotrix commands in {Context.Guild.Name}.");
         }
 
         [Command("remove")]
@@ -88,8 +83,8 @@ namespace Siotrix.Discord
             }
 
             await BlacklistExtensions.DeleteBlacklistUserAsync(blacklistedUser);
-            await ReplyAsync($"{user.Mention} has been removed from the blacklist, and can use Siotrix commands again in {Context.Guild.Name}.");
-
+            await ReplyAsync(
+                $"{user.Mention} has been removed from the blacklist, and can use Siotrix commands again in {Context.Guild.Name}.");
         }
 
         private bool HasTags(object obj, IEnumerable<DiscordGuildBlacklist> blacklist)
@@ -101,6 +96,5 @@ namespace Siotrix.Discord
             }
             return true;
         }
-
     }
 }

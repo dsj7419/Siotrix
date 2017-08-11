@@ -1,8 +1,5 @@
-﻿using Discord;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace Siotrix.Discord
 {
@@ -10,31 +7,50 @@ namespace Siotrix.Discord
     {
         // bot constants
         public const string BOT_VERSION = "0.11.0";
+
         public const string BOT_PREFIX = "!";
         public const string BOT_NAME = "Siotrix";
         public const string ZERO_LENGTH_CHAR = "\u180E";
-        public const long BOT_ID = 290393294645624833;
-        public const string DISCORD_INV = "https://discord.gg/nXvBxDX";
-        public const string BOT_URL = "https://discord.gg/nXvBxDX";
-        public const string BOT_INVITE = "https://discordapp.com/oauth2/authorize?client_id=285812392930050048&scope=bot&permissions=2097176631";
+        public const long BOT_ID = 344714431265243136;
+        public const string DISCORD_INV = "https://discord.gg/qRDPXJF";
+        public const string BOT_URL = "https://discord.gg/qRDPXJF";
+
+        public const string BOT_INVITE =
+            "https://discordapp.com/oauth2/authorize?client_id=344714431265243136&scope=bot&permissions=2097176631";
+
         public const string BOT_DONATE = "https://www.patreon.com/siotrix";
         public const string FAKE_EVERYONE = "@" + ZERO_LENGTH_CHAR + "everyone";
         public const string FAKE_DISCORD_LINK = "discord" + ZERO_LENGTH_CHAR + ".gg";
         public const string BOT_SUCCESS = "👍";
         public const int WAIT_TIME = 3;
 
+        // Other Constants
+        public const long BUG_CHANNEL = 336881482712743937;
+        public const long SUGGESTION_CHANNEL = 336882503006814210;
+
         //bot embed constants
         public const string BOT_FOOTER_TEXT = "A global bot with a local feel.";
+
         public const string BOT_DESC = "Siotrix - Created by gamers for gamers.";
 
         // images and logos
-        public const string BOT_LOGO = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png";
-        public const string BOT_AVATAR = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png";
-        public const string BOT_AUTHOR_ICON = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
-        public const string BOT_FOOTER_ICON = "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+        public const string BOT_LOGO =
+                "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-10-46.png"
+            ;
+
+        public const string BOT_AVATAR =
+                "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/ApplicationFrameHost_2017-06-22_11-15-13.png"
+            ;
+
+        public const string BOT_AUTHOR_ICON =
+            "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
+
+        public const string BOT_FOOTER_ICON =
+            "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
 
         // embeds
         public const int MAX_MESSAGE_LENGTH_LONG = 1900;
+
         public const int MAX_MESSAGE_LENGTH_SHORT = 750;
         public const int MAX_NICKNAME_LENGTH = 32;
         public const int MIN_NICKNAME_LENGTH = 2;
@@ -54,17 +70,25 @@ namespace Siotrix.Discord
         public const int MAX_FIELD_LINES = 5;
         public const int MAX_LENGTH_FOR_FIELD_VALUE = 250000;
 
-        public static ReadOnlyCollection<string> VALID_IMAGE_EXTENSIONS = new ReadOnlyCollection<string>(new List<string>
-        {
-            ".jpeg", ".jpg", ".png",
-        });
+        public static ReadOnlyCollection<string> VALID_IMAGE_EXTENSIONS =
+            new ReadOnlyCollection<string>(new List<string>
+            {
+                ".jpeg",
+                ".jpg",
+                ".png"
+            });
+
         public static ReadOnlyCollection<string> VALID_GIF_EXTENTIONS = new ReadOnlyCollection<string>(new List<string>
         {
-            ".gif", ".gifv",
+            ".gif",
+            ".gifv"
         });
-        public static ReadOnlyCollection<string> COMMANDS_UNABLE_TO_BE_TURNED_OFF = new ReadOnlyCollection<string>(new List<string>
-        {
-            "cset", "help",
-        });
+
+        public static ReadOnlyCollection<string> COMMANDS_UNABLE_TO_BE_TURNED_OFF = new ReadOnlyCollection<string>(
+            new List<string>
+            {
+                "cset",
+                "help"
+            });
     }
 }

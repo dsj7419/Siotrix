@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Siotrix.Discord.Developer
 {
@@ -14,7 +14,9 @@ namespace Siotrix.Discord.Developer
             $"&order=desc" +
             $"&sort=votes" +
             $"&filter=default";
-        public async Task<StackExchangeResponse> GetStackExchangeResultsAsync(string token, string phrase, string site, string tags)
+
+        public async Task<StackExchangeResponse> GetStackExchangeResultsAsync(string token, string phrase, string site,
+            string tags)
         {
             _ApiReferenceUrl = string.Format(_ApiReferenceUrl, token);
             phrase = Uri.EscapeDataString(phrase);
@@ -24,9 +26,7 @@ namespace Siotrix.Discord.Developer
             var client = new HttpClient();
             var response = await client.GetAsync(query);
             if (!response.IsSuccessStatusCode)
-            {
                 throw new WebException("Something failed while querying the Stack Exchange API.");
-            }
             var jsonResponse = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<StackExchangeResponse>(jsonResponse);
         }

@@ -1,9 +1,8 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Admin
 {
@@ -17,7 +16,7 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task RoleIDs()
         {
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var g_color = Context.GetGuildColor();
             /*  string message = null;
               foreach (var role in Context.Guild.Roles)
                   message += $"{role.Name}: {role.Id}\n";
@@ -27,11 +26,11 @@ namespace Siotrix.Discord.Admin
 
             try
             {
-                var eb = new EmbedBuilder()
+                var eb = new EmbedBuilder
                 {
                     Color = g_color,
                     Title = $"Roles in {Context.Guild.Name}",
-                    Footer = new EmbedFooterBuilder()
+                    Footer = new EmbedFooterBuilder
                     {
                         Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
                         IconUrl = Context.User.GetAvatarUrl()
@@ -40,16 +39,13 @@ namespace Siotrix.Discord.Admin
                 };
 
                 foreach (var r in Context.Guild.Roles.OrderByDescending(r => r.Position))
-                {
                     eb.Description += $"{r.Position}. {r.Name}: {r.Id}\n";
-                }
                 await Context.Channel.SendMessageAsync("", false, eb);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
         }
     }
 }

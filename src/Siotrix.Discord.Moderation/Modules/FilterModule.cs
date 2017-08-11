@@ -1,10 +1,8 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Addons.InteractiveCommands;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
+using Discord.Addons.InteractiveCommands;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Moderation
 {
@@ -15,11 +13,11 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
     {
-        string[] bad_words = new string[] {"shit", "fuck", "nigger", "rape", "sex", "coon" };
+        private readonly string[] bad_words = {"shit", "fuck", "nigger", "rape", "sex", "coon"};
 
         private bool SaveAndUpdateFilterWord(string word, long guild_id)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -51,16 +49,14 @@ namespace Siotrix.Discord.Moderation
 
         private bool ImportFilterWord(string[] words, long guild_id)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
                     if (result.Any())
-                    {
                         db.Gfilterlists.RemoveRange(result);
-                    }
                     foreach (var word in words)
                     {
                         var record = new DiscordGuildFilterList();
@@ -81,7 +77,7 @@ namespace Siotrix.Discord.Moderation
 
         private bool RemoveFilterWord(string word, long guildId)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -104,7 +100,7 @@ namespace Siotrix.Discord.Moderation
 
         private bool DeleteAllFilterWords(long guild_id)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -160,9 +156,10 @@ namespace Siotrix.Discord.Moderation
         [Remarks(" - No additional arguments needed.")]
         public async Task ImportAsync()
         {
-            await ReplyAsync("📣 : **WARNING**! You are about to import the siotrix default filter! This will delete any filters you have added for your guild, are you sure you want to do this? (Yes or No)");
+            await ReplyAsync(
+                "📣 : **WARNING**! You are about to import the siotrix default filter! This will delete any filters you have added for your guild, are you sure you want to do this? (Yes or No)");
             var response = await WaitForMessage(Context.Message.Author, Context.Channel);
-            if(response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
+            if (response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
             {
                 var success = ImportFilterWord(bad_words, Context.Guild.Id.ToLong());
                 if (success)
@@ -175,7 +172,8 @@ namespace Siotrix.Discord.Moderation
         [Remarks(" - No additional arguments needed.")]
         public async Task ResetAsync()
         {
-            await ReplyAsync("📣 : **WARNING**! This will delete all filters you have added for your guild, are you sure you want to do this? (Yes or No)");
+            await ReplyAsync(
+                "📣 : **WARNING**! This will delete all filters you have added for your guild, are you sure you want to do this? (Yes or No)");
             var response = await WaitForMessage(Context.Message.Author, Context.Channel);
             if (response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
             {

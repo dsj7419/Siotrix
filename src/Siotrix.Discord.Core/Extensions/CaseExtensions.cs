@@ -1,10 +1,6 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -31,14 +27,17 @@ namespace Siotrix.Discord
             return case_num;
         }
 
-        public static async void SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id, string reason)
+        public static async void SaveCaseDataAsync(string cmd_name, long case_num, long user_id, long guild_id,
+            string reason)
         {
             Console.WriteLine("================================================{0}", case_num);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var exist_data = db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) && x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
+                    var exist_data =
+                        db.Casenums.Where(x => x.GuildId.Equals(guild_id) && x.GCaseNum.Equals(case_num) &&
+                                               x.UserId.Equals(user_id) && x.CmdName.Equals(cmd_name));
                     if (exist_data.Any())
                     {
                         var data = exist_data.First();

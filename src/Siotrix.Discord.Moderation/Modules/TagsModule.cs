@@ -1,10 +1,10 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
@@ -27,7 +27,7 @@ namespace Siotrix.Discord.Moderation
         [Remarks("- No additional input required.")]
         public async Task TagsAsync()
         {
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var g_color = Context.GetGuildColor();
             var tags = await TagExtensions.GetTagsAsync(Context.Guild);
 
             if (!HasTags(Context.Guild, tags)) return;
@@ -44,7 +44,7 @@ namespace Siotrix.Discord.Moderation
         [Command("usertags")]
         [Summary("View all available tags for the specified user")]
         [Remarks("<username>")]
-        public async Task TagsAsync([Remainder]SocketUser user)
+        public async Task TagsAsync([Remainder] SocketUser user)
         {
             var tags = await TagExtensions.GetTagsAsync(Context.Guild, user);
 
@@ -69,13 +69,13 @@ namespace Siotrix.Discord.Moderation
 
             var selected = SelectRandom(tags);
             var _ = TagExtensions.AddLogAsync(selected, Context);
-            await ReplyAsync($"{selected.Name.ToString()}: {selected.Content}");
+            await ReplyAsync($"{selected.Name}: {selected.Content}");
         }
 
         [Command("randomusertag")]
         [Summary("Show a random tag from the specified user")]
         [Remarks("<username>")]
-        public async Task RandomAsync([Remainder]SocketUser user)
+        public async Task RandomAsync([Remainder] SocketUser user)
         {
             var tags = await TagExtensions.GetTagsAsync(Context.Guild, user);
 
@@ -83,17 +83,18 @@ namespace Siotrix.Discord.Moderation
 
             var selected = SelectRandom(tags);
             var _ = TagExtensions.AddLogAsync(selected, Context);
-            await ReplyAsync($"{selected.Name.ToString()}: {selected.Content}");
+            await ReplyAsync($"{selected.Name}: {selected.Content}");
         }
 
-        [Command("taginfo"), Priority(0)]
+        [Command("taginfo")]
+        [Priority(0)]
         [Summary("Get information about the specified tag")]
         [Remarks("<tagname>")]
-        public async Task InfoAsync([Remainder]string name)
+        public async Task InfoAsync([Remainder] string name)
         {
             var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
             var author = Context.Guild.GetUser(tag.OwnerId.ToUlong());
-            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id);
+            var count = await TagExtensions.CountLogsAsync((ulong) tag.Id);
 
             var builder = new EmbedBuilder()
                 .WithFooter(x => x.Text = "Last Updated")
@@ -111,41 +112,45 @@ namespace Siotrix.Discord.Moderation
             await ReplyAsync("", embed: builder);
         }
 
-        [Command("usertaginfo"), Priority(10)]
+        [Command("usertaginfo")]
+        [Priority(10)]
         [Summary("Get information about the specified tag in relation to the specified user")]
         [Remarks("<tagname> <username>")]
-        public async Task InfoAsync(string name, [Remainder]SocketUser user)
+        public async Task InfoAsync(string name, [Remainder] SocketUser user)
         {
             var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
-            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id, user);
+            var count = await TagExtensions.CountLogsAsync((ulong) tag.Id, user);
 
-            await ReplyAsync($"{tag.Name.ToString()} has been used {count} time(s)");
+            await ReplyAsync($"{tag.Name} has been used {count} time(s)");
         }
 
-        [Command("channeltaginfo"), Priority(10)]
+        [Command("channeltaginfo")]
+        [Priority(10)]
         [Summary("Get information about the specified tag in relation to the specified channel")]
         [Remarks("<tagname> <channelname>")]
-        public async Task InfoAsync(string name, [Remainder]SocketChannel channel)
+        public async Task InfoAsync(string name, [Remainder] SocketChannel channel)
         {
             var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
-            var count = await TagExtensions.CountLogsAsync((ulong)tag.Id, channel);
+            var count = await TagExtensions.CountLogsAsync((ulong) tag.Id, channel);
 
-            await ReplyAsync($"{tag.Name.ToString()} has been used {count} time(s)");
+            await ReplyAsync($"{tag.Name} has been used {count} time(s)");
         }
 
-        [Command("userinfo"), Priority(5)]
+        [Command("userinfo")]
+        [Priority(5)]
         [Summary("Get information about tags for the specified user")]
         [Remarks("<username>")]
-        public async Task InfoAsync([Remainder]SocketUser user)
+        public async Task InfoAsync([Remainder] SocketUser user)
         {
             var count = await TagExtensions.CountLogsAsync(user);
             await ReplyAsync($"{user} executed tags {count} time(s)");
         }
 
-        [Command("channelinfo"), Priority(5)]
+        [Command("channelinfo")]
+        [Priority(5)]
         [Summary("Get information about tags for the specified channel")]
         [Remarks("<channelname>")]
-        public async Task InfoAsync([Remainder]SocketChannel channel)
+        public async Task InfoAsync([Remainder] SocketChannel channel)
         {
             var count = await TagExtensions.CountLogsAsync(channel);
             await ReplyAsync($"{channel} executed tags {count} time(s)");

@@ -1,14 +1,15 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
-    [Group("cleanup"), Alias("clean")]
+    [Group("cleanup")]
+    [Alias("clean")]
     [Summary("Delete various types of messages.")]
     [RequireContext(ContextType.Guild)]
     [RequireBotPermission(ChannelPermission.ManageMessages)]
@@ -48,7 +49,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("user")]
         [Summary("Clean up past X amount of messages in channel from a specific user.")]
-        [Remarks( "<@username> <number> - cleanup past X amount of messages specific user wrote. Default is 25")]
+        [Remarks("<@username> <number> - cleanup past X amount of messages specific user wrote. Default is 25")]
         public async Task UserAsync(SocketUser user, int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Author.Id == user.Id);
@@ -72,7 +73,8 @@ namespace Siotrix.Discord.Moderation
 
         [Command("contains")]
         [Summary("Clean up past X amount of messages in channel that contains a keyword or words you provide.")]
-        [Remarks(" <keyword(s)> <number> - cleanup past X amount of messages containing those parameters. Default is 25")]
+        [Remarks(
+            " <keyword(s)> <number> - cleanup past X amount of messages containing those parameters. Default is 25")]
         public async Task ContainsAsync(string text, int history = 25)
         {
             var messages = (await GetMessageAsync(history)).Where(x => x.Content.ToLower().Contains(text.ToLower()));
@@ -95,10 +97,14 @@ namespace Siotrix.Discord.Moderation
         }
 
         private Task<IEnumerable<IMessage>> GetMessageAsync(int count)
-            => Context.Channel.GetMessagesAsync(count).Flatten();
+        {
+            return Context.Channel.GetMessagesAsync(count).Flatten();
+        }
 
         private Task DeleteMessagesAsync(IEnumerable<IMessage> messages)
-            => Context.Channel.DeleteMessagesAsync(messages);
+        {
+            return Context.Channel.DeleteMessagesAsync(messages);
+        }
 
         private async Task DelayDeleteMessageAsync(IMessage message, int ms = 5000)
         {

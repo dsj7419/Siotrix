@@ -1,8 +1,6 @@
-﻿using Discord.Commands;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -18,13 +16,9 @@ namespace Siotrix.Discord
                 {
                     var val = db.Gwebsiteurls.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
-                    {
                         url = db.Authors.First().AuthorUrl;
-                    }
                     else
-                    {
                         url = val.First().SiteUrl;
-                    }
                 }
                 catch (Exception e)
                 {

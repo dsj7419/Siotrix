@@ -1,10 +1,10 @@
-﻿using Discord;
-using Discord.Commands;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
@@ -13,7 +13,7 @@ namespace Siotrix.Discord
         /// <summary> Get a tag by it's id </summary>
         public static async Task<Tag> GetTagAsync(ulong id)
         {
-            Tag val = new Tag();
+            var val = new Tag();
             using (var db = new LogDatabase())
             {
                 try
@@ -31,12 +31,13 @@ namespace Siotrix.Discord
         /// <summary> Get a tag in the specified guild by name </summary>
         public static async Task<Tag> GetTagAsync(string name, IGuild guild)
         {
-            Tag val = new Tag();
+            var val = new Tag();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.Tags.FirstOrDefaultAsync(x => x.Name.Contains(name.ToLower()) && x.GuildId == guild.Id.ToLong());
+                    val = await db.Tags.FirstOrDefaultAsync(
+                        x => x.Name.Contains(name.ToLower()) && x.GuildId == guild.Id.ToLong());
                 }
                 catch (Exception e)
                 {
@@ -72,7 +73,8 @@ namespace Siotrix.Discord
             {
                 try
                 {
-                    val = await db.Tags.Where(x => x.GuildId == guild.Id.ToLong() && x.OwnerId == user.Id.ToLong()).ToListAsync();
+                    val = await db.Tags.Where(x => x.GuildId == guild.Id.ToLong() && x.OwnerId == user.Id.ToLong())
+                        .ToListAsync();
                 }
                 catch (Exception e)
                 {
@@ -85,7 +87,7 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of a tag </summary>
         public static async Task<int> CountLogsAsync(ulong id)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -103,7 +105,7 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of a tag for a user </summary>
         public static async Task<int> CountLogsAsync(ulong id, IUser user)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -121,12 +123,13 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of a tag for a channel </summary>
         public static async Task<int> CountLogsAsync(ulong id, IChannel channel)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    count = await db.TagsLogs.CountAsync(x => x.TagId == id.ToLong() && x.ChannelId == channel.Id.ToLong());
+                    count = await db.TagsLogs.CountAsync(
+                        x => x.TagId == id.ToLong() && x.ChannelId == channel.Id.ToLong());
                 }
                 catch (Exception e)
                 {
@@ -139,7 +142,7 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of all tags for a user </summary>
         public static async Task<int> CountLogsAsync(IUser user)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -157,7 +160,7 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of all tags for a channel </summary>
         public static async Task<int> CountLogsAsync(IChannel channel)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -175,7 +178,7 @@ namespace Siotrix.Discord
         /// <summary> Get the total usage of all tags for a guild </summary>
         public static async Task<int> CountLogsAsync(IGuild guild)
         {
-            int count = 0;
+            var count = 0;
             using (var db = new LogDatabase())
             {
                 try
@@ -193,12 +196,13 @@ namespace Siotrix.Discord
         /// <summary> Check if the specified tag has been executed recently </summary>
         public static async Task<bool> IsDupeExecutionAsync(ulong id)
         {
-            bool isDupe = false;
+            var isDupe = false;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    isDupe = await db.TagsLogs.AnyAsync(x => x.TagId == id.ToLong() && x.Timestamp.AddSeconds(30) >= DateTime.UtcNow);
+                    isDupe = await db.TagsLogs.AnyAsync(
+                        x => x.TagId == id.ToLong() && x.Timestamp.AddSeconds(30) >= DateTime.UtcNow);
                 }
                 catch (Exception e)
                 {
@@ -210,12 +214,13 @@ namespace Siotrix.Discord
 
 
         /// <summary> Find tags similar to the specified name </summary>
-        public static async Task<IEnumerable<Tag>> FindTagsAsync(string name, IGuild guild, int stop = 3, int tolerance = 5)
+        public static async Task<IEnumerable<Tag>> FindTagsAsync(string name, IGuild guild, int stop = 3,
+            int tolerance = 5)
         {
             return (await GetTagsAsync(guild))
                 .ToDictionary(x => x, x => x.Name
-                .Select(y => MathHelper.GetStringDistance(x.Name, name))
-                .Sum())
+                    .Select(y => MathHelper.GetStringDistance(x.Name, name))
+                    .Sum())
                 .OrderBy(x => x.Value)
                 .Select(x => x.Key)
                 .Take(stop);
@@ -224,7 +229,8 @@ namespace Siotrix.Discord
         /// <summary> Add a new log for the specified tag </summary>
         public static async Task AddLogAsync(Tag tag, SocketCommandContext context)
         {
-            var log = new TagLog(tag.Id, context.Guild.Id.ToLong(), context.Channel.Id.ToLong(), context.User.Id.ToLong());
+            var log = new TagLog(tag.Id, context.Guild.Id.ToLong(), context.Channel.Id.ToLong(),
+                context.User.Id.ToLong());
 
             using (var db = new LogDatabase())
             {

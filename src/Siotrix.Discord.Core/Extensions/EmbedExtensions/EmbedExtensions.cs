@@ -1,57 +1,37 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections;
+﻿using System;
+using Discord;
 
 namespace Siotrix.Discord
 {
     public static class EmbedExtensions
     {
+        public static EmbedBuilder MakeNewEmbed(string title = null, string description = null, Color? color = null,
+            string imageURL = null, string URL = null, string thumbnailURL = null)
+        {
+            //Make the embed builder
+            var embed = new EmbedBuilder().WithColor(1, 1, 1);
 
-        public static EmbedBuilder MakeNewEmbed(string title = null, string description = null, Color? color = null, string imageURL = null, string URL = null, string thumbnailURL = null)
-		{
-			//Make the embed builder
-			var embed = new EmbedBuilder().WithColor(1, 1, 1);
+            //Validate the URLs
+            imageURL = ValidateURL(imageURL) ? imageURL : null;
+            URL = ValidateURL(URL) ? URL : null;
+            thumbnailURL = ValidateURL(thumbnailURL) ? thumbnailURL : null;
 
-			//Validate the URLs
-			imageURL = ValidateURL(imageURL) ? imageURL : null;
-			URL = ValidateURL(URL) ? URL : null;
-			thumbnailURL = ValidateURL(thumbnailURL) ? thumbnailURL : null;
+            //Add in the properties
+            if (title != null)
+                embed.WithTitle(title.Substring(0, Math.Min(SiotrixConstants.MAX_TITLE_LENGTH, title.Length)));
+            if (description != null)
+                embed.WithDescription(description);
+            if (color != null)
+                embed.WithColor(color.Value);
+            if (imageURL != null)
+                embed.WithImageUrl(imageURL);
+            if (URL != null)
+                embed.WithUrl(URL);
+            if (thumbnailURL != null)
+                embed.WithThumbnailUrl(thumbnailURL);
 
-			//Add in the properties
-			if (title != null)
-			{
-				embed.WithTitle(title.Substring(0, Math.Min(SiotrixConstants.MAX_TITLE_LENGTH, title.Length)));
-			}
-			if (description != null)
-			{
-				embed.WithDescription(description);
-			}
-			if (color != null)
-			{
-				embed.WithColor(color.Value);
-			}
-			if (imageURL != null)
-			{
-				embed.WithImageUrl(imageURL);
-			}
-			if (URL != null)
-			{
-				embed.WithUrl(URL);
-			}
-			if (thumbnailURL != null)
-			{
-				embed.WithThumbnailUrl(thumbnailURL);
-			}
-
-			return embed;
-		}
+            return embed;
+        }
 
         public static bool ValidateURL(string input)
         {
@@ -60,6 +40,7 @@ namespace Siotrix.Discord
 
             return Uri.TryCreate(input, UriKind.Absolute, out Uri uriResult);
         }
+
         /*public static EmbedBuilder WithUrl(this EmbedBuilder builder, string url)
             => Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri) ? builder.WithUrl(uri) : builder;
 
@@ -75,5 +56,4 @@ namespace Siotrix.Discord
         public static EmbedFooterBuilder WithIconUrl(this EmbedFooterBuilder builder, string url)
             => Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uri) ? builder.WithIconUrl(uri) : builder; */
     }
-
 }

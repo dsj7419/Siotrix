@@ -1,20 +1,13 @@
-﻿using Discord;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Addons.InteractiveCommands;
 using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord.Addons.InteractiveCommands;
-using System.Runtime.CompilerServices;
 using static Siotrix.Discord.RoleExtensions;
-using System.Globalization;
 
 namespace Siotrix.Discord.Moderation
 {
@@ -23,8 +16,7 @@ namespace Siotrix.Discord.Moderation
     [Summary("Various role commands.")]
     public class RoleModule : InteractiveModuleBase<SocketCommandContext>
     {
-
-        private InteractiveService Interactive;
+        private readonly InteractiveService Interactive;
 
         public RoleModule(InteractiveService Inter)
         {
@@ -40,13 +32,15 @@ namespace Siotrix.Discord.Moderation
         private async Task GiveRoleAsync(SocketGuildUser user, string rolename)
         {
             IRole role = user.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
-            if(role == null)
+            if (role == null)
             {
                 await ReplyAsync("Please enter a valid role name.");
                 return;
             }
             await GiveRole(user, role);
-            await ReplyAsync(String.Format("Successfully gave the following role to `{0}`: `{1}`.", user.FormatUser(), role), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully gave the following role to `{0}`: `{1}`.", user.FormatUser(), role),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("takerole")]
@@ -58,7 +52,9 @@ namespace Siotrix.Discord.Moderation
         {
             IRole role = user.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await TakeRole(user, role);
-            await ReplyAsync(String.Format("Successfully took the following role from `{0}`: `{1}`.", user.FormatUser(), role), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully took the following role from `{0}`: `{1}`.", user.FormatUser(), role),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("createrole")]
@@ -70,11 +66,14 @@ namespace Siotrix.Discord.Moderation
         {
             var guild = Context.Guild as IGuild;
             await guild.CreateRoleAsync(rolename, GuildPermissions.None).ConfigureAwait(false);
-            await ReplyAsync(String.Format("Successfully created the role `{0}`. No permissions have been set.", rolename), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully created the role `{0}`. No permissions have been set.", rolename),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("softdeleterole")]
-        [Summary("Removes all permissions from a role (and all channels the role had permissions on) and removes the role from everyone. Leaves the name and color behind.")]
+        [Summary(
+            "Removes all permissions from a role (and all channels the role had permissions on) and removes the role from everyone. Leaves the name and color behind.")]
         [Remarks(" <rolename>")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
@@ -89,7 +88,10 @@ namespace Siotrix.Discord.Moderation
             await role.DeleteAsync();
             var newRole = await guild.CreateRoleAsync(name, GuildPermissions.None, color).ConfigureAwait(false);
             await ModifyRolePosition(newRole, position);
-            await ReplyAsync(String.Format("Successfully removed all permissions from the role `{0}` and removed the role from all users on the guild.", role.Name), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format(
+                    "Successfully removed all permissions from the role `{0}` and removed the role from all users on the guild.",
+                    role.Name), deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("deleterole")]
@@ -101,11 +103,14 @@ namespace Siotrix.Discord.Moderation
         {
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await role.DeleteAsync().ConfigureAwait(false);
-            await ReplyAsync(String.Format("Successfully deleted `{0}`.", role.FormatRole()), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(string.Format("Successfully deleted `{0}`.", role.FormatRole()),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
-        [Command("changeroleposition"), Alias("crp")]
-        [Summary("If only a role is input its position will be listed, else moves the role to the given position. " + SiotrixConstants.FAKE_EVERYONE + " is the first position and starts at zero.")]
+        [Command("changeroleposition")]
+        [Alias("crp")]
+        [Summary("If only a role is input its position will be listed, else moves the role to the given position. " +
+                 SiotrixConstants.FAKE_EVERYONE + " is the first position and starts at zero.")]
         [Remarks(" <rolename> [position] - position is optional")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
@@ -117,54 +122,50 @@ namespace Siotrix.Discord.Moderation
                 await ReplyAsync($"{role.Name.ToUpper()}'s current position on the roles list is {role.Position}.");
             }
             else
-            {                
+            {
                 var newPos = await ModifyRolePosition(role, position);
                 if (newPos != -1)
-                {
-                    await ReplyAsync(String.Format("Successfully gave `{0}` the position `{1}`.", role.FormatRole(), newPos), deleteAfter: SiotrixConstants.WAIT_TIME);
-                }
+                    await ReplyAsync(
+                        string.Format("Successfully gave `{0}` the position `{1}`.", role.FormatRole(), newPos),
+                        deleteAfter: SiotrixConstants.WAIT_TIME);
                 else
-                {
-                    await ReplyAsync(String.Format("Failed to give `{0}` the position `{1}`.", role.FormatRole(), position), deleteAfter: SiotrixConstants.WAIT_TIME);
-                }
+                    await ReplyAsync(
+                        string.Format("Failed to give `{0}` the position `{1}`.", role.FormatRole(), position),
+                        deleteAfter: SiotrixConstants.WAIT_TIME);
             }
         }
 
-        [Command("displayrolepositions"), Alias("drp")]
+        [Command("displayrolepositions")]
+        [Alias("drp")]
         [Summary("Lists the positions of each role on the guild.")]
         [Remarks(" - No additional argument needed.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
         private async Task DisplayRolePositionsAsync()
         {
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var g_color = Context.GetGuildColor();
 
-            var desc = String.Join("\n", Context.Guild.Roles.OrderByDescending(x => x.Position).Select(x =>
+            var desc = string.Join("\n", Context.Guild.Roles.OrderByDescending(x => x.Position).Select(x =>
             {
                 if (x.Id == Context.Guild.EveryoneRole.Id)
-                {
-                    return String.Format("`{0}.` {1}", x.Position.ToString("00"), SiotrixConstants.FAKE_EVERYONE);
-                }
-                else
-                {
-                    return String.Format("`{0}.` {1}", x.Position.ToString("00"), x.Name);
-                }
+                    return string.Format("`{0}.` {1}", x.Position.ToString("00"), SiotrixConstants.FAKE_EVERYONE);
+                return string.Format("`{0}.` {1}", x.Position.ToString("00"), x.Name);
             }));
 
 
-            var eb = new EmbedBuilder()
+            var eb = new EmbedBuilder
             {
                 Color = g_color,
                 Title = $"Roles in {Context.Guild.Name}",
-                Footer = new EmbedFooterBuilder()
+                Footer = new EmbedFooterBuilder
                 {
                     Text = $"Requested by {Context.User.Username}#{Context.User.Discriminator}",
                     IconUrl = Context.User.GetAvatarUrl()
                 },
                 Description = desc
-            };        
+            };
 
-            await Context.Channel.SendMessageAsync("", false, eb);           
+            await Context.Channel.SendMessageAsync("", false, eb);
         }
 
         [Command("changerolename")]
@@ -172,11 +173,13 @@ namespace Siotrix.Discord.Moderation
         [Remarks(" <rolename> <new_rolename>")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        private async Task ChangeRoleNameAsync(string rolename, [Remainder]string newname)
+        private async Task ChangeRoleNameAsync(string rolename, [Remainder] string newname)
         {
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await role.ModifyAsync(x => x.Name = newname).ConfigureAwait(false);
-            await ReplyAsync(String.Format("Successfully changed the name of `{0}` to `{1}`.", role.FormatRole(), newname), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully changed the name of `{0}` to `{1}`.", role.FormatRole(), newname),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("changerolecolor")]
@@ -187,10 +190,12 @@ namespace Siotrix.Discord.Moderation
         private async Task ChangeRoleColorAsync(string rolename)
         {
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
-            Color currentColor = role.Color;
+            var currentColor = role.Color;
             var regexColorCode = new Regex("^#[A-Fa-f0-9]{6}$");
-            var regexRGBCode = new Regex("^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
-            string currentHexColor = currentColor.ToString();
+            var regexRGBCode =
+                new Regex(
+                    "^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
+            var currentHexColor = currentColor.ToString();
 
             if (currentHexColor.Length != 7)
             {
@@ -198,7 +203,8 @@ namespace Siotrix.Discord.Moderation
                 currentHexColor = "#" + currentHexColor.PadLeft(6, '0');
             }
 
-            await ReplyAsync($"Give me any value of color (Hex, RGB, or a name) to set the color for the role: {role.Name} (Example Hex: #FF43A4).\nYour Current Hex Code is: {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
+            await ReplyAsync(
+                $"Give me any value of color (Hex, RGB, or a name) to set the color for the role: {role.Name} (Example Hex: #FF43A4).\nYour Current Hex Code is: {Format.Bold(currentHexColor)}. Type list for a breakdown of your current color.");
             var response = await Interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
 
             if (response.Content == "cancel")
@@ -209,17 +215,17 @@ namespace Siotrix.Discord.Moderation
 
             if (response.Content == "list")
             {
-                string cleanHex = currentHexColor.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+                var cleanHex = currentHexColor.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
                 var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
 
 
                 if (colornamelower == null)
                     colornamelower = "no name found";
 
-                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
 
-                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(currentHexColor); // convert hex to an RGB value
+                var rgbvalue = HextoRGB.HexadecimalToRGB(currentHexColor); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
                 var blue = Convert.ToString(rgbvalue.B); // Blue property  
@@ -240,11 +246,11 @@ namespace Siotrix.Discord.Moderation
 
                 return;
             }
-            string colorchoice = response.Content.ToLower();
+            var colorchoice = response.Content.ToLower();
 
             if (regexColorCode.IsMatch(colorchoice.Trim()))
             {
-                string cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+                var cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
                 var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
 
                 if (colornamelower == null)
@@ -252,12 +258,12 @@ namespace Siotrix.Discord.Moderation
 
                 await role.ModifyAsync(x => x.Color = new Color(Convert.ToUInt32(cleanHex, 16)));
 
-                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
 
                 var hexcolor = colorchoice.ToUpper();
 
-                HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convert hex to an RGB value
+                var rgbvalue = HextoRGB.HexadecimalToRGB(colorchoice); // convert hex to an RGB value
                 var red = Convert.ToString(rgbvalue.R); // Red Property
                 var green = Convert.ToString(rgbvalue.G); // Green property
                 var blue = Convert.ToString(rgbvalue.B); // Blue property  
@@ -280,9 +286,9 @@ namespace Siotrix.Discord.Moderation
 
                 await role.ModifyAsync(x => x.Color = new Color(Convert.ToUInt32(colorhex, 16)));
 
-                string cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
+                var cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
 
-                TextInfo text = new CultureInfo("en-US").TextInfo;
+                var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colorchoice);
 
                 var rgbvalue = HextoRGB.HexadecimalToRGB(cleanhex); // convert hex to RGB value
@@ -301,11 +307,13 @@ namespace Siotrix.Discord.Moderation
             }
             else if (regexRGBCode.IsMatch(colorchoice))
             {
-                string[] str = colorchoice.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries); // Split up string of numbers into Red/Green/Blue
-                int red = int.Parse(str[0]); //convert to red int
-                int green = int.Parse(str[1]); //convert to green int
-                int blue = int.Parse(str[2]); // convery to blue int
-                RGBtoHex.RGB data = new RGBtoHex.RGB((byte)red, (byte)green, (byte)blue); // convert broken out ints into a data struct - prep for conversion
+                var str = colorchoice.Split(new[] {',', ' '},
+                    StringSplitOptions.RemoveEmptyEntries); // Split up string of numbers into Red/Green/Blue
+                var red = int.Parse(str[0]); //convert to red int
+                var green = int.Parse(str[1]); //convert to green int
+                var blue = int.Parse(str[2]); // convery to blue int
+                var data = new RGBtoHex.RGB((byte) red, (byte) green,
+                    (byte) blue); // convert broken out ints into a data struct - prep for conversion
 
                 var colorhex = RGBtoHex.RGBToHexadecimal(data); // convert RGB input into hex           
 
@@ -313,17 +321,16 @@ namespace Siotrix.Discord.Moderation
                 {
                     var colorname = "No Name Found";
                     var hexcolorcaps = "Hex Not Available";
-                    byte r = (byte)red;
-                    byte g = (byte)green;
-                    byte b = (byte)blue;
+                    var r = (byte) red;
+                    var g = (byte) green;
+                    var b = (byte) blue;
                     var rgbvalue = new HextoRGB.RGB(r, g, b);
                     var embed = GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
                 else
                 {
-
-                    string cleanHex = colorhex.Replace("#", "0x"); // replace # with 0x for dictionary lookup
+                    var cleanHex = colorhex.Replace("#", "0x"); // replace # with 0x for dictionary lookup
                     var hexcolorcaps = colorhex.ToUpper();
 
                     var cleanHexLower = cleanHex.ToLower();
@@ -334,10 +341,10 @@ namespace Siotrix.Discord.Moderation
                     if (colornamelower == null)
                         colornamelower = "no name found";
 
-                    TextInfo text = new CultureInfo("en-US").TextInfo;
+                    var text = new CultureInfo("en-US").TextInfo;
                     var colorname = text.ToTitleCase(colornamelower);
 
-                    HextoRGB.RGB rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
+                    var rgbvalue = HextoRGB.HexadecimalToRGB(colorhex);
 
                     if (colorname == "Black")
                     {
@@ -367,7 +374,9 @@ namespace Siotrix.Discord.Moderation
         {
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await role.ModifyAsync(x => x.Hoist = !role.IsHoisted).ConfigureAwait(false);
-            await ReplyAsync(String.Format("Successfully {0} `{1}`.", (role.IsHoisted ? "de-hoisted" : "hoisted"), role.FormatRole()), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully {0} `{1}`.", role.IsHoisted ? "de-hoisted" : "hoisted", role.FormatRole()),
+                deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
         [Command("changerolemention")]
@@ -379,21 +388,24 @@ namespace Siotrix.Discord.Moderation
         {
             IRole role = Context.Guild.Roles.FirstOrDefault(x => x.Name == rolename);
             await role.ModifyAsync(x => x.Mentionable = !role.IsMentionable).ConfigureAwait(false);
-            await ReplyAsync(String.Format("Successfully made `{0}` {1}.", role.FormatRole(), (role.IsMentionable ? "unmentionable" : "mentionable")), deleteAfter: SiotrixConstants.WAIT_TIME);
+            await ReplyAsync(
+                string.Format("Successfully made `{0}` {1}.", role.FormatRole(),
+                    role.IsMentionable ? "unmentionable" : "mentionable"), deleteAfter: SiotrixConstants.WAIT_TIME);
         }
 
-        private EmbedBuilder GetEmbed(IRole role, string colorchoice, string colorname, string colorhex, HextoRGB.RGB rgbvalue)
+        private EmbedBuilder GetEmbed(IRole role, string colorchoice, string colorname, string colorhex,
+            HextoRGB.RGB rgbvalue)
         {
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var g_icon_url = Context.GetGuildIconUrl();
+            var g_name = Context.GetGuildName();
+            var g_url = Context.GetGuildUrl();
+            var g_thumbnail = Context.GetGuildThumbNail();
+            var g_footer = Context.GetGuildFooter();
+            var g_prefix = Context.GetGuildPrefix();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property
             var blue = Convert.ToString(rgbvalue.B); // Blue property
-            Color color = new Color(rgbvalue.R, rgbvalue.G, rgbvalue.B);
+            var color = new Color(rgbvalue.R, rgbvalue.G, rgbvalue.B);
 
             if (colorname == null)
                 colorname = "No Name Found";

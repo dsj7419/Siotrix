@@ -1,31 +1,32 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
     public class AntispamService : IService
     {
-        private const int _maxDiff = 5;             // Max difference to trigger the antispam
+        private const int _maxDiff = 5; // Max difference to trigger the antispam
         private const int _singleUserTolerance = 3; // Min similar messages to begin actions against the user
-        private const int _multiUserTolerance = 6;  // Min similar messages to begin actions against users
-        private const int _expirySeconds = 10;      // Max time between messages to be considered spam
-        private int number_of_the_same_msg = 0;
-        private int number_of_the_cap_msg = 0;
-        private IUserMessage msg;
-        private EmbedBuilder builder = null;
-        private int warnings_of_repeat = 0;
-        private int warnings_of_caps = 0;
-        private IUserMessage log_msg;
+        private const int _multiUserTolerance = 6; // Min similar messages to begin actions against users
+        private const int _expirySeconds = 10; // Max time between messages to be considered spam
 
-        private DiscordSocketClient _client;
-        private readonly Dictionary<ulong, SocketUserMessage> _lastMessages = new Dictionary<ulong, SocketUserMessage>();
+        private readonly Dictionary<ulong, SocketUserMessage> _lastMessages = new Dictionary<ulong, SocketUserMessage>()
+            ;
+
+        private readonly DiscordSocketClient _client;
+        private EmbedBuilder builder;
+        private IUserMessage log_msg;
+        private IUserMessage msg;
+        private int number_of_the_cap_msg;
+        private int number_of_the_same_msg;
+        private int warnings_of_caps;
+        private int warnings_of_repeat;
 
         public AntispamService(DiscordSocketClient client)
         {
@@ -37,7 +38,7 @@ namespace Siotrix.Discord.Moderation
             _client.MessageReceived += OnMessageReceivedAsync;
             await PrettyConsole.LogAsync("Info", "Antispam", "Service started successfully").ConfigureAwait(false);
         }
-        
+
         public async Task StopAsync()
         {
             _client.MessageReceived -= OnMessageReceivedAsync;
@@ -49,11 +50,9 @@ namespace Siotrix.Discord.Moderation
             var regexItem = new Regex("^[a-zA-Z ]*$");
             if (regexItem.IsMatch(input))
             {
-                for (int i = 0; i < input.Length; i++)
-                {
-                    if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
+                for (var i = 0; i < input.Length; i++)
+                    if (char.IsLetter(input[i]) && !char.IsUpper(input[i]))
                         return false;
-                }
                 return true;
             }
             return false;
@@ -76,7 +75,8 @@ namespace Siotrix.Discord.Moderation
             var mute_caps_spam_value = GetSpamValue(context.Guild.Id.ToLong(), 5);
             var mute_repeat_time_value = GetSpamValue(context.Guild.Id.ToLong(), 3);
             var mute_caps_time_value = GetSpamValue(context.Guild.Id.ToLong(), 6);
-            var mod_channel = context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+            var mod_channel =
+                context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
 
             //var log_channel = _client.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
             //if (IsAllUpper(message.Content))
@@ -138,34 +138,34 @@ namespace Siotrix.Discord.Moderation
                 if (number_of_the_cap_msg == caps_spam_value)
                 {
                     warnings_of_caps++;
-                    if(warnings_of_caps == mute_caps_spam_value)
+                    if (warnings_of_caps == mute_caps_spam_value)
                         await MuteSpamUser(context.User as IGuildUser, mute_caps_time_value, context);
                     builder = GetBuilder(context, warnings_of_caps, null, number_of_the_cap_msg, true);
-                    if(warnings_of_caps == 1)
-                        log_msg = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, builder.Build());
+                    if (warnings_of_caps == 1)
+                        log_msg = await mod_channel.SendMessageSafeAsync("", false, builder.Build());
                     else
                         await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                     number_of_the_cap_msg = 0;
-                    return;
                 }
             }
             else
             {
-                if(_lastMessages.TryGetValue(message.Author.Id, out var lastMessage) && message.Content == lastMessage.Content)
+                if (_lastMessages.TryGetValue(message.Author.Id, out var lastMessage) &&
+                    message.Content == lastMessage.Content)
                 {
                     number_of_the_same_msg++;
-                    if(number_of_the_same_msg == repeat_spam_value - 1)
+                    if (number_of_the_same_msg == repeat_spam_value - 1)
                     {
                         warnings_of_repeat++;
-                        if(warnings_of_repeat == mute_repeat_spam_value)
+                        if (warnings_of_repeat == mute_repeat_spam_value)
                             await MuteSpamUser(context.User as IGuildUser, mute_repeat_time_value, context);
-                        builder = GetBuilder(context, warnings_of_repeat, message.Content, number_of_the_same_msg + 1, false);
-                        if(warnings_of_repeat == 1)
-                            log_msg = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, builder.Build());
+                        builder = GetBuilder(context, warnings_of_repeat, message.Content, number_of_the_same_msg + 1,
+                            false);
+                        if (warnings_of_repeat == 1)
+                            log_msg = await mod_channel.SendMessageSafeAsync("", false, builder.Build());
                         else
                             await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                         number_of_the_same_msg = 0;
-                        return;
                     }
                 }
                 else
@@ -180,13 +180,15 @@ namespace Siotrix.Discord.Moderation
         {
             try
             {
-                if(!user.IsBot)
-                    await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true).ConfigureAwait(false);
+                if (!user.IsBot)
+                    await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true)
+                        .ConfigureAwait(false);
                 var is_save = MuteExtensions.SaveMuteUser(user, minutes);
                 if (is_save)
                 {
-                    var case_id = CaseExtensions.GetCaseNumber(context);
-                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(), "auto");
+                    var case_id = context.GetCaseNumber();
+                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(),
+                        "auto");
                 }
             }
             catch
@@ -195,33 +197,36 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private EmbedBuilder GetBuilder(SocketCommandContext context, int warn_count, string spamword, int spam_count, bool is_caps_spam)
+        private EmbedBuilder GetBuilder(SocketCommandContext context, int warn_count, string spamword, int spam_count,
+            bool is_caps_spam)
         {
             string value = null;
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
-            string g_name = GuildEmbedName.GetGuildName(context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(context);
+            var g_icon_url = context.GetGuildIconUrl();
+            var g_name = context.GetGuildName();
+            var g_url = context.GetGuildUrl();
+            var g_thumbnail = context.GetGuildThumbNail();
+            var g_footer = context.GetGuildFooter();
+            var g_prefix = context.GetGuildPrefix();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 0, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
             if (is_caps_spam)
-                value = context.User.Mention + " has been issued **" + warn_count.ToString() + "** warning points for breaking caps spam\n" +
-              "Reason : CapsSpammed : **" + spam_count.ToString() + "** times";
+                value = context.User.Mention + " has been issued **" + warn_count +
+                        "** warning points for breaking caps spam\n" +
+                        "Reason : CapsSpammed : **" + spam_count + "** times";
             else
-                value = context.User.Mention + " has been issued **" + warn_count.ToString() + "** warning points for breaking spam threshold\n" +
-              "Reason : RepeatSpammed : ***" + spamword + "*** - **" + spam_count.ToString() + "** times";
+                value = context.User.Mention + " has been issued **" + warn_count +
+                        "** warning points for breaking spam threshold\n" +
+                        "Reason : RepeatSpammed : ***" + spamword + "*** - **" + spam_count + "** times";
 
             embed
                 .AddField(x =>
@@ -286,16 +291,14 @@ namespace Siotrix.Discord.Moderation
 
         private int GetSpamValue(long guild_id, int option_value)
         {
-            int spam_value = 0;
+            var spam_value = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var result = db.Gspams.Where(p => p.GuildId.Equals(guild_id) && p.Option.Equals(option_value));
                     if (result.Any())
-                    {
                         spam_value = result.First().SpamValue;
-                    }
                 }
                 catch (Exception e)
                 {

@@ -1,10 +1,10 @@
-﻿using Discord.Commands;
-using Discord;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -29,7 +29,8 @@ namespace Siotrix.Discord
                     AddResult(results, context.Guild.GetChannel(id) as T, 0.90f);
 
                 //By Name (0.7-0.8)
-                foreach (var channel in channels.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
+                foreach (var channel in channels.Where(
+                    x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
                     AddResult(results, channel as T, channel.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)

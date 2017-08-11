@@ -1,15 +1,15 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Developer
 {
-    [Name("Developer")]    
-    [Group("siotrix"), Alias("sio")]
+    [Name("Developer")]
+    [Group("siotrix")]
+    [Alias("sio")]
     [Summary("Various Siotrix property Settings.")]
     public class SiotrixModule : ModuleBase<SocketCommandContext>
     {
@@ -18,18 +18,19 @@ namespace Siotrix.Discord.Developer
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public Task AvatarAsync()
-            => ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
+        {
+            return ReplyAsync(Context.Client.CurrentUser.GetAvatarUrl());
+        }
 
         [Command("avatar")]
         [Summary("Will set bots avatar.")]
-        [Remarks("<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix avatar.")]
+        [Remarks(
+            "<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix avatar.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AvatarAsync(Uri url)
         {
             if (url.ToString().Equals("reset"))
-            {
                 url = new Uri(SiotrixConstants.BOT_AVATAR);
-            }
             var request = new HttpRequestMessage(new HttpMethod("GET"), url);
 
             using (var client = new HttpClient())
@@ -38,10 +39,7 @@ namespace Siotrix.Discord.Developer
                 var stream = await response.Content.ReadAsStreamAsync();
 
                 var self = Context.Client.CurrentUser;
-                await self.ModifyAsync(x =>
-                {
-                    x.Avatar = new Image(stream);
-                });
+                await self.ModifyAsync(x => { x.Avatar = new Image(stream); });
                 await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
             }
         }
@@ -84,7 +82,8 @@ namespace Siotrix.Discord.Developer
 
         [Command("authoricon")]
         [Summary("Will set bots author icon.")]
-        [Remarks("<url> - url of picture to assign as bot author icon **note** using keyword reset will reset to Siotrix icon.")]
+        [Remarks(
+            "<url> - url of picture to assign as bot author icon **note** using keyword reset will reset to Siotrix icon.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync(Uri url)
         {
@@ -92,13 +91,9 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordAuthor();
                 if (url.ToString().Equals("reset"))
-                {
                     val.AuthorIcon = SiotrixConstants.BOT_AUTHOR_ICON;
-                }
                 else
-                {
                     val.AuthorIcon = url.ToString();
-                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -139,7 +134,7 @@ namespace Siotrix.Discord.Developer
                     else
                     {
                         url = db.Authors.First().AuthorUrl;
-                        if (url == null || url.ToString() == "")
+                        if (url == null || url == "")
                         {
                             url = "No Url";
                             var data = db.Authors.First();
@@ -159,7 +154,8 @@ namespace Siotrix.Discord.Developer
 
         [Command("authorurl")]
         [Summary("Will set bots author url.")]
-        [Remarks("<url> - This links author name as a hyperlink. **note** using keyword reset will reset to Siotrix url.")]
+        [Remarks(
+            "<url> - This links author name as a hyperlink. **note** using keyword reset will reset to Siotrix url.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync(Uri url)
         {
@@ -167,13 +163,9 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordAuthor();
                 if (url.ToString().Equals("reset"))
-                {
                     val.AuthorUrl = "";
-                }
                 else
-                {
                     val.AuthorUrl = url.ToString();
-                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -198,7 +190,8 @@ namespace Siotrix.Discord.Developer
 
         [Command("authorname")]
         [Summary("Will set bots current author name.")]
-        [Remarks("<name> - This defaults to your guild name. **note** You can use reset as the parameter to reset back to your guild name.")]
+        [Remarks(
+            "<name> - This defaults to your guild name. **note** You can use reset as the parameter to reset back to your guild name.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync([Remainder] string txt)
         {
@@ -206,13 +199,9 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordAuthor();
                 if (txt.Equals("reset"))
-                {
                     val.AuthorName = Context.Guild.Name;
-                }
                 else
-                {
                     val.AuthorName = txt;
-                }
                 try
                 {
                     if (db.Authors == null || db.Authors.ToList().Count <= 0)
@@ -283,13 +272,9 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Binfos == null || db.Binfos.ToList().Count <= 0)
-                    {
                         str = SiotrixConstants.BOT_DESC;
-                    }
                     else
-                    {
                         str = db.Binfos.First().BotInfo;
-                    }
                 }
                 catch (Exception e)
                 {
@@ -343,13 +328,9 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bwebsiteurls == null || db.Bwebsiteurls.ToList().Count <= 0)
-                    {
                         url = SiotrixConstants.BOT_URL;
-                    }
                     else
-                    {
                         url = db.Bwebsiteurls.First().SiteUrl;
-                    }
                 }
                 catch (Exception e)
                 {
@@ -403,13 +384,9 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                    {
                         url = SiotrixConstants.BOT_FOOTER_ICON;
-                    }
                     else
-                    {
                         url = db.Bfooters.First().FooterIcon;
-                    }
                 }
                 catch (Exception e)
                 {
@@ -429,13 +406,9 @@ namespace Siotrix.Discord.Developer
             {
                 var val = new DiscordSiotrixFooter();
                 if (url.ToString().Equals("reset"))
-                {
                     val.FooterIcon = SiotrixConstants.BOT_FOOTER_ICON;
-                }
                 else
-                {
                     val.FooterIcon = url.ToString();
-                }
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
@@ -502,13 +475,9 @@ namespace Siotrix.Discord.Developer
                 try
                 {
                     if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                    {
                         txt = SiotrixConstants.BOT_FOOTER_TEXT;
-                    }
                     else
-                    {
                         txt = db.Bfooters.First().FooterText;
-                    }
                 }
                 catch (Exception e)
                 {
@@ -523,19 +492,18 @@ namespace Siotrix.Discord.Developer
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public Task UsernameAsync()
-            => ReplyAsync(Context.Client.CurrentUser.ToString());
+        {
+            return ReplyAsync(Context.Client.CurrentUser.ToString());
+        }
 
         [Command("username")]
         [Summary("Sets Siotrix's username.")]
         [Remarks("<name> - new name to change Siotrix too, but why??.")]
         [MinPermissions(AccessLevel.BotOwner)]
-        public async Task UsernameAsync([Remainder]string name)
+        public async Task UsernameAsync([Remainder] string name)
         {
             var self = Context.Client.CurrentUser;
-            await self.ModifyAsync(x =>
-            {
-                x.Username = name;
-            });
+            await self.ModifyAsync(x => { x.Username = name; });
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
@@ -544,15 +512,17 @@ namespace Siotrix.Discord.Developer
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public Task ActivityAsync()
-            => ReplyAsync($"Playing: {Context.Client.CurrentUser.Game.ToString()}");
+        {
+            return ReplyAsync($"Playing: {Context.Client.CurrentUser.Game}");
+        }
 
         [Command("activity")]
         [Summary("Sets Siotrix's activity.")]
         [Remarks("<activity> - Whatever activity you want to set Siotrix as playing.")]
         [MinPermissions(AccessLevel.BotOwner)]
-        public async Task ActivityAsync([Remainder]string activity)
+        public async Task ActivityAsync([Remainder] string activity)
         {
-            await (Context.Client as DiscordSocketClient).SetGameAsync(activity);
+            await Context.Client.SetGameAsync(activity);
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
         }
 
@@ -561,7 +531,9 @@ namespace Siotrix.Discord.Developer
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.BotOwner)]
         public Task StatusAsync()
-            => ReplyAsync(Context.Client.CurrentUser.Status.ToString());
+        {
+            return ReplyAsync(Context.Client.CurrentUser.Status.ToString());
+        }
 
         [Command("status")]
         [Summary("Sets Siotrix's status.")]
@@ -579,25 +551,22 @@ namespace Siotrix.Discord.Developer
         [Remarks(" - no additional arguments needed.")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task NicknameAsync()
-               => await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
+        {
+            await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
+        }
 
         [Command("nickname")]
         [Summary("Sets Siotrix's nickname.")]
-        [Remarks("<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
+        [Remarks(
+            "<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
         [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task NicknameAsync([Remainder]string name)
+        public async Task NicknameAsync([Remainder] string name)
         {
             var self = Context.Guild.CurrentUser;
             if (name.Equals("reset"))
-            {
                 name = SiotrixConstants.BOT_NAME;
-            }
-            await self.ModifyAsync(x =>
-            {
-                x.Nickname = name;
-            });
+            await self.ModifyAsync(x => { x.Nickname = name; });
             await ReplyAsync(SiotrixConstants.BOT_SUCCESS);
-
         }
     }
 }

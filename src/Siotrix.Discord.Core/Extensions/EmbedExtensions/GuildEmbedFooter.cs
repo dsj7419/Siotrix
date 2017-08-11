@@ -1,8 +1,6 @@
-﻿using Discord.Commands;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -11,7 +9,7 @@ namespace Siotrix.Discord
         public static string[] GetGuildFooter(this SocketCommandContext context)
         {
             var guild_id = context.Guild.Id;
-            string[] footer = new string[2];
+            var footer = new string[2];
             using (var db = new LogDatabase())
             {
                 try

@@ -1,18 +1,13 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Discord.Commands;
 
 namespace Siotrix.Discord.Statistics
 {
     [Name("Developer")]
-    [Summary("Testing module for Frank")]
+    [Summary("Testing module")]
     [MinPermissions(AccessLevel.BotOwner)]
     public class GlobalStatisticsModule : ModuleBase<SocketCommandContext>
     {
-  /*      [Command("testinfo")]
-        [Summary("Unless you are Frank, you have no reason to use this.")]
+        /*      [Command("testinfo")]
         [MinPermissions(AccessLevel.GuildOwner)]
         public Task GlobalDataAsync()
         {
@@ -246,7 +241,7 @@ namespace Siotrix.Discord.Statistics
                          };
                      });*/
 
-          /*      var builder = new EmbedBuilder()
+        /*      var builder = new EmbedBuilder()
                     .WithTitle("Statistics Data")
                     .WithColor(new Color(rColor, gColor, bColor))
                     .WithDescription(desc_query.Description)
@@ -421,5 +416,5 @@ namespace Siotrix.Discord.Statistics
                 return ReplyAsync("", embed: builder);
             }
         } */
-    } 
-} 
+    }
+}

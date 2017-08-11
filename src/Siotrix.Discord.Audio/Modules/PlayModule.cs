@@ -1,16 +1,15 @@
-﻿using Discord.WebSocket;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Audio
 {
-
     [Name("Audio")]
     [Summary("Audio commands.")]
     public class PlayModule : ModuleBase<SocketCommandContext>
     {
-        private AudioService _audio;
+        private readonly AudioService _audio;
 
         public PlayModule(AudioService audio)
         {
@@ -31,7 +30,8 @@ namespace Siotrix.Discord.Audio
             return _audio.PlayAsync(user.VoiceChannel, "surf.mp3");
         }
 
-        [Command("play", RunMode = RunMode.Async), Priority(10)]
+        [Command("play", RunMode = RunMode.Async)]
+        [Priority(10)]
         [Summary("Search for and then play a song")]
         [Remarks("<song> - name of song you would like to play.")]
         [MinPermissions(AccessLevel.User)]
@@ -40,7 +40,8 @@ namespace Siotrix.Discord.Audio
             return ReplyAsync("Search is not supported at this time.");
         }
 
-        [Command("play", RunMode = RunMode.Async), Priority(20)]
+        [Command("play", RunMode = RunMode.Async)]
+        [Priority(20)]
         [Summary("Play a song from a specific url")]
         [Remarks("<url> - Play song from specific URL.")]
         [MinPermissions(AccessLevel.User)]
@@ -50,7 +51,7 @@ namespace Siotrix.Discord.Audio
 
             if (user.VoiceChannel == null)
                 return ReplyAsync("You must be in a voice channel to play music.");
-            
+
             return _audio.PlayAsync(user.VoiceChannel, url);
         }
 
@@ -64,8 +65,7 @@ namespace Siotrix.Discord.Audio
 
             if (playing == null)
                 return ReplyAsync("There aren't any songs playing right now.");
-            else
-                return ReplyAsync("Song Info");
+            return ReplyAsync("Song Info");
         }
     }
 }

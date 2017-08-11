@@ -1,27 +1,26 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace Siotrix.Discord.Roslyn
 {
-    [Name("Developer")]  
+    [Name("Developer")]
     public class EvalModule : ModuleBase<SocketCommandContext>
     {
-        private Stopwatch _timer = new Stopwatch();
+        private readonly Stopwatch _timer = new Stopwatch();
 
         protected override void BeforeExecute(CommandInfo info)
         {
             _timer.Start();
-         //   Console.WriteLine(info.Summary);
+            //   Console.WriteLine(info.Summary);
         }
 
         [Command("evaluate", RunMode = RunMode.Async)]
@@ -29,34 +28,34 @@ namespace Siotrix.Discord.Roslyn
         [Summary("Evaluate a c# expression.")]
         [Remarks("<code> - Any simple c# expressions and discord.net code.")]
         [MinPermissions(AccessLevel.BotOwner)]
-        public async Task EvalAsync([Remainder]string code)
+        public async Task EvalAsync([Remainder] string code)
         {
             var options = ScriptOptions.Default
-            .AddReferences(           
-                typeof(string).GetTypeInfo().Assembly,
-                typeof(Assembly).GetTypeInfo().Assembly,
-                typeof(Task).GetTypeInfo().Assembly,
-                typeof(Enumerable).GetTypeInfo().Assembly,
-                typeof(List<>).GetTypeInfo().Assembly,
-                typeof(IGuild).GetTypeInfo().Assembly,
-                typeof(SocketGuild).GetTypeInfo().Assembly,
-                typeof(Entity).GetTypeInfo().Assembly
+                .AddReferences(
+                    typeof(string).GetTypeInfo().Assembly,
+                    typeof(Assembly).GetTypeInfo().Assembly,
+                    typeof(Task).GetTypeInfo().Assembly,
+                    typeof(Enumerable).GetTypeInfo().Assembly,
+                    typeof(List<>).GetTypeInfo().Assembly,
+                    typeof(IGuild).GetTypeInfo().Assembly,
+                    typeof(SocketGuild).GetTypeInfo().Assembly,
+                    typeof(Entity).GetTypeInfo().Assembly
                 )
-            .AddImports(
-                "System",
-                "System.Diagnostics",
-                "System.Text",
-                "System.Reflection",
-                "System.Threading.Tasks",
-                "System.Linq",
-                "System.Collections.Generic",
-                "System.Net",
-                "Discord",
-                "Discord.WebSocket",
-                "Siotrix"
-            );
-            
-            string cleancode = GetCode(code);
+                .AddImports(
+                    "System",
+                    "System.Diagnostics",
+                    "System.Text",
+                    "System.Reflection",
+                    "System.Threading.Tasks",
+                    "System.Linq",
+                    "System.Collections.Generic",
+                    "System.Net",
+                    "Discord",
+                    "Discord.WebSocket",
+                    "Siotrix"
+                );
+
+            var cleancode = GetCode(code);
             string reply, type;
 
             try
@@ -64,7 +63,8 @@ namespace Siotrix.Discord.Roslyn
                 var result = await CSharpScript.EvaluateAsync(cleancode, options, Context);
                 type = result.GetType().Name;
                 reply = result.ToString();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 type = ex.GetType().Name;
                 reply = ex.Message;
@@ -76,7 +76,7 @@ namespace Siotrix.Discord.Roslyn
 
         private string GetCode(string rawmsg)
         {
-            string code = rawmsg;
+            var code = rawmsg;
 
             if (code.StartsWith("```"))
                 code = code.Substring(3, code.Length - 6);
@@ -93,9 +93,8 @@ namespace Siotrix.Discord.Roslyn
 
         private EmbedBuilder GetEmbed(string code, string result, string resultType)
         {
-
             _timer.Stop();
-            
+
             var builder = new EmbedBuilder();
             builder.Color = new Color(25, 185, 0);
             builder.AddField(x =>
@@ -108,12 +107,9 @@ namespace Siotrix.Discord.Roslyn
                 x.Name = $"Result<{resultType}>";
                 x.Value = result;
             });
-            builder.WithFooter(x =>
-            {
-                x.Text = $"In {_timer.ElapsedMilliseconds}ms";
-            });
+            builder.WithFooter(x => { x.Text = $"In {_timer.ElapsedMilliseconds}ms"; });
 
             return builder;
-        }       
+        }
     }
 }

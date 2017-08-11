@@ -1,17 +1,19 @@
-﻿using Discord.Audio;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using Discord.Audio;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Audio
 {
     public class AudioService : IService
     {
-        private ConcurrentDictionary<ulong, IAudioClient> _clients = new ConcurrentDictionary<ulong, IAudioClient>();
-        private YoutubeDLHandler _ytdl;
+        private readonly ConcurrentDictionary<ulong, IAudioClient> _clients =
+            new ConcurrentDictionary<ulong, IAudioClient>();
+
         private FfmpegHandler _ffmpeg;
-        
+        private YoutubeDLHandler _ytdl;
+
         public async Task StartAsync()
         {
             _ytdl = new YoutubeDLHandler();
@@ -26,7 +28,7 @@ namespace Siotrix.Discord.Audio
         {
             foreach (var client in _clients.Values)
                 await client.StopAsync();
-            
+
             _ytdl = null;
             _ffmpeg = null;
             await PrettyConsole.LogAsync("Info", "Audio", "Service stopped successfully");
@@ -36,7 +38,7 @@ namespace Siotrix.Discord.Audio
         {
             if (_clients.TryGetValue(channel.Guild.Id, out IAudioClient a))
                 return;
-            
+
             var client = await channel.ConnectAsync().ConfigureAwait(false);
 
             if (_clients.TryAdd(channel.Guild.Id, client))
@@ -61,7 +63,7 @@ namespace Siotrix.Discord.Audio
 
             if (_clients.TryGetValue(channel.Guild.Id, out IAudioClient client))
             {
-                string file = await _ytdl.DownloadAsync(channel.Guild.Id, url.ToString());
+                var file = await _ytdl.DownloadAsync(channel.Guild.Id, url.ToString());
                 await _ffmpeg.SendAsync(client, file).ConfigureAwait(false);
             }
         }
@@ -86,7 +88,7 @@ namespace Siotrix.Discord.Audio
 
             if (_clients.TryGetValue(channel.Guild.Id, out IAudioClient client))
             {
-                string file = $"cache/sounds/{soundId}.mp3";
+                var file = $"cache/sounds/{soundId}.mp3";
                 await _ffmpeg.SendAsync(client, file).ConfigureAwait(false);
             }
         }

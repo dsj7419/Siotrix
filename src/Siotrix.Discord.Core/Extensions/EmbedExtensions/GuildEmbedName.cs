@@ -1,8 +1,6 @@
-﻿using Discord.Commands;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -18,13 +16,9 @@ namespace Siotrix.Discord
                 {
                     var val = db.Gnames.Where(p => p.GuildId == guild_id.ToLong());
                     if (val == null || val.ToList().Count <= 0)
-                    {
                         name = context.Guild.Name;
-                    }
                     else
-                    {
                         name = val.First().GuildName;
-                    }
                 }
                 catch (Exception e)
                 {

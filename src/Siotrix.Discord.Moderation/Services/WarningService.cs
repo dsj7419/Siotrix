@@ -1,22 +1,19 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System.Threading.Tasks;
-using Discord.Commands;
-using Discord.Addons.InteractiveCommands;
-using System;
+﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
     public class WarningService : IService
     {
-        private DiscordSocketClient _client;
-        private int count = 0;
+        private readonly DiscordSocketClient _client;
+        private string bad_words;
+        private EmbedBuilder builder;
+        private int count;
         private IUserMessage log_msg;
-        private EmbedBuilder builder = null;
-        string bad_words = null;
 
         public WarningService(DiscordSocketClient client)
         {
@@ -40,7 +37,7 @@ namespace Siotrix.Discord.Moderation
             var message = msg as SocketUserMessage;
             var context = new SocketCommandContext(_client, message);
             var dictionary = LogChannelExtensions.GetFilterWords(context.Guild.Id.ToLong());
-            string[] words = msg.Content.Split(' ');
+            var words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
@@ -49,7 +46,8 @@ namespace Siotrix.Discord.Moderation
                 bad_words += badword + " ";
                 var warn_count = GetWarnValue(context.Guild.Id.ToLong(), 1);
                 var warn_mute_time = GetWarnValue(context.Guild.Id.ToLong(), 2);
-                var mod_channel = context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
+                var mod_channel =
+                    context.Guild.GetChannel(LogChannelExtensions.modlogchannel_id.ToUlong()) as ISocketMessageChannel;
 
                 //if (count == warn_count)
                 //{
@@ -64,35 +62,31 @@ namespace Siotrix.Discord.Moderation
                 //    await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
                 //    return;
                 //}
-                if(count == 1)
+                if (count == 1)
                 {
                     builder = GetBuilder(context, 1, badword);
-                    log_msg = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, builder.Build());
-                    return;
+                    log_msg = await mod_channel.SendMessageSafeAsync("", false, builder.Build());
                 }
                 else
                 {
-                    if(count > warn_count)
+                    if (count > warn_count)
                         await MuteWarnUser(context.User as IGuildUser, warn_mute_time, context);
                     builder = GetBuilder(context, count, bad_words);
                     await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
-                    return;
                 }
             }
         }
 
         private int GetWarnValue(long guild_id, int option_value)
         {
-            int warn_value = 0;
+            var warn_value = 0;
             using (var db = new LogDatabase())
             {
                 try
                 {
                     var result = db.Gwarns.Where(p => p.GuildId.Equals(guild_id) && p.Option.Equals(option_value));
                     if (result.Any())
-                    {
                         warn_value = result.First().WarnValue;
-                    }
                 }
                 catch (Exception e)
                 {
@@ -107,12 +101,14 @@ namespace Siotrix.Discord.Moderation
             try
             {
                 if (!user.IsBot)
-                    await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true).ConfigureAwait(false);
+                    await MuteExtensions.TimedMute(user, TimeSpan.FromMinutes(minutes), minutes, context, true)
+                        .ConfigureAwait(false);
                 var is_save = MuteExtensions.SaveMuteUser(user, minutes);
                 if (is_save)
                 {
-                    var case_id = CaseExtensions.GetCaseNumber(context);
-                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(), "auto");
+                    var case_id = context.GetCaseNumber();
+                    CaseExtensions.SaveCaseDataAsync("mute", case_id, user.Id.ToLong(), context.Guild.Id.ToLong(),
+                        "auto");
                 }
             }
             catch
@@ -124,26 +120,27 @@ namespace Siotrix.Discord.Moderation
         private EmbedBuilder GetBuilder(SocketCommandContext context, int warn_count, string badword)
         {
             string value = null;
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
-            string g_name = GuildEmbedName.GetGuildName(context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(context);
+            var g_icon_url = context.GetGuildIconUrl();
+            var g_name = context.GetGuildName();
+            var g_url = context.GetGuildUrl();
+            var g_thumbnail = context.GetGuildThumbNail();
+            var g_footer = context.GetGuildFooter();
+            var g_prefix = context.GetGuildPrefix();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 0, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
 
-            value = context.User.Mention + " has been issued **" + warn_count.ToString() + "** warning points for breaking filter rule\n" +
-              "Reason : use of the words : ***" + badword + "***\n";
+            value = context.User.Mention + " has been issued **" + warn_count +
+                    "** warning points for breaking filter rule\n" +
+                    "Reason : use of the words : ***" + badword + "***\n";
 
             embed
                 .AddField(x =>
@@ -153,19 +150,19 @@ namespace Siotrix.Discord.Moderation
                 });
             return embed;
         }
+        //        .WithIconUrl(g_icon_url)
+        //        .WithAuthor(new EmbedAuthorBuilder()
+        //    var embed = new EmbedBuilder()
+        //    string g_prefix = PrefixExtensions.GetGuildPrefix(context);
+        //    string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
+        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
+        //    string g_url = GuildEmbedUrl.GetGuildUrl(context);
+        //    string g_name = GuildEmbedName.GetGuildName(context);
+        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
+        //    string value = null;
+        //{
 
         //private EmbedBuilder GetBuilder(SocketCommandContext context, int set_warn_count, long all_warn_count)
-        //{
-        //    string value = null;
-        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
-        //    string g_name = GuildEmbedName.GetGuildName(context);
-        //    string g_url = GuildEmbedUrl.GetGuildUrl(context);
-        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-        //    string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
-        //    string g_prefix = PrefixExtensions.GetGuildPrefix(context);
-        //    var embed = new EmbedBuilder()
-        //        .WithAuthor(new EmbedAuthorBuilder()
-        //        .WithIconUrl(g_icon_url)
         //        .WithName(g_name)
         //        .WithUrl(g_url))
         //        .WithColor(new Color(255, 0, 0))

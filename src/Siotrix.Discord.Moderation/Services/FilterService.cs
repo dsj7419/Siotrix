@@ -1,18 +1,15 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System.Threading.Tasks;
-using Discord.Commands;
-using Discord.Addons.InteractiveCommands;
-using System;
+﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
     public class FilterService : IService
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
 
         public FilterService(DiscordSocketClient client)
         {
@@ -38,38 +35,37 @@ namespace Siotrix.Discord.Moderation
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
-            int argPos = 0;
+            var argPos = 0;
             string spec = null;
             var context = new SocketCommandContext(_client, message);
             var dictionary = LogChannelExtensions.GetFilterWords(context.Guild.Id.ToLong());
-            string[] words = msg.Content.Split(' ');
+            var words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
-            var channel = context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+            var channel =
+                context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
             {
                 var builder = new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(msg.Author.GetAvatarUrl())
-                .WithName("Found --" + badword + "-- word from message of " + msg.Author.Username + "#" + msg.Author.Discriminator))
-                .WithColor(new Color(255, 0, 0));
+                    .WithAuthor(new EmbedAuthorBuilder()
+                        .WithIconUrl(msg.Author.GetAvatarUrl())
+                        .WithName("Found --" + badword + "-- word from message of " + msg.Author.Username + "#" +
+                                  msg.Author.Discriminator))
+                    .WithColor(new Color(255, 0, 0));
                 await channel.SendMessageAsync("", false, builder.Build());
                 await msg.DeleteAsync();
             }
 
-            spec = PrefixExtensions.GetGuildPrefix(context);
+            spec = context.GetGuildPrefix();
             var is_found = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
             if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
-            {
-                //run auto delete command function
                 if (is_found)
                     await message.DeleteAsync();
-            }
         }
 
         private bool IsUsableAutoDeleteCommand(long guild_id)
         {
-            bool isFound = false;
+            var isFound = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -86,7 +82,8 @@ namespace Siotrix.Discord.Moderation
             return isFound;
         }
 
-        private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg, ISocketMessageChannel channel)
+        private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg,
+            ISocketMessageChannel channel)
         {
             return Task.CompletedTask;
         }

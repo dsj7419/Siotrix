@@ -1,26 +1,21 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Addons.EmojiTools;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.InteractiveCommands;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Globalization;
-using Discord.WebSocket;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Developer
 {
     [Name("Developer")]
     [Group("leaveguild")]
-    [Summary("Instructs the bot to leave a Guild specified by a developer. This could could be temporary or permanent.")]
+    [Summary(
+        "Instructs the bot to leave a Guild specified by a developer. This could could be temporary or permanent.")]
     [MinPermissions(AccessLevel.BotOwner)]
     public class LeaveGuildModule : ModuleBase<SocketCommandContext>
     {
         private bool SaveLeaveGuild(long guild_id, string reason, string guild_name)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try
@@ -50,14 +45,16 @@ namespace Siotrix.Discord.Developer
                 {
                     var result = db.Banguildlists;
                     if (!result.Any())
+                    {
                         list = "No banned guilds at this moment.";
+                    }
                     else
                     {
-                        int index = 0;
-                        foreach(var item in result)
+                        var index = 0;
+                        foreach (var item in result)
                         {
                             index++;
-                            list += index.ToString() + ". " + item.GuildName + " - " + item.GuildId.ToString() + " - " + item.Reason + "\n";
+                            list += index + ". " + item.GuildName + " - " + item.GuildId + " - " + item.Reason + "\n";
                         }
                     }
                 }
@@ -105,9 +102,10 @@ namespace Siotrix.Discord.Developer
             var ch = await gld.GetDefaultChannelAsync();
 
             var embed = new EmbedBuilder();
-            embed.Description = $"Hello, I've been instructed by my developers to leave this guild..\n**Reason: **{msg}";
+            embed.Description =
+                $"Hello, I've been instructed by my developers to leave this guild..\n**Reason: **{msg}";
             embed.Color = new Color(0, 0, 255);
-            embed.Author = new EmbedAuthorBuilder()
+            embed.Author = new EmbedAuthorBuilder
             {
                 Name = "Siotrix - click to join my discord!",
                 IconUrl = SiotrixConstants.BOT_AVATAR,
@@ -127,29 +125,29 @@ namespace Siotrix.Discord.Developer
         public async Task BanGuildAsync()
         {
             var list = GetBanGuildList();
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var g_icon_url = Context.GetGuildIconUrl();
+            var g_name = Context.GetGuildName();
+            var g_url = Context.GetGuildUrl();
+            var g_thumbnail = Context.GetGuildThumbNail();
+            var g_footer = Context.GetGuildFooter();
+            var g_prefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 127, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
-           .AddField(x =>
-           {
-               x.Name = "Banned Guilds";
-               x.Value = list;
-           });
+                .AddField(x =>
+                {
+                    x.Name = "Banned Guilds";
+                    x.Value = list;
+                });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
@@ -169,7 +167,7 @@ namespace Siotrix.Discord.Developer
             var embed = new EmbedBuilder();
             embed.Description = $"The developers have banned me from this guild..\n**Reason: **{msg}";
             embed.Color = new Color(255, 0, 0);
-            embed.Author = new EmbedAuthorBuilder()
+            embed.Author = new EmbedAuthorBuilder
             {
                 Name = "Siotrix - click to join my discord!",
                 IconUrl = SiotrixConstants.BOT_AVATAR,
@@ -179,9 +177,8 @@ namespace Siotrix.Discord.Developer
             await Task.Delay(5000);
             await gld.LeaveAsync();
             var success = SaveLeaveGuild(ID.ToLong(), msg, gld.Name);
-            if(success)
+            if (success)
                 await ReplyAsync($"Message has been sent and I've left the guild forever! {gld.Name}");
-            
         }
 
         [Command("guildunban")]
@@ -192,28 +189,33 @@ namespace Siotrix.Discord.Developer
             var reason = DeleteLeaveGuild(guild_id.ToLong());
             if (reason != null)
             {
-                string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-                string g_name = GuildEmbedName.GetGuildName(Context);
-                string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-                string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-                string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-                string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+                var g_icon_url = Context.GetGuildIconUrl();
+                var g_name = Context.GetGuildName();
+                var g_url = Context.GetGuildUrl();
+                var g_thumbnail = Context.GetGuildThumbNail();
+                var g_footer = Context.GetGuildFooter();
+                var g_prefix = Context.GetGuildPrefix();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                        .WithIconUrl(g_icon_url)
+                        .WithName(g_name)
+                        .WithUrl(g_url))
                     .WithColor(new Color(255, 0, 0))
                     .WithThumbnailUrl(g_thumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                        .WithIconUrl(g_footer[0])
+                        .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 builder
                     .WithTitle("Unauthorized Guild")
-                    .WithDescription("Hi, thank you for inviting me to the server. Unfortunately I am not able to stay as you have been added to my banlist.\nReason: " + " ***" + reason + " ***")
+                    .WithDescription(
+                        "Hi, thank you for inviting me to the server. Unfortunately I am not able to stay as you have been added to my banlist.\nReason: " +
+                        " ***" + reason + " ***")
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
-                    .AddField(new EmbedFieldBuilder() { IsInline = true, Name = Format.Underline("If you have questions, feel free to join our Discord at : "),
+                    .AddField(new EmbedFieldBuilder
+                    {
+                        IsInline = true,
+                        Name = Format.Underline("If you have questions, feel free to join our Discord at : "),
                         Value = SiotrixConstants.DISCORD_INV
                     });
                 await ReplyAsync("", embed: builder);

@@ -13,20 +13,20 @@ namespace Siotrix.Discord.Audio
         {
             if (!Directory.Exists("cache/audio"))
                 Directory.CreateDirectory("cache/audio");
-            
+
             return Task.CompletedTask;
         }
-        
+
         public Task<string> DownloadAsync(ulong guildId, string url)
         {
             var id = new Random().Next(1000, 1000000);
-            string pathpart = Path.Combine(appdir, $"cache/audio/{guildId}");
-            string filepart = $"{id}.mp3";
+            var pathpart = Path.Combine(appdir, $"cache/audio/{guildId}");
+            var filepart = $"{id}.mp3";
 
             if (!Directory.Exists(pathpart))
                 Directory.CreateDirectory(pathpart);
 
-            string path = Path.Combine(pathpart, filepart);
+            var path = Path.Combine(pathpart, filepart);
 
             var process = Process.Start(new ProcessStartInfo
             {

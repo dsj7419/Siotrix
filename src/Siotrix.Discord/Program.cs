@@ -1,17 +1,18 @@
-﻿using Discord;
-using Discord.Audio;
+﻿using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
-    class Program
+    internal class Program
     {
-        public static void Main(string[] args)
-            => new Program().Start().GetAwaiter().GetResult();
-
         private DiscordSocketClient _client;
         private ServiceManager _manager;
+
+        public static void Main(string[] args)
+        {
+            new Program().Start().GetAwaiter().GetResult();
+        }
 
         public async Task Start()
         {
@@ -21,7 +22,7 @@ namespace Siotrix.Discord
             Configuration.EnsureExists();
             await LogDatabase.EnsureExistsAsync();
 
-            _client = new DiscordSocketClient(new DiscordSocketConfig()
+            _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
                 AlwaysDownloadUsers = true,

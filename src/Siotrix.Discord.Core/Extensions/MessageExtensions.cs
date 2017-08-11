@@ -1,17 +1,19 @@
-﻿using Discord;
-using Discord.Net;
-using Discord.WebSocket;
-using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
-using Discord.Commands;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Net;
 
 namespace Siotrix.Discord
 {
     public static class MessageExtensions
     {
+        public static int number_of_messages;
+        public static ulong userId;
+
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos)
         {
             var text = msg.Content;
@@ -22,12 +24,13 @@ namespace Siotrix.Discord
             }
             return false;
         }
+
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
             if (text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
 
-            int endPos = text.IndexOf('>');
+            var endPos = text.IndexOf('>');
             if (endPos == -1) return false;
             if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return false; //Must end in "> "
 
@@ -40,7 +43,8 @@ namespace Siotrix.Discord
             return false;
         }
 
-        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text,
+            Func<Exception, Task> handler, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             try
             {
@@ -55,7 +59,8 @@ namespace Siotrix.Discord
                         sw.Flush();
                     }
                     ms.Position = 0;
-                    return await channel.SendFileAsync(ms, "Output.txt", $"I tried to send a message that was too long!", isTTS, options);
+                    return await channel.SendFileAsync(ms, "Output.txt",
+                        $"I tried to send a message that was too long!", isTTS, options);
                 }
             }
             catch (HttpException ex)
@@ -65,12 +70,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task<IUserMessage> SendMessageSafeAsync(this IMessageChannel channel, string text,
+            bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             return await channel.SendMessageSafeAsync(text, null, isTTS, embed, options);
         }
 
-        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func, Func<Exception, Task> handler, RequestOptions options = null)
+        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func,
+            Func<Exception, Task> handler, RequestOptions options = null)
         {
             try
             {
@@ -82,17 +89,17 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func, RequestOptions options = null)
+        public static async Task ModifySafeAsync(this IUserMessage msg, Action<MessageProperties> func,
+            RequestOptions options = null)
         {
             await msg.ModifySafeAsync(func, null, options);
         }
 
-        public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public static async Task SendToAll(this IEnumerable<IMessageChannel> channels, string text, bool isTTS = false,
+            Embed embed = null, RequestOptions options = null)
         {
             foreach (var channel in channels)
-            {
                 await SendMessageSafeAsync(channel, text, isTTS, embed, options);
-            }
         }
 
         public static async Task DMUser(IUser user, string message = "", Embed embed = null)
@@ -101,10 +108,10 @@ namespace Siotrix.Discord
         }
 
         public static bool UserHasPermission(this IGuildChannel channel, IGuildUser user, ChannelPermission permission)
-            => user.GetPermissions(channel).Has(permission);
+        {
+            return user.GetPermissions(channel).Has(permission);
+        }
 
-        public static int number_of_messages = 0;
-        public static ulong userId = 0;
         public static async Task NumberOfCleanupMessages(int count, ulong user_id)
         {
             number_of_messages = count;
@@ -114,7 +121,7 @@ namespace Siotrix.Discord
 
         public static string JoinNonNullStrings(string joining, params string[] toJoin)
         {
-            return String.Join(joining, toJoin.Where(x => !String.IsNullOrWhiteSpace(x)));
+            return string.Join(joining, toJoin.Where(x => !string.IsNullOrWhiteSpace(x)));
         }
 
         public static string EscapeMarkdown(string str, bool onlyAccentGrave)
@@ -129,14 +136,14 @@ namespace Siotrix.Discord
             if (string.IsNullOrEmpty(s))
                 return string.Empty;
 
-            char[] a = s.ToCharArray();
+            var a = s.ToCharArray();
             a[0] = char.ToUpper(a[0]);
             return new string(a);
         }
 
         public static string CaseInsReplace(this string str, string oldValue, string newValue)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
 
             var previousIndex = 0;
             var index = str.IndexOf(oldValue, StringComparison.OrdinalIgnoreCase);

@@ -1,12 +1,7 @@
-﻿using Discord;
+﻿using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Siotrix.Discord
 {
@@ -15,14 +10,13 @@ namespace Siotrix.Discord
     [Summary("Set various antilinking properties in the guild")]
     public class AntilinkModule : ModuleBase<SocketCommandContext>
     {
-
         [Command("status")]
         [Summary("Check current antilink status for guild.")]
         [Remarks("- No other argument needed")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync()
         {
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+            var g_color = Context.GetGuildColor();
             var description = "";
             var title = $"Antilink Information for {Context.Guild.Name}";
 
@@ -38,56 +32,48 @@ namespace Siotrix.Discord
                 .WithTitle(title)
                 .WithColor(g_color);
 
-          //  TableExtensions.TableBuilder tb = new TableExtensions.TableBuilder();
-           // IEnumerable<Tuple<int, string, bool, bool>> channellist = new[] { Tuple.Create(1, "help", false, false)};
-            string isActive = antilink.IsActive == true ? isActive = "On" : isActive = "Off";
-            string isDMActive = antilink.IsDmMessage == true ? isDMActive = "On" : isDMActive = "Off";
-            int channelcount = 0;
+            //  TableExtensions.TableBuilder tb = new TableExtensions.TableBuilder();
+            // IEnumerable<Tuple<int, string, bool, bool>> channellist = new[] { Tuple.Create(1, "help", false, false)};
+            string isActive = antilink.IsActive ? isActive = "On" : isActive = "Off";
+            string isDMActive = antilink.IsDmMessage ? isDMActive = "On" : isDMActive = "Off";
+            var channelcount = 0;
             description = $"Current Antilink status: **{isActive}**\n";
             description += $"Current Antilink DM status: **{isDMActive}**\n";
-            description += $"DM Message: **{antilink.DmMessage}**\n\n";           
+            description += $"DM Message: **{antilink.DmMessage}**\n\n";
             // description += String.Format("## | {0, 20} | {1, 28} | {2, 35}\n", "Channel Name", "Is Active", "Is Strict");
-          //  tb.AddRow("Num", "Channel Name", "Active?", "Strict Mode");
-         //   tb.AddRow("------", "----------------", "---------", "-------------");
+            //  tb.AddRow("Num", "Channel Name", "Active?", "Strict Mode");
+            //   tb.AddRow("------", "----------------", "---------", "-------------");
 
-                foreach (var channel in Context.Guild.Channels)
+            foreach (var channel in Context.Guild.Channels)
+            foreach (var user in channel.Users)
+                if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
                 {
-                    foreach (var user in channel.Users)
+                    var antilinkChannel =
+                        await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+
+                    if (antilinkChannel != null)
                     {
-                        if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
-                        {                        
-                            var antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                        channelcount++;
+                        builder.AddInlineField($"{channel.Name.FirstLetterToUpperCaseOrConvertNullToEmptyString()} ",
+                            $"Active: {antilinkChannel.IsActive}  | Strict Mode: {antilinkChannel.IsStrict}");
 
-                            if (antilinkChannel != null)
-                            {
-                                channelcount++;
-                                builder.AddInlineField($"{channel.Name.FirstLetterToUpperCaseOrConvertNullToEmptyString()} ", $"Active: {antilinkChannel.IsActive}  | Strict Mode: {antilinkChannel.IsStrict}");
-
-                             //   tb.AddRow(channelcount, channel.Name, antilinkChannel.IsActive, antilinkChannel.IsStrict);
-                            // description += String.Format("** {0,3}** | {1, 20} | {2,28} | {3,35}\n", channelcount, channel.Name, antilinkChannel.IsActive, antilinkChannel.IsStrict);
-                            }
-                        }
+                        //   tb.AddRow(channelcount, channel.Name, antilinkChannel.IsActive, antilinkChannel.IsStrict);
+                        // description += String.Format("** {0,3}** | {1, 20} | {2,28} | {3,35}\n", channelcount, channel.Name, antilinkChannel.IsActive, antilinkChannel.IsStrict);
                     }
                 }
             if (channelcount == 0)
-            {
                 description += $"No channel settings have been found..";
-            }
             else if (channelcount == 1)
-            {
                 description += $"Only {channelcount} channel has been found with settings: ";
-            }
             else
-            {
                 description += $"These {channelcount} channels have been found with settings: ";
-            }
 
-                builder.WithDescription(description);
+            builder.WithDescription(description);
             //  var embed = EmbedExtensions.MakeNewEmbed(title, description, g_color);
-             await ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
             //   description += tb.Output();
-           // await ReplyAsync(description);
-        } 
+            // await ReplyAsync(description);
+        }
 
         [Command("toggle")]
         [Summary("Toggle antilinking on or off.")]
@@ -97,21 +83,22 @@ namespace Siotrix.Discord
         {
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
-            if(antilink == null)
+            if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
                 var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
                 await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
             }
 
             var isActive = antilink.IsActive;
 
-            if(isActive)
+            if (isActive)
             {
-               await  AntilinkExtensions.SetIsActiveAsync(antilink, false);
-               await ReplyAsync("Antilink has been disabled for the guild.");
+                await AntilinkExtensions.SetIsActiveAsync(antilink, false);
+                await ReplyAsync("Antilink has been disabled for the guild.");
             }
             else
             {
@@ -131,7 +118,8 @@ namespace Siotrix.Discord
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default setup with DM's off");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default setup with DM's off");
                 return;
             }
 
@@ -150,10 +138,11 @@ namespace Siotrix.Discord
         }
 
         [Command("dmmessage")]
-        [Summary("Set the DM message that the bot will send to the user if they use a link in a channel they aren't supposed to.")]
+        [Summary(
+            "Set the DM message that the bot will send to the user if they use a link in a channel they aren't supposed to.")]
         [Remarks("[message] - no argument will list the current message and reset will restore to default.")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task AntilinkDMMessageAsync([Remainder]string message=null)
+        public async Task AntilinkDMMessageAsync([Remainder] string message = null)
         {
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
@@ -162,14 +151,16 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
                 var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
                 await AntilinkExtensions.SetDmMessageAsync(subAntilink, message);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default setup with your DM message.");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default setup with your DM message.");
                 return;
             }
 
             if (antilink == null && message == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default setup with the default DM message.");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default setup with the default DM message.");
                 return;
             }
 
@@ -181,14 +172,14 @@ namespace Siotrix.Discord
 
             if (message == "reset")
             {
-                await AntilinkExtensions.SetDmMessageAsync(antilink, $"{Context.Guild.Name.ToUpper()} does not allow that link in the channel.");
+                await AntilinkExtensions.SetDmMessageAsync(antilink,
+                    $"{Context.Guild.Name.ToUpper()} does not allow that link in the channel.");
                 await ReplyAsync($"Your current DM Message has been reset.");
                 return;
             }
 
             await AntilinkExtensions.SetDmMessageAsync(antilink, message);
             await ReplyAsync($"Your DM Message has been changed to: **{message}**");
-
         }
 
         [Command("togglechannel")]
@@ -204,7 +195,8 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
                 var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
                 await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
             }
 
@@ -215,9 +207,10 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
                 var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
                 await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find this channels Antilink settings. Creating and activating for this channel.");
+                await ReplyAsync(
+                    "I am not able to find this channels Antilink settings. Creating and activating for this channel.");
                 return;
-            }           
+            }
 
             var isActive = antilinkChannel.IsActive;
             var channelname = channel as IChannel;
@@ -238,7 +231,7 @@ namespace Siotrix.Discord
         [Summary("Toggle antilink strict rules on or off for a channel.")]
         [Remarks("(channel name)")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task AntilinkStrictToggleAsync( SocketChannel channel)
+        public async Task AntilinkStrictToggleAsync(SocketChannel channel)
         {
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
@@ -247,7 +240,8 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
                 var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
                 await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
             }
 
@@ -259,7 +253,8 @@ namespace Siotrix.Discord
                 var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
                 await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
                 await AntilinkExtensions.SetIsStrictChannelAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find this channels Antilink settings. Creating and activating strict rules for this channel.");
+                await ReplyAsync(
+                    "I am not able to find this channels Antilink settings. Creating and activating strict rules for this channel.");
                 return;
             }
 
@@ -276,7 +271,7 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.SetIsStrictChannelAsync(antilinkChannel, true);
                 await ReplyAsync($"Antilink strict mode has been enabled for {channelname.Name}");
             }
-        }        
+        }
 
         [Command("toggleall")]
         [Summary("Toggle all channels bot is in on or off depending on what each is set to.")]
@@ -284,70 +279,71 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkToggleAllAsync()
         {
-            int activecount = 0;
-            int nonactivecount = 0;
-            int channelcount = 0;
+            var activecount = 0;
+            var nonactivecount = 0;
+            var channelcount = 0;
             var antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
 
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default Antilink. Try command again.");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default Antilink. Try command again.");
                 return;
             }
 
             foreach (var channel in Context.Guild.Channels)
-            {
-                foreach (var user in channel.Users)
+            foreach (var user in channel.Users)
+                if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
                 {
-                    if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
-                    {
-                        channelcount++;
-                        var antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                    channelcount++;
+                    var antilinkChannel =
+                        await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
 
-                        if (antilinkChannel == null)
+                    if (antilinkChannel == null)
+                    {
+                        await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
+                        var subAntilink =
+                            await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                        await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
+                        activecount++;
+                    }
+                    else
+                    {
+                        var isActive = antilinkChannel.IsActive;
+
+                        if (isActive)
                         {
-                            await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
-                            var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
-                            await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
-                            activecount++;
+                            await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, false);
+                            nonactivecount++;
                         }
                         else
                         {
-
-                            var isActive = antilinkChannel.IsActive;
-
-                            if (isActive)
-                            {
-                                await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, false);
-                                nonactivecount++;
-                            }
-                            else
-                            {
-                                await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);                                
-                                activecount++;
-                            }
+                            await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);
+                            activecount++;
                         }
                     }
                 }
-            }
-                await ReplyAsync($"A total of {channelcount} channels have changed. {activecount} activated, and {nonactivecount} deactivated.");
+            await ReplyAsync(
+                $"A total of {channelcount} channels have changed. {activecount} activated, and {nonactivecount} deactivated.");
         }
 
         [Command("authorize")]
         [Summary("Authorize a user to use a link either permenantly, or one time only")]
-        [Remarks("(user) (channel) [permenant] - must use the word permenant or it will be a one time only authorization.")]
+        [Remarks(
+            "(user) (channel) [permenant] - must use the word permenant or it will be a one time only authorization.")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task AntilinkAuthorizeAsync(SocketGuildUser user, SocketChannel channel, [Remainder]string parameter = null)
-        {          
-            string message = "";
+        public async Task AntilinkAuthorizeAsync(SocketGuildUser user, SocketChannel channel,
+            [Remainder] string parameter = null)
+        {
+            var message = "";
 
 
             if (channel.GetUser(user.Id) == null)
             {
                 await ReplyAsync($"You cant authorize {user.Username} because they are not in that channel!");
                 return;
-            }               
+            }
 
 
             if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
@@ -356,7 +352,7 @@ namespace Siotrix.Discord
                 return;
             }
 
-            if (user.GetPermissions(channel as IGuildChannel).ManageMessages == true)
+            if (user.GetPermissions(channel as IGuildChannel).ManageMessages)
             {
                 await ReplyAsync($"No need to authorise {user.Username}. They bypass antilink with their permissions.");
                 return;
@@ -369,7 +365,8 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
                 var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
                 await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find your guilds Antilink settings. Creating default and activating Antilink. Try command again.");
+                await ReplyAsync(
+                    "I am not able to find your guilds Antilink settings. Creating default and activating Antilink. Try command again.");
                 return;
             }
 
@@ -380,16 +377,18 @@ namespace Siotrix.Discord
                 await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
                 var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
                 await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
-                await ReplyAsync("I am not able to find this channels Antilink settings. Creating and activating for this channel. Try command again.");
+                await ReplyAsync(
+                    "I am not able to find this channels Antilink settings. Creating and activating for this channel. Try command again.");
                 return;
             }
 
-            bool isChannelActive = antilinkChannel.IsActive;
-            var channelname = channel as IChannel;           
+            var isChannelActive = antilinkChannel.IsActive;
+            var channelname = channel as IChannel;
 
-            if(!isChannelActive)
+            if (!isChannelActive)
             {
-                await ReplyAsync("You have tried to authorize a person in a channel that is not actively monitored. Activate the channel first.");
+                await ReplyAsync(
+                    "You have tried to authorize a person in a channel that is not actively monitored. Activate the channel first.");
                 return;
             }
 
@@ -397,7 +396,8 @@ namespace Siotrix.Discord
 
             if (antilinkUser == null)
             {
-                await AntilinkExtensions.CreateUserAntilinkAsync(Context, antilink, channel, user, parameter == "permenant" ? false : true);
+                await AntilinkExtensions.CreateUserAntilinkAsync(Context, antilink, channel, user,
+                    parameter == "permenant" ? false : true);
                 var isPermenent = parameter == "permenant" ? "permenantly." : "for a single use.";
                 message = $"You have authorized {user.Username} to use links in {channelname.Name} {isPermenent}.";
             }
@@ -421,7 +421,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkDeAuthorizeAsync(SocketGuildUser user, SocketChannel channel)
         {
-            string message = "";
+            var message = "";
             var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);
             var channelname = channel as IChannel;
 
@@ -431,8 +431,8 @@ namespace Siotrix.Discord
             }
             else
             {
-                await AntilinkExtensions.DeleteAntilinkUserAsync(antilinkUser);                
-                message = $"You have de-authorized {user.Username} from using links in {channelname.Name}.";                   
+                await AntilinkExtensions.DeleteAntilinkUserAsync(antilinkUser);
+                message = $"You have de-authorized {user.Username} from using links in {channelname.Name}.";
             }
 
             await ReplyAsync(message);
@@ -443,8 +443,8 @@ namespace Siotrix.Discord
         [Remarks("(username)")]
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync(SocketGuildUser user)
-        {            
-            Color g_color = GuildEmbedColorExtensions.GetGuildColor(Context);
+        {
+            var g_color = Context.GetGuildColor();
             var description = "";
             var title = $"Antilink Information for {user.Username} in {Context.Guild.Name}";
 
@@ -460,44 +460,38 @@ namespace Siotrix.Discord
                 .WithTitle(title)
                 .WithColor(g_color);
 
-            string isActive = antilink.IsActive == true ? isActive = "On" : isActive = "Off";
-            int channelcount = 0;
+            string isActive = antilink.IsActive ? isActive = "On" : isActive = "Off";
+            var channelcount = 0;
             description = $"Current Antilink status: **{isActive}**\n\n";
 
             foreach (var channel in Context.Guild.Channels)
-            {
-                foreach (var users in channel.Users)
+            foreach (var users in channel.Users)
+                if (users == user)
                 {
-                    if (users == user)
+                    if (user.GetPermissions(channel).ManageMessages)
                     {
-                        if (user.GetPermissions(channel as IGuildChannel).ManageMessages == true)
-                        {
-                            await ReplyAsync($"{user.Mention} has manage channels ability so they are immune to antilink.");
-                            return;
-                        }
-                        var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);
-                        if (antilinkUser != null)
-                        {
-                            channelcount++;
-                            string isOneTime = antilinkUser.IsOneTime == true ? isOneTime = "one time usage" : isOneTime = "unlimited usage";
-                            builder.AddInlineField($"{channel.Name.FirstLetterToUpperCaseOrConvertNullToEmptyString()} ", $"User has been authorized for {isOneTime} in this channel.");
-                        }
+                        await ReplyAsync($"{user.Mention} has manage channels ability so they are immune to antilink.");
+                        return;
+                    }
+                    var antilinkUser =
+                        await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);
+                    if (antilinkUser != null)
+                    {
+                        channelcount++;
+                        string isOneTime = antilinkUser.IsOneTime
+                            ? isOneTime = "one time usage"
+                            : isOneTime = "unlimited usage";
+                        builder.AddInlineField($"{channel.Name.FirstLetterToUpperCaseOrConvertNullToEmptyString()} ",
+                            $"User has been authorized for {isOneTime} in this channel.");
                     }
                 }
-            }
 
             if (channelcount == 0)
-            {
                 description += $"This user is not authorized for any channel.";
-            }
             else if (channelcount == 1)
-            {
                 description += $"Only {channelcount} channel has been found with authorization: ";
-            }
             else
-            {
                 description += $"These {channelcount} channels have been found with authorization: ";
-            }
 
             builder.WithDescription(description);
             await ReplyAsync("", embed: builder);

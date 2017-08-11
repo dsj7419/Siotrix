@@ -1,7 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord.Utility
 {
@@ -9,14 +9,14 @@ namespace Siotrix.Discord.Utility
     [MinPermissions(AccessLevel.User)]
     public class SuggestModule : ModuleBase<SocketCommandContext>
     {
-
-        [Command("suggest"), Alias("suggestion", "idea")]
+        [Command("suggest")]
+        [Alias("suggestion", "idea")]
         [Summary("Give a suggestion or idea to the developers of this bot!")]
         [Remarks(" (suggestion text)")]
         [MinPermissions(AccessLevel.User)]
-        public async Task SuggestAsync([Remainder]string message)
+        public async Task SuggestAsync([Remainder] string message)
         {
-            var suggestionChannel = Context.Client.GetChannel(328336838844743681) as IMessageChannel;
+            var suggestionChannel = Context.Client.GetChannel(SiotrixConstants.SUGGESTION_CHANNEL) as IMessageChannel;
 
             if (suggestionChannel == null)
             {
@@ -25,18 +25,18 @@ namespace Siotrix.Discord.Utility
             }
 
             var builder = new EmbedBuilder
-            {
-                Author = new EmbedAuthorBuilder
                 {
-                    Name = $"{Context.User.Username}#{Context.User.Discriminator}",
-                    IconUrl = Context.User.GetAvatarUrl()
-                },
-                Timestamp = DateTime.Now,
-                Color = new Color(1, 1, 1)
-            }
-            .AddField("Suggestion", message)
-            .AddInlineField(Context.Guild?.Name ?? Context.User.Username, Context.Guild?.Id ?? Context.User.Id)
-            .AddInlineField(Context.Channel.Name, Context.Channel.Id);
+                    Author = new EmbedAuthorBuilder
+                    {
+                        Name = $"{Context.User.Username}#{Context.User.Discriminator}",
+                        IconUrl = Context.User.GetAvatarUrl()
+                    },
+                    Timestamp = DateTime.Now,
+                    Color = new Color(1, 1, 1)
+                }
+                .AddField("Suggestion", message)
+                .AddInlineField(Context.Guild?.Name ?? Context.User.Username, Context.Guild?.Id ?? Context.User.Id)
+                .AddInlineField(Context.Channel.Name, Context.Channel.Id);
             await suggestionChannel.SendMessageSafeAsync("", embed: builder.Build());
             await ReplyAsync("Suggestion sent. Thank You for helping!");
         }

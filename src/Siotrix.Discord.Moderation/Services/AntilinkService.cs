@@ -1,18 +1,14 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
-using Discord.Addons.InteractiveCommands;
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
 {
     public class AntilinkService : IService
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
 
         public AntilinkService(DiscordSocketClient client)
         {
@@ -37,10 +33,13 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
-            var regexItem = new Regex(@"<?(https?:\/\/)?(www\.)?(discord\.gg|discordapp\.com\/invite)\b([-a-zA-Z0-9/]*)>?");
+            var regexItem =
+                new Regex(@"<?(https?:\/\/)?(www\.)?(discord\.gg|discordapp\.com\/invite)\b([-a-zA-Z0-9/]*)>?");
             var regexDiscordMe = new Regex(@"<?(https?:\/\/)?(www\.)?(discord\.me\/)\b([-a-zA-Z0-9/]*)>?");
             var regexDiscordEmojis = new Regex(@"<?([a-zA-Z]+):([0-9]+)>?");
-            var RegexUrl = new Regex(@"(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_=]*)?");
+            var RegexUrl =
+                new Regex(
+                    @"(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_=]*)?");
 
             var message = msg as SocketUserMessage;
             var context = new SocketCommandContext(_client, message);
@@ -51,10 +50,13 @@ namespace Siotrix.Discord.Moderation
             {
                 await AntilinkExtensions.CreateAntilinkAsync(context);
                 return;
-            } else if (antilink.IsActive == false)            
+            }
+            if (antilink.IsActive == false)
+            {
                 return;
-            
-    
+            }
+
+
             var channel = message.Channel as SocketGuildChannel;
             var antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(context.Guild.Id, channel);
 
@@ -66,46 +68,44 @@ namespace Siotrix.Discord.Moderation
             var user = message.Author as SocketGuildUser;
             var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(context.Guild.Id, user.Id, channel.Id);
 
-            if (regexItem.IsMatch(message.Content) || regexDiscordMe.IsMatch(message.Content) || (RegexUrl.IsMatch(message.Content) && antilinkChannel.IsStrict == true))
-            {
+            if (regexItem.IsMatch(message.Content) || regexDiscordMe.IsMatch(message.Content) ||
+                RegexUrl.IsMatch(message.Content) && antilinkChannel.IsStrict)
                 if (user.IsBot && user.Id == SiotrixConstants.BOT_ID)
                 {
-                    return;
                 }
-                else if (user.GetPermissions(channel as IGuildChannel).ManageMessages == true)
+                else if (user.GetPermissions(channel).ManageMessages)
                 {
-                    return;
                 }
                 else if (antilinkUser != null && antilinkUser.IsOneTime == false)
                 {
-                    return;
                 }
-                else if (antilinkUser != null && antilinkUser.IsOneTime == true)
+                else if (antilinkUser != null && antilinkUser.IsOneTime)
                 {
                     await AntilinkExtensions.DeleteAntilinkUserAsync(antilinkUser);
-                    return;
                 }
                 else
                 {
-
                     LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
-                    var channelLog = context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
+                    var channelLog =
+                        context.Guild.GetChannel(LogChannelExtensions.logchannel_id.ToUlong()) as ISocketMessageChannel;
                     var builder = new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(msg.Author.GetAvatarUrl())
-                .WithName("Removed Message - Broke Hyperlink Rules in " + channel.Name + ": " + message.Content + " " + msg.Author.Username + "#" + msg.Author.Discriminator + user.Mention))
-                .WithColor(new Color(255, 127, 0));
+                        .WithAuthor(new EmbedAuthorBuilder()
+                            .WithIconUrl(msg.Author.GetAvatarUrl())
+                            .WithName("Removed Message - Broke Hyperlink Rules in " + channel.Name + ": " +
+                                      message.Content + " " + msg.Author.Username + "#" + msg.Author.Discriminator +
+                                      user.Mention))
+                        .WithColor(new Color(255, 127, 0));
                     await channelLog.SendMessageAsync("", false, builder.Build());
 
-                    if (antilink.IsDmMessage == true)
+                    if (antilink.IsDmMessage)
                         await MessageExtensions.DMUser(user, antilink.DmMessage);
 
                     await msg.DeleteAsync();
                 }
-            }           
         }
 
-            private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg, ISocketMessageChannel channel)
+        private Task OnMessageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage msg,
+            ISocketMessageChannel channel)
         {
             return Task.CompletedTask;
         }

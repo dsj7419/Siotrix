@@ -1,8 +1,8 @@
-﻿using Discord.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
@@ -19,18 +19,19 @@ namespace Siotrix.Discord
             {
                 int value;
                 if (!int.TryParse(match.Groups[1].Value, out value))
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Invalid time value specified."));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                        "Invalid time value specified."));
 
-                string range = match.Groups[2].Value;
+                var range = match.Groups[2].Value;
                 if (string.IsNullOrWhiteSpace(range))
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Invalid time range specified."));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                        "Invalid time range specified."));
 
                 times.Add(range.Trim(), value);
             }
 
             var finalTime = new TimeSpan();
             foreach (var range in times)
-            {
                 switch (range.Key)
                 {
                     case "w":
@@ -72,9 +73,9 @@ namespace Siotrix.Discord
                         finalTime = finalTime.Add(new TimeSpan(0, 0, range.Value));
                         break;
                     default:
-                        return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Unknown time range {range.Key}"));
+                        return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                            $"Unknown time range {range.Key}"));
                 }
-            }
 
             return Task.FromResult(TypeReaderResult.FromSuccess(finalTime));
         }

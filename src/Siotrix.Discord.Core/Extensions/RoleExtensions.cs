@@ -1,22 +1,23 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord
 {
     public static class RoleExtensions
     {
-
         public static EmbedBuilder FormatRoleInfo(IGuild guildInfo, SocketGuild guild, SocketRole role)
         {
-            var ageStr = String.Format("**Created:** `{0}` (`{1}` days ago)", DateTimeExtensions.FormatDateTime(role.CreatedAt.UtcDateTime), DateTime.UtcNow.Subtract(role.CreatedAt.UtcDateTime).Days);
-            var positionStr = String.Format("**Position:** `{0}`", role.Position);
-            var usersStr = String.Format("**User Count:** `{0}`", guild.Users.Where(x => x.Roles.Any(y => y.Id == role.Id)).Count());
-            var description = String.Join("\n", new[] { ageStr, positionStr, usersStr });
+            var ageStr = string.Format("**Created:** `{0}` (`{1}` days ago)",
+                DateTimeExtensions.FormatDateTime(role.CreatedAt.UtcDateTime),
+                DateTime.UtcNow.Subtract(role.CreatedAt.UtcDateTime).Days);
+            var positionStr = string.Format("**Position:** `{0}`", role.Position);
+            var usersStr = string.Format("**User Count:** `{0}`",
+                guild.Users.Where(x => x.Roles.Any(y => y.Id == role.Id)).Count());
+            var description = string.Join("\n", ageStr, positionStr, usersStr);
 
             var color = role.Color;
             var embed = EmbedExtensions.MakeNewEmbed(null, description, color);
@@ -28,13 +29,8 @@ namespace Siotrix.Discord
         public static string FormatRole(this IRole role)
         {
             if (role != null)
-            {
-                return String.Format("'{0}' ({1})", MessageExtensions.EscapeMarkdown(role.Name, true), role.Id);
-            }
-            else
-            {
-                return "Irretrievable Role";
-            }
+                return string.Format("'{0}' ({1})", MessageExtensions.EscapeMarkdown(role.Name, true), role.Id);
+            return "Irretrievable Role";
         }
 
         public static IGuildUser GetBot(IGuild guild)
@@ -57,25 +53,18 @@ namespace Siotrix.Discord
             if (role == null)
                 return -1;
 
-            var roles = role.Guild.Roles.Where(x => x.Id != role.Id && x.Position < GetUserPosition(GetBot(role.Guild))).OrderBy(x => x.Position).ToArray();
+            var roles = role.Guild.Roles.Where(x => x.Id != role.Id && x.Position < GetUserPosition(GetBot(role.Guild)))
+                .OrderBy(x => x.Position).ToArray();
             position = Math.Max(1, Math.Min(position, roles.Length));
 
             var reorderProperties = new ReorderRoleProperties[roles.Length + 1];
-            for (int i = 0; i < reorderProperties.Length; i++)
-            {
+            for (var i = 0; i < reorderProperties.Length; i++)
                 if (i == position)
-                {
                     reorderProperties[i] = new ReorderRoleProperties(role.Id, i);
-                }
                 else if (i > position)
-                {
                     reorderProperties[i] = new ReorderRoleProperties(roles[i - 1].Id, i);
-                }
                 else if (i < position)
-                {
                     reorderProperties[i] = new ReorderRoleProperties(roles[i].Id, i);
-                }
-            }
 
             await role.Guild.ReorderRolesAsync(reorderProperties);
             return reorderProperties.FirstOrDefault(x => x.Id == role.Id)?.Position ?? -1;

@@ -1,28 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace Siotrix.Discord
 {
     public static class DateTimeExtensions
     {
         // because dotnet core has no ToLongTimeString support at the moment.
-        public static string ToShortDateString(this DateTime dateTime) => dateTime.ToString("d");
-        public static string ToShortTimeString(this DateTime dateTime) => dateTime.ToString("t");
-        public static string ToLongDateString(this DateTime dateTime) => dateTime.ToString("D");
-        public static string ToLongTimeString(this DateTime dateTime) => dateTime.ToString("T");
+        public static string ToShortDateString(this DateTime dateTime)
+        {
+            return dateTime.ToString("d");
+        }
 
-       public static string FormatDateTime(DateTime? dt)
+        public static string ToShortTimeString(this DateTime dateTime)
+        {
+            return dateTime.ToString("t");
+        }
+
+        public static string ToLongDateString(this DateTime dateTime)
+        {
+            return dateTime.ToString("D");
+        }
+
+        public static string ToLongTimeString(this DateTime dateTime)
+        {
+            return dateTime.ToString("T");
+        }
+
+        public static string FormatDateTime(DateTime? dt)
         {
             if (!dt.HasValue)
-            {
                 return "N/A";
-            }
 
             var ndt = dt.Value.ToUniversalTime();
-            return String.Format("{0} {1}, {2} at {3}",
-                System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(ndt.Month),
+            return string.Format("{0} {1}, {2} at {3}",
+                CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(ndt.Month),
                 ndt.Day,
                 ndt.Year,
                 ndt.ToLongTimeString());
@@ -31,16 +42,14 @@ namespace Siotrix.Discord
         public static string FormatDateTime(DateTimeOffset? dt)
         {
             if (!dt.HasValue)
-            {
                 return "N/A";
-            }
 
             return FormatDateTime(dt.Value.UtcDateTime);
         }
 
         public static DateTime FirstDayOfWeek(this DateTime dt)
         {
-            CultureInfo culture = CultureInfo.CurrentCulture;
+            var culture = CultureInfo.CurrentCulture;
             var diff = dt.DayOfWeek - culture.DateTimeFormat.FirstDayOfWeek;
             if (diff < 0)
                 diff += 7;

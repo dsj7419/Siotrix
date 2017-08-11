@@ -1,13 +1,8 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Addons.EmojiTools;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.InteractiveCommands;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Globalization;
+using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
@@ -25,12 +20,14 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(x => x.Index == id && x.UserId == user_id && x.GuildId == guild_id);
+                    var data = db.Gwarningusers.Where(
+                        x => x.Index == id && x.UserId == user_id && x.GuildId == guild_id);
                     if (data.Any())
                     {
-                        var item =data.First();
-                        output = "*" + item.CreatedAt.ToUniversalTime().ToString() + "* " + item.Type + " awarded by " + Context.Guild.GetUser(item.ModId.ToUlong()).Mention + "\n"
-                            + "Reason : " + item.Reason + "\n" + "Points Awarded : " + item.PointNum;
+                        var item = data.First();
+                        output = "*" + item.CreatedAt.ToUniversalTime() + "* " + item.Type + " awarded by " +
+                                 Context.Guild.GetUser(item.ModId.ToUlong()).Mention + "\n"
+                                 + "Reason : " + item.Reason + "\n" + "Points Awarded : " + item.PointNum;
                     }
                 }
                 catch (Exception e)
@@ -44,7 +41,7 @@ namespace Siotrix.Discord.Moderation
         private string GetWarningUsers(long user_id, long guild_id)
         {
             string output = null;
-            int total = 0;
+            var total = 0;
             string value = null;
             using (var db = new LogDatabase())
             {
@@ -52,15 +49,17 @@ namespace Siotrix.Discord.Moderation
                 {
                     var data = db.Gwarningusers.Where(x => x.UserId == user_id && x.GuildId == guild_id);
                     var falloff = db.Gwarns.Where(x => x.GuildId == guild_id && x.Option == 6);
-                    if (data.Any() && falloff.Any()) 
+                    if (data.Any() && falloff.Any())
                     {
                         var list = data.OrderByDescending(x => x.CreatedAt).Take(10);
                         foreach (var item in list)
                         {
-                            output += item.Index.ToString() + ") " + item.PointNum + "    " + item.CreatedAt.ToUniversalTime().ToString() + "     " + item.Type + "\n";
+                            output += item.Index + ") " + item.PointNum + "    " + item.CreatedAt.ToUniversalTime() +
+                                      "     " + item.Type + "\n";
                             total += item.PointNum;
                         }
-                        value = output + "Total Points Active: " + total.ToString() + "\n" + "Guild Max: 10 \n" + "Guild Falloff Time: " + falloff.First().WarnValue.ToString() + " Days\n";
+                        value = output + "Total Points Active: " + total + "\n" + "Guild Max: 10 \n" +
+                                "Guild Falloff Time: " + falloff.First().WarnValue + " Days\n";
                     }
                 }
                 catch (Exception e)
@@ -78,14 +77,12 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(x => x.GuildId == guild_id && (x.CreatedAt >= from && x.CreatedAt <= to));
+                    var data = db.Gwarningusers.Where(x => x.GuildId == guild_id && x.CreatedAt >= from &&
+                                                           x.CreatedAt <= to);
                     if (data.Any())
-                    {
                         foreach (var item in data)
-                        {
-                            output += item.PointNum + "    " + item.CreatedAt.ToUniversalTime().ToString() + "     " + item.Type + "\n";
-                        }
-                    }
+                            output += item.PointNum + "    " + item.CreatedAt.ToUniversalTime() + "     " + item.Type +
+                                      "\n";
                 }
                 catch (Exception e)
                 {
@@ -105,29 +102,29 @@ namespace Siotrix.Discord.Moderation
             {
                 var user = Context.User;
                 var value = GetWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong()) ?? "No Active Warnings";
-                string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-                string g_name = GuildEmbedName.GetGuildName(Context);
-                string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-                string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-                string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-                string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+                var g_icon_url = Context.GetGuildIconUrl();
+                var g_name = Context.GetGuildName();
+                var g_url = Context.GetGuildUrl();
+                var g_thumbnail = Context.GetGuildThumbNail();
+                var g_footer = Context.GetGuildFooter();
+                var g_prefix = Context.GetGuildPrefix();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                        .WithIconUrl(g_icon_url)
+                        .WithName(g_name)
+                        .WithUrl(g_url))
                     .WithColor(new Color(255, 127, 0))
                     .WithThumbnailUrl(g_thumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                        .WithIconUrl(g_footer[0])
+                        .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 builder
-               .AddField(x =>
-               {
-                   x.Name = "Active Warnings for " + user.Username + "#" + user.Discriminator;
-                   x.Value = value;
-               });
+                    .AddField(x =>
+                    {
+                        x.Name = "Active Warnings for " + user.Username + "#" + user.Discriminator;
+                        x.Value = value;
+                    });
                 await Context.Channel.SendMessageAsync("", false, builder.Build());
             }
         }
@@ -139,29 +136,29 @@ namespace Siotrix.Discord.Moderation
         public async Task WarningAsync(DateTime from, DateTime to)
         {
             var value = GetWarningPeriod(Context.Guild.Id.ToLong(), from, to);
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var g_icon_url = Context.GetGuildIconUrl();
+            var g_name = Context.GetGuildName();
+            var g_url = Context.GetGuildUrl();
+            var g_thumbnail = Context.GetGuildThumbNail();
+            var g_footer = Context.GetGuildFooter();
+            var g_prefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 127, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
-           .AddField(x =>
-           {
-               x.Name = "Active Warnings between " + from.ToUniversalTime() + " and " + to.ToUniversalTime();
-               x.Value = value;
-           });
+                .AddField(x =>
+                {
+                    x.Name = "Active Warnings between " + from.ToUniversalTime() + " and " + to.ToUniversalTime();
+                    x.Value = value;
+                });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
@@ -172,29 +169,29 @@ namespace Siotrix.Discord.Moderation
         public async Task WarningAsync(SocketGuildUser user)
         {
             var value = GetWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong()) ?? "No Active Warnings";
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var g_icon_url = Context.GetGuildIconUrl();
+            var g_name = Context.GetGuildName();
+            var g_url = Context.GetGuildUrl();
+            var g_thumbnail = Context.GetGuildThumbNail();
+            var g_footer = Context.GetGuildFooter();
+            var g_prefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 127, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
-           .AddField(x =>
-           {
-               x.Name = "Active Warnings for " + user.Username + "#" + user.Discriminator;
-               x.Value = value;
-           });
+                .AddField(x =>
+                {
+                    x.Name = "Active Warnings for " + user.Username + "#" + user.Discriminator;
+                    x.Value = value;
+                });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
@@ -205,29 +202,29 @@ namespace Siotrix.Discord.Moderation
         public async Task WarningAsync(SocketGuildUser user, int id)
         {
             var value = GetWarningUser(user.Id.ToLong(), id, Context.Guild.Id.ToLong()) ?? "No Information";
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-            string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+            var g_icon_url = Context.GetGuildIconUrl();
+            var g_name = Context.GetGuildName();
+            var g_url = Context.GetGuildUrl();
+            var g_thumbnail = Context.GetGuildThumbNail();
+            var g_footer = Context.GetGuildFooter();
+            var g_prefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithIconUrl(g_icon_url)
-                .WithName(g_name)
-                .WithUrl(g_url))
+                    .WithIconUrl(g_icon_url)
+                    .WithName(g_name)
+                    .WithUrl(g_url))
                 .WithColor(new Color(255, 127, 0))
                 .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                .WithIconUrl(g_footer[0])
-                .WithText(g_footer[1]))
+                    .WithIconUrl(g_footer[0])
+                    .WithText(g_footer[1]))
                 .WithTimestamp(DateTime.UtcNow);
             builder
-           .AddField(x =>
-           {
-               x.Name = "Warning information of " + user.Username + "#" + user.Discriminator;
-               x.Value = value;
-           });
+                .AddField(x =>
+                {
+                    x.Name = "Warning information of " + user.Username + "#" + user.Discriminator;
+                    x.Value = value;
+                });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
@@ -240,32 +237,31 @@ namespace Siotrix.Discord.Moderation
             if (!Context.User.IsBot)
             {
                 var value = GetWarningUser(Context.User.Id.ToLong(), id, Context.Guild.Id.ToLong()) ?? "No Information";
-                string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-                string g_name = GuildEmbedName.GetGuildName(Context);
-                string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-                string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-                string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
-                string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
+                var g_icon_url = Context.GetGuildIconUrl();
+                var g_name = Context.GetGuildName();
+                var g_url = Context.GetGuildUrl();
+                var g_thumbnail = Context.GetGuildThumbNail();
+                var g_footer = Context.GetGuildFooter();
+                var g_prefix = Context.GetGuildPrefix();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(g_icon_url)
-                    .WithName(g_name)
-                    .WithUrl(g_url))
+                        .WithIconUrl(g_icon_url)
+                        .WithName(g_name)
+                        .WithUrl(g_url))
                     .WithColor(new Color(255, 127, 0))
                     .WithThumbnailUrl(g_thumbnail)
                     .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(g_footer[0])
-                    .WithText(g_footer[1]))
+                        .WithIconUrl(g_footer[0])
+                        .WithText(g_footer[1]))
                     .WithTimestamp(DateTime.UtcNow);
                 builder
-               .AddField(x =>
-               {
-                   x.Name = "Waning Informations";
-                   x.Value = value;
-               });
+                    .AddField(x =>
+                    {
+                        x.Name = "Waning Informations";
+                        x.Value = value;
+                    });
                 await Context.Channel.SendMessageAsync("", false, builder.Build());
             }
-            
         }
     }
 }

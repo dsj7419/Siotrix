@@ -1,51 +1,54 @@
-﻿using Discord.WebSocket;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
+using Discord.Addons.InteractiveCommands;
 using Discord.Commands;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Siotrix.Discord.Audio;
 using Siotrix.Discord.Moderation;
 using Siotrix.Discord.Statistics;
-using System.Threading.Tasks;
-using System;
-using Discord.Addons.InteractiveCommands;
 
 namespace Siotrix.Discord
 {
     public class ServiceManager : IService
     {
-        public SiotrixModules Modules => _modules;
-
         private readonly DiscordSocketClient _client;
-        private SiotrixModules _modules;
-        private Configuration _config;
+
+        // Moderation
+        private AntilinkService _antilink;
+
+        private AntispamService _antispam;
+        //  private CommandHandler _commands;
+
+        // Audio
+        private AudioService _audio;
+
+        private readonly Configuration _config;
+        private FilterService _filter;
 
 
         // General
         private GlobalErrorHandler _handler;
-      //  private CommandHandler _commands;
 
-        // Audio
-        private AudioService _audio;
+        private LogService _log;
 
         // Events
 
         // Statistics
         private MembershipService _membership;
-        private MessageService _message;
 
-        // Moderation
-        private AntilinkService _antilink;
-        private AntispamService _antispam;
-        private FilterService _filter;
+        private MessageService _message;
         private WarningService _warning;
-        private LogService _log;
 
         public ServiceManager(DiscordSocketClient client)
         {
             _client = client;
             _config = Configuration.Load();
-            _modules = new SiotrixModules();
+            Modules = new SiotrixModules();
         }
+
+        public SiotrixModules Modules { get; }
 
         public async Task StartAsync()
         {
@@ -65,15 +68,15 @@ namespace Siotrix.Discord
 
             await ConfigureServices();
 
-       //     await _commands.StartAsync().ConfigureAwait(false);
+            //     await _commands.StartAsync().ConfigureAwait(false);
 
             if (_config.Modules.Moderation)
                 await StartModerationAsync().ConfigureAwait(false);
 
             //var handler = provider.GetService<CommandHandler>();
-           // var handler = new CommandHandler(provider);
-          //  await handler.StartAsync();
-        }      
+            // var handler = new CommandHandler(provider);
+            //  await handler.StartAsync();
+        }
 
 
         public async Task StopAsync()
@@ -87,32 +90,55 @@ namespace Siotrix.Discord
             if (_config.Modules.Moderation)
                 await StopModerationAsync();
 
-          //  await _commands.StopAsync();
+            //  await _commands.StopAsync();
+        }
+
+        public async Task ConfigureServices()
+        {
+            var config = Configuration.Load();
+
+            var services = new ServiceCollection()
+                .AddSingleton<CommandHandler>()
+                .AddSingleton<Random>()
+                .AddSingleton(_client)
+                .AddSingleton(config)
+                .AddSingleton(new CommandService(new CommandServiceConfig
+                {
+                    CaseSensitiveCommands = false,
+                    DefaultRunMode = RunMode.Async,
+                    LogLevel = LogSeverity.Info,
+                    ThrowOnError = false
+                }))
+                .AddSingleton(new InteractiveService(_client));
+
+            var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
+            var handler = provider.GetService<CommandHandler>();
+            await handler.StartAsync();
+            // return provider;
         }
 
         #region Start
 
         public async Task StartAudioAsync()
         {
-            _modules.Audio = true;
+            Modules.Audio = true;
             _audio = new AudioService();
 
             await _audio.StartAsync();
 
             //if (!_map.TryAdd(_audio))
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Audio to map");
-
         }
 
         public Task StartEventsAsync()
         {
-            _modules.Events = true;
+            Modules.Events = true;
             return Task.CompletedTask;
         }
-        
+
         public async Task StartModerationAsync()
         {
-            _modules.Moderation = true;
+            Modules.Moderation = true;
             _antilink = new AntilinkService(_client);
             _antispam = new AntispamService(_client);
             _filter = new FilterService(_client);
@@ -134,13 +160,11 @@ namespace Siotrix.Discord
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Warning to map");
             //if (!_map.TryAdd(_log))
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Log to map");
-
-
         }
 
         public async Task StartStatisticsAsync()
         {
-            _modules.Statistics = true;
+            Modules.Statistics = true;
             _membership = new MembershipService(_client);
             _message = new MessageService(_client);
 
@@ -151,28 +175,28 @@ namespace Siotrix.Discord
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Membership to map");
             //if (!_map.TryAdd(_message))
             //    await PrettyConsole.LogAsync("Error", "Manager", "Unable to add Message to map");
-
         }
 
         #endregion
+
         #region Stop
 
         public async Task StopAudioAsync()
         {
-            _modules.Audio = false;
+            Modules.Audio = false;
             _audio = null;
             await _audio.StopAsync();
         }
 
         public Task StopEventsAsync()
         {
-            _modules.Events = false;
+            Modules.Events = false;
             return Task.CompletedTask;
         }
 
         public async Task StopModerationAsync()
         {
-            _modules.Moderation = false;
+            Modules.Moderation = false;
             _antilink = null;
             _antispam = null;
             _filter = null;
@@ -188,7 +212,7 @@ namespace Siotrix.Discord
 
         public async Task StopStatisticsAsync()
         {
-            _modules.Statistics = false;
+            Modules.Statistics = false;
             _membership = null;
             _message = null;
 
@@ -197,29 +221,5 @@ namespace Siotrix.Discord
         }
 
         #endregion
-
-        public async Task ConfigureServices()
-        {
-            var config = Configuration.Load();
-
-            var services = new ServiceCollection()
-                .AddSingleton<CommandHandler>()
-                .AddSingleton<Random>()
-                .AddSingleton(_client)
-                .AddSingleton(config)
-                .AddSingleton(new CommandService(new CommandServiceConfig()
-                {
-                    CaseSensitiveCommands = false,
-                    DefaultRunMode = RunMode.Async,
-                    LogLevel = LogSeverity.Info,
-                    ThrowOnError = false
-                }))
-                .AddSingleton(new InteractiveService(_client));
-
-            var provider = new DefaultServiceProviderFactory().CreateServiceProvider(services);
-            var handler = provider.GetService<CommandHandler>();
-            await handler.StartAsync();
-           // return provider;
-        }
     }
 }

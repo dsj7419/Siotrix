@@ -1,13 +1,13 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 
 namespace Siotrix.Discord.Statistics
 {
     public class MessageService : IService
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
         private LogDatabase _db;
 
         public MessageService(DiscordSocketClient client)
@@ -40,7 +40,7 @@ namespace Siotrix.Discord.Statistics
 
             await PrettyConsole.LogAsync("Info", "Message", "Service stopped successfully").ConfigureAwait(false);
         }
-        
+
         private async Task OnMessageReceivedAsync(SocketMessage message)
         {
             try
@@ -49,13 +49,15 @@ namespace Siotrix.Discord.Statistics
 
                 _db.Messages.Add(msg);
                 await _db.SaveChangesAsync().ConfigureAwait(false);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.InnerException.ToString());
             }
         }
 
-        private async Task OnMesssageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage message, ISocketMessageChannel channel)
+        private async Task OnMesssageUpdatedAsync(Cacheable<IMessage, ulong> cachemsg, SocketMessage message,
+            ISocketMessageChannel channel)
         {
             var msg = await _db.GetMessageAsync(message.Id);
 
@@ -75,7 +77,8 @@ namespace Siotrix.Discord.Statistics
             await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel,
+            SocketReaction reaction)
         {
             var react = EntityHelper.CreateReaction(reaction);
 
@@ -83,7 +86,8 @@ namespace Siotrix.Discord.Statistics
             await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task OnReactionRemovedAsync(Cacheable<IUserMessage, ulong> cachemsg,
+            ISocketMessageChannel channel, SocketReaction reaction)
         {
             var react = await _db.GetReactionAsync(cachemsg.Id, reaction.UserId, reaction.Emote.Name);
 
@@ -93,7 +97,8 @@ namespace Siotrix.Discord.Statistics
             await _db.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel)
+        private async Task OnReactionsClearedAsync(Cacheable<IUserMessage, ulong> cachemsg,
+            ISocketMessageChannel channel)
         {
             var reacts = await _db.GetReactionsAsync(cachemsg.Id);
 

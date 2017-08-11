@@ -1,17 +1,15 @@
-﻿using Discord.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Siotrix.Discord
 {
     public static class LogChannelExtensions
     {
-        public static long modlogchannel_id = 0;
-        public static long logchannel_id = 0;
-        public static bool is_toggled_log = false;
-        public static bool is_toggled_modlog = false;
+        public static long modlogchannel_id;
+        public static long logchannel_id;
+        public static bool is_toggled_log;
+        public static bool is_toggled_modlog;
 
         public static void IsUsableLogChannel(long guild_id)
         {
@@ -57,7 +55,7 @@ namespace Siotrix.Discord
                     var result = db.Gfilterlists.Where(x => x.GuildId == guild_id);
                     if (result.Any())
                     {
-                        int i = 0;
+                        var i = 0;
                         foreach (var item in result)
                         {
                             dictionary.Add(i, item.Word);
@@ -78,16 +76,12 @@ namespace Siotrix.Discord
         {
             string badword = null;
             foreach (var msg_item in msg)
-            {
-                foreach (var dic_item in dictionary)
+            foreach (var dic_item in dictionary)
+                if (msg_item.ToLower().Equals(dic_item.Value.ToLower()))
                 {
-                    if (msg_item.ToLower().Equals(dic_item.Value.ToLower()))
-                    {
-                        badword = msg_item;
-                        break;
-                    }
+                    badword = msg_item;
+                    break;
                 }
-            }
             return badword;
         }
     }

@@ -1,13 +1,7 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.Addons.EmojiTools;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Addons.InteractiveCommands;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Globalization;
+using Discord.Commands;
 using Discord.WebSocket;
 
 namespace Siotrix.Discord.Moderation
@@ -17,7 +11,7 @@ namespace Siotrix.Discord.Moderation
     {
         private bool DeleteWarningUser(long userId, long guildId)
         {
-            bool is_success = false;
+            var is_success = false;
             using (var db = new LogDatabase())
             {
                 try

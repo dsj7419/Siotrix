@@ -1,16 +1,13 @@
-﻿using Discord;
-using Discord.Commands;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 
 namespace Siotrix.Discord
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequireBotPermissionAttribute : PreconditionAttribute
     {
-        public GuildPermission? GuildPermission { get; }
-        public ChannelPermission? ChannelPermission { get; }
-        
         public RequireBotPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
@@ -23,7 +20,11 @@ namespace Siotrix.Discord
             GuildPermission = null;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command, IServiceProvider map)
+        public GuildPermission? GuildPermission { get; }
+        public ChannelPermission? ChannelPermission { get; }
+
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext icontext, CommandInfo command,
+            IServiceProvider map)
         {
             var context = icontext as SocketCommandContext;
             var guildUser = context.Guild.CurrentUser;
@@ -33,7 +34,8 @@ namespace Siotrix.Discord
                 if (guildUser == null)
                     return Task.FromResult(PreconditionResult.FromError("Command must be used in a guild channel"));
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"Command requires guild permission {GuildPermission.Value}"));
+                    return Task.FromResult(
+                        PreconditionResult.FromError($"Command requires guild permission {GuildPermission.Value}"));
             }
 
             if (ChannelPermission.HasValue)
@@ -47,7 +49,8 @@ namespace Siotrix.Discord
                     perms = ChannelPermissions.All(guildChannel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"Command requires channel permission {ChannelPermission.Value}"));
+                    return Task.FromResult(
+                        PreconditionResult.FromError($"Command requires channel permission {ChannelPermission.Value}"));
             }
 
             return Task.FromResult(PreconditionResult.FromSuccess());
