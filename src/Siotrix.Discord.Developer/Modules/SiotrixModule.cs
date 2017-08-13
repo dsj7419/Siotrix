@@ -140,22 +140,8 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task BotInfoAsync()
         {
-            string str = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Binfos == null || db.Binfos.ToList().Count <= 0)
-                        str = SiotrixConstants.BotDesc;
-                    else
-                        str = db.Binfos.First().BotInfo;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(str);
+            var val = await SiotrixEmbedInfoExtensions.GetSiotrixInfoAsync();
+            await ReplyAsync(val.BotInfo);
         }
 
         [Command("description")]
@@ -164,29 +150,16 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task BotInfoAsync([Remainder] string str)
         {
-            using (var db = new LogDatabase())
+            var val = await SiotrixEmbedInfoExtensions.GetSiotrixInfoAsync();
+
+            if (str.Equals("reset"))
             {
-                var val = new DiscordSiotrixInfo();
-                val.BotInfo = str;
-                try
-                {
-                    if (db.Binfos == null || db.Binfos.ToList().Count <= 0)
-                    {
-                        db.Binfos.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Binfos.First();
-                        data.BotInfo = val.BotInfo;
-                        db.Binfos.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedInfoExtensions.SetSiotrixInfo(val, SiotrixConstants.BotDesc);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+
+            await SiotrixEmbedInfoExtensions.SetSiotrixInfo(val, str);
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
