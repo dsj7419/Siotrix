@@ -16,6 +16,11 @@ namespace Siotrix.Discord
                 try
                 {
                     val = await db.Gfooters.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    if (val == null)
+                    {
+                        await CreateDiscordFooterAsync(context, SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                        val = await db.Gfooters.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    }
                 }
                 catch (Exception e)
                 {

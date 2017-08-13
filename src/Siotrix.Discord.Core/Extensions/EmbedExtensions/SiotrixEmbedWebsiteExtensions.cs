@@ -16,6 +16,11 @@ namespace Siotrix.Discord
                 try
                 {
                     val = await db.Bwebsiteurls.FirstOrDefaultAsync();
+                    if (val == null)
+                    {
+                        await CreateSiotrixSiteUrl(SiotrixConstants.BotUrl);
+                        val = await db.Bwebsiteurls.FirstOrDefaultAsync();
+                    }
                 }
                 catch (Exception e)
                 {

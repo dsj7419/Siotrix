@@ -16,6 +16,11 @@ namespace Siotrix.Discord
                 try
                 {
                     val = await db.Bfooters.FirstOrDefaultAsync();
+                    if (val == null)
+                    {
+                        await CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                        val = await db.Bfooters.FirstOrDefaultAsync();
+                    }
                 }
                 catch (Exception e)
                 {

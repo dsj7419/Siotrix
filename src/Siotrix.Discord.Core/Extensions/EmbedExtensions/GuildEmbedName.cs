@@ -16,6 +16,11 @@ namespace Siotrix.Discord
                 try
                 {
                     val = await db.Gnames.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    if (val == null)
+                    {
+                        await CreateDiscordGuildNameAsync(context, context.Guild.Name);
+                        val = await db.Gnames.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    }
                 }
                 catch (Exception e)
                 {
