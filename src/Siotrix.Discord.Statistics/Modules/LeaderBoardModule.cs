@@ -139,30 +139,30 @@ namespace Siotrix.Discord.Statistics
         [Remarks(" - no additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task StatsAsync()
+        public async Task StatsAsync()
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var list = GetLeaderBoardDatasPerGuild(false);
             var getValues = new string[2];
             var index = 0;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithDescription($"Last 30 days")
                 .WithColor(gColor)
                 .WithTitle("Current Leaderboard for " + gName)
                 //  .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
             foreach (var element in list)
             {
@@ -176,7 +176,7 @@ namespace Siotrix.Discord.Statistics
                         Value = getValues[1] + " messages"
                     });
             }
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
 
         [Command("leaderboard")]
@@ -185,32 +185,32 @@ namespace Siotrix.Discord.Statistics
         [Remarks("alltime - Keyword to activate all time leaderboard.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task StatsAsync(string alltime)
+        public async Task StatsAsync(string alltime)
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var list = GetLeaderBoardDatasPerGuild(true);
             var getValues = new string[2];
             var index = 0;
 
             if (!alltime.Equals("alltime"))
-                return ReplyAsync($"Input Error");
+                await ReplyAsync($"Input Error");
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithDescription($"All Time")
                 .WithColor(gColor)
                 .WithTitle("Current Leaderboard for " + gName)
                 //     .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
             foreach (var element in list)
             {
@@ -224,7 +224,7 @@ namespace Siotrix.Discord.Statistics
                         Value = getValues[1] + " messages"
                     });
             }
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
     }
 }

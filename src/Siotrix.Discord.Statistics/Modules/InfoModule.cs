@@ -288,12 +288,12 @@ namespace Siotrix.Discord.Statistics
         [Remarks(" - no additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task InfoAsync()
+        public async Task InfoAsync()
         {
             var gIconUrl = GetGuildIconUrl(0);
             var gName = GetGuildName(0);
             var gUrl = GetGuildUrl(0);
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var gThumbnail = GetGuildThumbNail();
             var gDescription = GetGuildDescription(0);
             var gFooter = GetGuildFooter(0);
@@ -367,7 +367,7 @@ namespace Siotrix.Discord.Statistics
                     x.Value = $"Uptime: {GetUptime()}";
                 });
 
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
 
         [Command("info")]
@@ -376,7 +376,7 @@ namespace Siotrix.Discord.Statistics
         [Remarks("<@username> - any @user in guild. May also user it for the bot as well!")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task InfoAsync(SocketUser user)
+        public async Task InfoAsync(SocketUser user)
         {
             var id = 0;
             var bot = CheckBot(user);
@@ -388,7 +388,7 @@ namespace Siotrix.Discord.Statistics
             var gIconUrl = GetGuildIconUrl(id);
             var gName = GetGuildName(id);
             var gUrl = GetGuildUrl(id);
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var gDescription = GetGuildDescription(id);
             var gFooter = GetGuildFooter(id);
             var mCount = GetLifeTimeMessages(user);
@@ -575,7 +575,7 @@ namespace Siotrix.Discord.Statistics
                         Value = Format.Bold($"Dan Johnson. See {gPrefix}about for more info!")
                     });
             }
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
     }
 }

@@ -322,22 +322,15 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task WebSiteAsync()
         {
-            string url = null;
-            using (var db = new LogDatabase())
+            var val = await SiotrixEmbedWebsiteExtensions.GetSiotrixSiteUrlAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    if (db.Bwebsiteurls == null || db.Bwebsiteurls.ToList().Count <= 0)
-                        url = SiotrixConstants.BotUrl;
-                    else
-                        url = db.Bwebsiteurls.First().SiteUrl;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedWebsiteExtensions.CreateSiotrixSiteUrl(SiotrixConstants.BotUrl);
+                await ReplyAsync(SiotrixConstants.BotUrl);
+                return;
             }
-            await ReplyAsync(url);
+            await ReplyAsync(val.SiteUrl);
         }
 
         [Command("website")]
@@ -346,29 +339,15 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task WebSiteAsync(Uri url)
         {
-            using (var db = new LogDatabase())
+            var val = await SiotrixEmbedWebsiteExtensions.GetSiotrixSiteUrlAsync();
+
+            if (val == null)
             {
-                var val = new DiscordSiotrixSiteUrl();
-                val.SiteUrl = url.ToString();
-                try
-                {
-                    if (db.Bwebsiteurls == null || db.Bwebsiteurls.ToList().Count <= 0)
-                    {
-                        db.Bwebsiteurls.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Bwebsiteurls.First();
-                        data.SiteUrl = val.SiteUrl;
-                        db.Bwebsiteurls.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedWebsiteExtensions.CreateSiotrixSiteUrl(url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+            await SiotrixEmbedWebsiteExtensions.SetSiotrixSiteUrl(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
@@ -378,22 +357,15 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task FooterIconAsync()
         {
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                        url = SiotrixConstants.BotFooterIcon;
-                    else
-                        url = db.Bfooters.First().FooterIcon;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(url);
+            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+
+            if (val == null)
+            {                
+                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                await ReplyAsync(SiotrixConstants.BotFooterIcon);
+                return;
+            }            
+            await ReplyAsync(val.FooterIcon);
         }
 
         [Command("footericon")]
@@ -402,64 +374,15 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task FooterIconAsync(Uri url)
         {
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordSiotrixFooter();
-                if (url.ToString().Equals("reset"))
-                    val.FooterIcon = SiotrixConstants.BotFooterIcon;
-                else
-                    val.FooterIcon = url.ToString();
-                try
-                {
-                    if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                    {
-                        db.Bfooters.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Bfooters.First();
-                        data.FooterIcon = val.FooterIcon;
-                        db.Bfooters.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
 
-        [Command("footertext")]
-        [Summary("Will set Siotrix footer text.")]
-        [Remarks("<text> - Update main footer text for Siotrix.")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task FooterTextAsync([Remainder] string txt)
-        {
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                var val = new DiscordSiotrixFooter();
-                val.FooterText = txt;
-                try
-                {
-                    if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                    {
-                        db.Bfooters.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Bfooters.First();
-                        data.FooterText = val.FooterText;
-                        db.Bfooters.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+            await SiotrixEmbedFooterExtensions.SetSiotrixFooterIcon(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
@@ -469,22 +392,33 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task FooterTextAsync()
         {
-            string txt = null;
-            using (var db = new LogDatabase())
+            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    if (db.Bfooters == null || db.Bfooters.ToList().Count <= 0)
-                        txt = SiotrixConstants.BotFooterText;
-                    else
-                        txt = db.Bfooters.First().FooterText;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                await ReplyAsync(SiotrixConstants.BotFooterText);
+                return;
             }
-            await ReplyAsync(txt);
+            await ReplyAsync(val.FooterText);
+        }
+
+        [Command("footertext")]
+        [Summary("Will set Siotrix footer text.")]
+        [Remarks("<text> - Update main footer text for Siotrix.")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task FooterTextAsync([Remainder] string txt)
+        {
+            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+
+            if (val == null)
+            {
+                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(txt, SiotrixConstants.BotFooterIcon);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+            await SiotrixEmbedFooterExtensions.SetSiotrixFooterText(val, txt);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("username")]

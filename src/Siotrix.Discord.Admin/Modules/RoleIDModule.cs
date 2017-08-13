@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task RoleIDs()
         {
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             /*  string message = null;
               foreach (var role in Context.Guild.Roles)
                   message += $"{role.Name}: {role.Id}\n";

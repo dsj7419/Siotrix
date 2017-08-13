@@ -2,35 +2,38 @@
 using System.Linq;
 using Discord;
 using Discord.Commands;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
     public static class GuildEmbedColorExtensions
     {
-        public static Color GetGuildColor(this SocketCommandContext context)
+        public static async Task<Color> GetGuildColorAsync(this SocketCommandContext context)
         {
             var siotrixColor = "0x010101";
             var guildId = context.Guild.Id;
             string colorHex = null;
 
+            var val = new DiscordColor();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gcolors.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
+                    val = await db.Gcolors.FirstOrDefaultAsync(p => p.GuildId == guildId.ToLong());
+                    if (val == null)
                     {
-                        db.Gcolors.Add(new DiscordColor
+                        await db.Gcolors.AddAsync(new DiscordColor
                         {
                             ColorHex = siotrixColor,
                             GuildId = guildId.ToLong()
                         });
-                        db.SaveChanges();
+                        await db.SaveChangesAsync().ConfigureAwait(false);
                         colorHex = siotrixColor;
                     }
                     else
                     {
-                        colorHex = val.First().ColorHex;
+                        colorHex = val.ColorHex;
                         if (colorHex == "0x000000")
                             colorHex = "0x010101";
                     }

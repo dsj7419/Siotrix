@@ -19,7 +19,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task BlacklistListAsync()
         {
-            var gColor = Context.GetGuildColor();
+            var gColor =  await Context.GetGuildColorAsync();
             var title = $"Blacklistk Information for {Context.Guild.Name}";
 
             var blacklist = await BlacklistExtensions.GetBlacklistUsersAsync(Context.Guild);

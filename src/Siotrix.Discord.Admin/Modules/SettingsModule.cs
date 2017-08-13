@@ -30,25 +30,16 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync()
         {
-            CheckGuildFooters();
-            var guildId = Context.Guild.Id;
-            string url = null;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildFooterAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    var val = db.Gfooters.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        url = SiotrixConstants.BotFooterIcon;
-                    else
-                        url = val.First().FooterIcon;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, siotrixVal.FooterIcon);
+                await ReplyAsync(siotrixVal.FooterIcon);
+                return;
             }
-            await ReplyAsync(url);
+            await ReplyAsync(val.FooterIcon);
         }
 
         [Command("gfootericon")]
@@ -58,66 +49,49 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterIconAsync(Uri url)
         {
-            CheckGuildFooters();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildFooter();
-                if (url.ToString().Equals("reset"))
-                    val.FooterIcon = SiotrixConstants.BotFooterIcon;
-                else
-                    val.FooterIcon = url.ToString();
-                try
-                {
-                    var arr = db.Gfooters.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gfooters.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.FooterIcon = val.FooterIcon;
-                        db.Gfooters.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildFooterAsync();
 
-        private void CheckGuildFooters()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                var list = db.Gfooters.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildFooter();
-                        instance.GuildId = id;
-                        instance.FooterIcon = SiotrixConstants.BotFooterIcon;
-                        instance.FooterText = SiotrixConstants.BotFooterText;
-                        db.Gfooters.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                if (url.ToString().Equals("reset"))
+                {
+                    await GuildEmbedFooter.CreateDiscordFooterAsync(Context, SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
+                }
+                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+
+            if (url.ToString().Equals("reset"))
+            {
+                await GuildEmbedFooter.SetGuildFooterIcon(val, SiotrixConstants.BotFooterIcon);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedFooter.SetGuildFooterIcon(val, url.ToString());
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }       
+
+        [Command("gfootertext")]
+        [Summary("Will list bots current footer text.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task FooterTextAsync()
+        {
+            var val = await Context.GetGuildFooterAsync();
+
+            if (val == null)
+            {               
+                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, siotrixVal.FooterIcon);
+                await ReplyAsync(siotrixVal.FooterText);
+                return;
+            }
+            await ReplyAsync(val.FooterText);
         }
 
         [Command("gfootertext")]
@@ -127,64 +101,31 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task FooterTextAsync([Remainder] string txt)
         {
-            CheckGuildFooters();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildFooter();
-                if (txt.Equals("reset"))
-                    val.FooterText = SiotrixConstants.BotFooterText;
-                else
-                    val.FooterText = txt;
-                try
-                {
-                    var arr = db.Gfooters.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gfooters.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.FooterText = val.FooterText;
-                        db.Gfooters.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildFooterAsync();
 
-        [Command("gfootertext")]
-        [Summary("Will list bots current footer text.")]
-        [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task FooterTextAsync()
-        {
-            CheckGuildFooters();
-            var guildId = Context.Guild.Id;
-            string txt = null;
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                try
+                if (txt.Equals("reset"))
                 {
-                    var val = db.Gfooters.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        txt = SiotrixConstants.BotFooterText;
-                    else
-                        txt = val.First().FooterText;
+                    await GuildEmbedFooter.CreateDiscordFooterAsync(Context, SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
+                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, txt, siotrixVal.FooterIcon);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-            await ReplyAsync(txt);
-        }
+            if (txt.Equals("reset"))
+            {
+                await GuildEmbedFooter.SetGuildFooterText(val, SiotrixConstants.BotFooterText);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedFooter.SetGuildFooterText(val, txt);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }        
 
         [Command("gthumbnail")]
         [Summary("Will list bots current thumbnail image link.")]
@@ -192,25 +133,15 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildThumbNailAsync()
         {
-            CheckGuildThumbNails();
-            var guildId = Context.Guild.Id;
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gthumbnails.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        url = SiotrixConstants.BotLogo;
-                    else
-                        url = val.First().ThumbNail;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+            var val = await Context.GetGuildThumbNailAsync();
+
+            if (val == null)
+            {               
+                await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, SiotrixConstants.BotAvatar);
+                await ReplyAsync(SiotrixConstants.BotAvatar);
+                return;
             }
-            await ReplyAsync(url);
+            await ReplyAsync(val.ThumbNail);
         }
 
         [Command("gthumbnail")]
@@ -220,66 +151,31 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildThumbNailAsync(Uri url)
         {
-            CheckGuildThumbNails();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildThumbNail();
-                if (url.ToString().Equals("reset"))
-                    val.ThumbNail = SiotrixConstants.BotLogo;
-                else
-                    val.ThumbNail = url.ToString();
-                try
-                {
-                    var arr = db.Gthumbnails.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gthumbnails.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.ThumbNail = val.ThumbNail;
-                        db.Gthumbnails.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildThumbNailAsync();
 
-        private void CheckGuildThumbNails()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                var list = db.Gthumbnails.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildThumbNail();
-                        instance.GuildId = id;
-                        instance.ThumbNail = SiotrixConstants.BotLogo;
-                        db.Gthumbnails.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                if (url.ToString().Equals("reset"))
+                {
+                    await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, SiotrixConstants.BotAvatar);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
+                }
+                await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-        }
+
+            if (url.ToString().Equals("reset"))
+            {
+                await GuildEmbedThumbnail.SetGuildThumbNail(val, SiotrixConstants.BotAvatar);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedThumbnail.SetGuildThumbNail(val, url.ToString());
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }       
 
         [Command("gwebsite")]
         [Alias("gweb")]
@@ -288,25 +184,15 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildWebSiteAsync()
         {
-            CheckGuildWebSites();
-            var guildId = Context.Guild.Id;
-            string url = null;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildUrlAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    var val = db.Gwebsiteurls.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        url = SiotrixConstants.BotUrl;
-                    else
-                        url = val.First().SiteUrl;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, SiotrixConstants.BotUrl);
+                await ReplyAsync(SiotrixConstants.BotUrl);
+                return;
             }
-            await ReplyAsync(url);
+            await ReplyAsync(val.SiteUrl);
         }
 
         [Command("gwebsite")]
@@ -317,66 +203,31 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildWebSiteAsync(Uri url)
         {
-            CheckGuildWebSites();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildSiteUrl();
-                if (url.ToString().Equals("reset"))
-                    val.SiteUrl = SiotrixConstants.BotUrl;
-                else
-                    val.SiteUrl = url.ToString();
-                try
-                {
-                    var arr = db.Gwebsiteurls.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gwebsiteurls.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.SiteUrl = val.SiteUrl;
-                        db.Gwebsiteurls.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildUrlAsync();
 
-        private void CheckGuildWebSites()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                var list = db.Gwebsiteurls.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildSiteUrl();
-                        instance.GuildId = id;
-                        instance.SiteUrl = SiotrixConstants.BotUrl;
-                        db.Gwebsiteurls.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                if (url.ToString().Equals("reset"))
+                {
+                    await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, SiotrixConstants.BotUrl);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
+                }
+                await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-        }
+
+            if (url.ToString().Equals("reset"))
+            {
+                await GuildEmbedUrl.SetGuildUrl(val, SiotrixConstants.BotUrl);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedUrl.SetGuildUrl(val, url.ToString());
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }        
 
         [Command("gdescription")]
         [Alias("gdesc")]
@@ -482,7 +333,7 @@ namespace Siotrix.Discord.Admin
             var regexRgbCode =
                 new Regex(
                     "^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
-            var currentGColor = Context.GetGuildColor();
+            var currentGColor = Context.GetGuildColorAsync();
 
             var currentHexColor = currentGColor.ToString();
 
@@ -531,7 +382,7 @@ namespace Siotrix.Discord.Admin
 
                 var hexcolor = currentHexColor.ToUpper();
 
-                var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
+                var embed = await GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);
 
                 return;
@@ -591,7 +442,7 @@ namespace Siotrix.Discord.Admin
                     rgbvalue.B = 1;
                 }
 
-                var embed = GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
+                var embed = await GetEmbed(hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
@@ -639,7 +490,7 @@ namespace Siotrix.Discord.Admin
                     rgbvalue.B = 1;
                 }
 
-                var embed = GetEmbed(colorname, colorname, cleanhex, rgbvalue);
+                var embed = await GetEmbed(colorname, colorname, cleanhex, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
             else if (regexRgbCode.IsMatch(colorchoice))
@@ -662,7 +513,7 @@ namespace Siotrix.Discord.Admin
                     var g = (byte) green;
                     var b = (byte) blue;
                     var rgbvalue = new HextoRgb.Rgb(r, g, b);
-                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    var embed = await GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
                 else
@@ -716,7 +567,7 @@ namespace Siotrix.Discord.Admin
                         rgbvalue.B = 1;
                     }
 
-                    var embed = GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    var embed = await GetEmbed(colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -726,14 +577,14 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        private EmbedBuilder GetEmbed(string colorchoice, string colorname, string colorhex, HextoRgb.Rgb rgbvalue)
+        private async Task<EmbedBuilder> GetEmbed(string colorchoice, string colorname, string colorhex, HextoRgb.Rgb rgbvalue)
         {
             _timer.Stop();
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var gPrefix = Context.GetGuildPrefix();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property
@@ -751,13 +602,13 @@ namespace Siotrix.Discord.Admin
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
-                .WithThumbnailUrl(gThumbnail)
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
             builder.Title = $"Color Embed Information for: {colorchoice}";
             builder.Color = color;
@@ -786,6 +637,22 @@ namespace Siotrix.Discord.Admin
             return builder;
         }
 
+        [Command("gname")]
+        [Summary("Lists your guilds current name thats been set for embeds.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task GuildNameAsync()
+        {
+            var val = await Context.GetGuildNameAsync();
+
+            if (val == null)
+            {
+                await GuildEmbedName.CreateDiscordGuildNameAsync(Context, Context.Guild.Name);
+                await ReplyAsync(Context.Guild.Name);
+                return;
+            }
+            await ReplyAsync(val.GuildName);
+        }
 
         [Command("gname")]
         [Summary("Sets guild name.")]
@@ -794,93 +661,31 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildNameAsync([Remainder] string txt)
         {
-            CheckGuildNames();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildNameAsync();
+
+            if (val == null)
             {
-                var val = new DiscordGuildName();
                 if (txt.Equals("reset"))
-                    val.GuildName = Context.Guild.Name;
-                else
-                    val.GuildName = txt;
-                try
                 {
-                    var arr = db.Gnames.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gnames.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.GuildName = val.GuildName;
-                        db.Gnames.Update(data);
-                    }
-                    db.SaveChanges();
+                    await GuildEmbedName.CreateDiscordGuildNameAsync(Context, Context.Guild.Name);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                var siotrixVal = await Context.GetGuildNameAsync();
+                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, txt, siotrixVal.GuildName);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+            if (txt.Equals("reset"))
+            {
+                await GuildEmbedName.SetGuildName(val, Context.Guild.Name);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedName.SetGuildName(val, txt);
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
-
-        [Command("gname")]
-        [Summary("Lists your guilds current name thats been set for embeds.")]
-        [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task GuildNameAsync()
-        {
-            CheckGuildNames();
-            var guildId = Context.Guild.Id;
-            string txt = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var val = db.Gnames.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        txt = Context.Guild.Name;
-                    else
-                        txt = val.First().GuildName;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(txt);
-        }
-
-        private void CheckGuildNames()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
-            {
-                var list = db.Gnames.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildName();
-                        instance.GuildId = id;
-                        instance.GuildName = Context.Guild.Name;
-                        db.Gnames.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-            }
-        }
+        }              
 
         [Command("gavatar")]
         [Summary("Will list bots current guild avatar for embeds.")]
@@ -888,25 +693,16 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildAvatarAsync()
         {
-            CheckGuildAvatars();
-            var guildId = Context.Guild.Id;
-            string url = null;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildIconUrlAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    var val = db.Gavatars.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        url = SiotrixConstants.BotAvatar;
-                    else
-                        url = val.First().Avatar;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                var avatar = Context.Client.CurrentUser.GetAvatarUrl();
+                await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, avatar);
+                await ReplyAsync(avatar);
+                return;
             }
-            await ReplyAsync(url);
+            await ReplyAsync(val.Avatar);
         }
 
         [Command("gavatar")]
@@ -916,66 +712,32 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildAvatarAsync(Uri url)
         {
-            CheckGuildAvatars();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildAvatar();
-                if (url.ToString().Equals("reset"))
-                    val.Avatar = SiotrixConstants.BotAvatar;
-                else
-                    val.Avatar = url.ToString();
-                var arr = db.Gavatars.Where(p => p.GuildId == guildId.ToLong());
-                try
-                {
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gavatars.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.Avatar = val.Avatar;
-                        db.Gavatars.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildIconUrlAsync();
 
-        private void CheckGuildAvatars()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
+            if (val == null)
             {
-                var list = db.Gavatars.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildAvatar();
-                        instance.GuildId = id;
-                        instance.Avatar = SiotrixConstants.BotAvatar;
-                        db.Gavatars.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                if (url.ToString().Equals("reset"))
+                {
+                    await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, SiotrixConstants.BotAvatar);
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
+                }
+                await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, url.ToString());
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-        }
+
+            if (url.ToString().Equals("reset"))
+            {
+                val.SetGuildAvatar(SiotrixConstants.BotAvatar);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            val.SetGuildAvatar(url.ToString());
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+            return;
+        }        
 
         [Command("prefix")]
         [Summary("Will set bot prefix for your guild.")]

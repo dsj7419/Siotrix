@@ -48,7 +48,7 @@ namespace Siotrix.Discord.Developer
 
             var response = await new StackExchangeService().GetStackExchangeResultsAsync(_token, phrase, site, tags);
             var filteredRes = response.Items.Where(x => x.Tags.Contains(tags));
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             foreach (var res in filteredRes.Take(3))
             {
                 var builder = new EmbedBuilder()

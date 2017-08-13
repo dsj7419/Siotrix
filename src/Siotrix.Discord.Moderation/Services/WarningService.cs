@@ -64,14 +64,14 @@ namespace Siotrix.Discord.Moderation
                 //}
                 if (_count == 1)
                 {
-                    _builder = GetBuilder(context, 1, badword);
+                    _builder = await GetBuilder(context, 1, badword);
                     _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());
                 }
                 else
                 {
                     if (_count > warnCount)
                         await MuteWarnUser(context.User as IGuildUser, warnMuteTime, context);
-                    _builder = GetBuilder(context, _count, _badWords);
+                    _builder = await GetBuilder(context, _count, _badWords);
                     await _logMsg.ModifyAsync(x => { x.Embed = _builder.Build(); });
                 }
             }
@@ -117,25 +117,25 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private EmbedBuilder GetBuilder(SocketCommandContext context, int warnCount, string badword)
+        private async Task<EmbedBuilder> GetBuilder(SocketCommandContext context, int warnCount, string badword)
         {
             string value = null;
-            var gIconUrl = context.GetGuildIconUrl();
-            var gName = context.GetGuildName();
-            var gUrl = context.GetGuildUrl();
-            var gThumbnail = context.GetGuildThumbNail();
-            var gFooter = context.GetGuildFooter();
+            var gIconUrl = await context.GetGuildIconUrlAsync();
+            var gName = await context.GetGuildNameAsync();
+            var gUrl = await context.GetGuildUrlAsync();
+            var gThumbnail = await context.GetGuildThumbNailAsync();
+            var gFooter = await context.GetGuildFooterAsync();
             var gPrefix = context.GetGuildPrefix();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(new Color(255, 0, 0))
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
             value = context.User.Mention + " has been issued **" + warnCount +
@@ -154,11 +154,11 @@ namespace Siotrix.Discord.Moderation
         //        .WithAuthor(new EmbedAuthorBuilder()
         //    var embed = new EmbedBuilder()
         //    string g_prefix = PrefixExtensions.GetGuildPrefix(context);
-        //    string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
-        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-        //    string g_url = GuildEmbedUrl.GetGuildUrl(context);
-        //    string g_name = GuildEmbedName.GetGuildName(context);
-        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
+        //    string[] g_footer = GuildEmbedFooter.GetGuildFooterAsync(context);
+        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNailAsync(context);
+        //    string g_url = GuildEmbedUrl.GetGuildUrlAsync(context);
+        //    string g_name = GuildEmbedName.GetGuildNameAsync(context);
+        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrlAsync(context);
         //    string value = null;
         //{
 

@@ -16,7 +16,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync()
         {
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var description = "";
             var title = $"Antilink Information for {Context.Guild.Name}";
 
@@ -444,7 +444,7 @@ namespace Siotrix.Discord
         [MinPermissions(AccessLevel.GuildMod)]
         public async Task AntilinkStatusAsync(SocketGuildUser user)
         {
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var description = "";
             var title = $"Antilink Information for {user.Username} in {Context.Guild.Name}";
 

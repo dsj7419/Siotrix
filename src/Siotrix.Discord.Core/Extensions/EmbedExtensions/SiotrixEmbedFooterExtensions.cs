@@ -6,16 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
-    public static class GuildEmbedFooter
+    public static class SiotrixEmbedFooterExtensions
     {
-        public static async Task<DiscordGuildFooter> GetGuildFooterAsync(this SocketCommandContext context)
+        public static async Task<DiscordSiotrixFooter> GetSiotrixFooterAsync()
         {
-            var val = new DiscordGuildFooter();
+            var val = new DiscordSiotrixFooter();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.Gfooters.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    val = await db.Bfooters.FirstOrDefaultAsync();
                 }
                 catch (Exception e)
                 {
@@ -25,14 +25,14 @@ namespace Siotrix.Discord
             return val;
         }
 
-        public static async Task CreateDiscordFooterAsync(SocketCommandContext context, string footerText, string footerIcon)
+        public static async Task CreateSiotrixFooterAsync(string footerText, string footerIcon)
         {
-            var val = new DiscordGuildFooter(context.Guild.Id.ToLong(), footerText, footerIcon);
+            var val = new DiscordSiotrixFooter(footerText, footerIcon);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    await db.Gfooters.AddAsync(val);
+                    await db.Bfooters.AddAsync(val);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)
@@ -42,14 +42,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task SetGuildFooterText(DiscordGuildFooter discordGuildFooter, string guildFooter)
+        public static async Task SetSiotrixFooterText(DiscordSiotrixFooter discordSiotrixFooter, string siotrixFooter)
         {
-            discordGuildFooter.SetFooterText(guildFooter);
+            discordSiotrixFooter.SetFooterText(siotrixFooter);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    db.Gfooters.Update(discordGuildFooter);
+                    db.Bfooters.Update(discordSiotrixFooter);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)
@@ -59,14 +59,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task SetGuildFooterIcon(DiscordGuildFooter discordGuildFooter, string guildFooterIcon)
+        public static async Task SetSiotrixFooterIcon(DiscordSiotrixFooter discordSiotrixFooter, string siotrixFooterIcon)
         {
-            discordGuildFooter.SetFooterIcon(guildFooterIcon);
+            discordSiotrixFooter.SetFooterIcon(siotrixFooterIcon);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    db.Gfooters.Update(discordGuildFooter);
+                    db.Bfooters.Update(discordSiotrixFooter);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)

@@ -143,7 +143,7 @@ namespace Siotrix.Discord.Moderation
         [RequireUserPermission(GuildPermission.ManageRoles)]
         private async Task DisplayRolePositionsAsync()
         {
-            var gColor = Context.GetGuildColor();
+            var gColor =  await Context.GetGuildColorAsync();
 
             var desc = string.Join("\n", Context.Guild.Roles.OrderByDescending(x => x.Position).Select(x =>
             {
@@ -241,7 +241,7 @@ namespace Siotrix.Discord.Moderation
 
                 var hexcolor = currentHexColor.ToUpper();
 
-                var embed = GetEmbed(role, hexcolor, colorname, hexcolor, rgbvalue);
+                var embed = await GetEmbed(role, hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);
 
                 return;
@@ -277,7 +277,7 @@ namespace Siotrix.Discord.Moderation
                     rgbvalue.B = 1;
                 }
 
-                var embed = GetEmbed(role, hexcolor, colorname, hexcolor, rgbvalue);
+                var embed = await GetEmbed(role, hexcolor, colorname, hexcolor, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
@@ -302,7 +302,7 @@ namespace Siotrix.Discord.Moderation
                     rgbvalue.B = 1;
                 }
 
-                var embed = GetEmbed(role, colorname, colorname, cleanhex, rgbvalue);
+                var embed = await GetEmbed(role, colorname, colorname, cleanhex, rgbvalue);
                 await ReplyAsync("", embed: embed);
             }
             else if (regexRgbCode.IsMatch(colorchoice))
@@ -325,7 +325,7 @@ namespace Siotrix.Discord.Moderation
                     var g = (byte) green;
                     var b = (byte) blue;
                     var rgbvalue = new HextoRgb.Rgb(r, g, b);
-                    var embed = GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    var embed = await GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
                 else
@@ -355,7 +355,7 @@ namespace Siotrix.Discord.Moderation
                         rgbvalue.B = 1;
                     }
 
-                    var embed = GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
+                    var embed = await GetEmbed(role, colorchoice, colorname, hexcolorcaps, rgbvalue);
                     await ReplyAsync("", embed: embed);
                 }
             }
@@ -393,14 +393,14 @@ namespace Siotrix.Discord.Moderation
                     role.IsMentionable ? "unmentionable" : "mentionable"), deleteAfter: SiotrixConstants.WaitTime);
         }
 
-        private EmbedBuilder GetEmbed(IRole role, string colorchoice, string colorname, string colorhex,
+        private async Task<EmbedBuilder> GetEmbed(IRole role, string colorchoice, string colorname, string colorhex,
             HextoRgb.Rgb rgbvalue)
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = Context.GetGuildNameAsync();
+            var gUrl = Context.GetGuildUrlAsync();
+            var gThumbnail = Context.GetGuildThumbNailAsync();
+            var gFooter = Context.GetGuildFooterAsync();
             var gPrefix = Context.GetGuildPrefix();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property

@@ -48,11 +48,11 @@ namespace Siotrix.Discord.Utility
         [Alias("list")]
         [Summary("Complete list of all performance information.")]
         [Remarks(" - no additional argument needed")]
-        public Task PerformanceAsync()
+        public async Task PerformanceAsync()
         {
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var gIconUrl = GetGuildIconUrl(0);
-            var gThumbnail = Context.GetGuildThumbNail();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -65,7 +65,7 @@ namespace Siotrix.Discord.Utility
                 .WithTimestamp(DateTime.UtcNow);
 
             builder.Color = gColor;
-            builder.ThumbnailUrl = gThumbnail;
+            builder.ThumbnailUrl = gThumbnail.ThumbNail;
 
             var desc = $"**Uptime:** {GetUptime()}\n" +
                        $"**Library:** {GetLibrary()}\n" +
@@ -77,7 +77,7 @@ namespace Siotrix.Discord.Utility
                        $"**Siotrix Official Discord:** " + SiotrixConstants.DiscordInv;
 
             builder.Description = desc;
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
 
         [Command("uptime")]

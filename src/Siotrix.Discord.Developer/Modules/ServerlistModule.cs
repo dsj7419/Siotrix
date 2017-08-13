@@ -15,7 +15,7 @@ namespace Siotrix.Discord.Developer
         {
             var client = Context.Client;
             var embed = new EmbedBuilder();
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             foreach (var guild in client.Guilds)
                 embed.AddField(x =>
                 {

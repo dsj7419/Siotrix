@@ -876,13 +876,13 @@ namespace Siotrix.Discord.Statistics
         [Remarks(" - No additional arguments needed.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task StatsAsync()
+        public async Task StatsAsync()
         {
             var gIconUrl = GetGuildIconUrl(0);
             var gName = GetGuildName(0);
             var gUrl = GetGuildUrl(0);
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = GetGuildFooter(0);
             var gPrefix = Context.GetGuildPrefix();
             var mCount = GetLifeTimeMessagesPerGuild();
@@ -905,7 +905,7 @@ namespace Siotrix.Discord.Statistics
                 .WithDescription($"for individual information or bot information please use {gPrefix}stats @username")
                 .WithColor(gColor)
                 .WithTitle("Statistical Information sheet for " + gName)
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter[0])
                     .WithText(gFooter[1]))
@@ -966,7 +966,7 @@ namespace Siotrix.Discord.Statistics
                     Value = activeDataOfWeek
                 });
 
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
 
         [Command("stats")]
@@ -975,7 +975,7 @@ namespace Siotrix.Discord.Statistics
         [Remarks("<@username> - any @user or bot.")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public Task StatsAsync(SocketUser user)
+        public async Task StatsAsync(SocketUser user)
         {
             var id = 0;
             var bot = CheckBot(user);
@@ -987,8 +987,8 @@ namespace Siotrix.Discord.Statistics
             var gIconUrl = GetGuildIconUrl(id);
             var gName = GetGuildName(id);
             var gUrl = GetGuildUrl(id);
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = Context.GetGuildThumbNailAsync();
             var gFooter = GetGuildFooter(id);
             var gPrefix = Context.GetGuildPrefix();
             var mCount = GetLifeTimeMessagesPerUser(person);
@@ -1136,7 +1136,7 @@ namespace Siotrix.Discord.Statistics
                     });
             }
 
-            return ReplyAsync("", embed: builder);
+            await ReplyAsync("", embed: builder);
         }
     }
 }

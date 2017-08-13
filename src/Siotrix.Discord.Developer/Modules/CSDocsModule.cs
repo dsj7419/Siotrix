@@ -16,7 +16,7 @@ namespace Siotrix.Discord.Developer
         public async Task GetDocumentationAsync([Remainder] string term)
         {
             var response = await new CsDocsService().GetDocumentationResultsAsync(term);
-            var gColor = Context.GetGuildColor();
+            var gColor = await Context.GetGuildColorAsync();
             var embedCount = 0;
 
             foreach (var res in response.Results.Take(3).OrderBy(x => x.DisplayName))

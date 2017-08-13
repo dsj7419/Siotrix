@@ -49,12 +49,12 @@ namespace Siotrix.Discord.Utility
                 var channelname = Context.Guild.Channels.FirstOrDefault(x => x.Id == (ulong) channelindex).Name;
                 var description = $"Text: {lastmessage}\nChannel: #{channelname}";
 
-                var embed = SeenEmbed(Context, target.GetAvatarUrl(), name, serverjoined, description);
+                var embed = await SeenEmbed(Context, target.GetAvatarUrl(), name, serverjoined, description);
                 await ReplyAsync("", embed: embed);
             }
             else
             {
-                var embed = SeenEmbed(Context, target.GetAvatarUrl(), name, serverjoined);
+                var embed = await SeenEmbed(Context, target.GetAvatarUrl(), name, serverjoined);
                 await ReplyAsync("", embed: embed);
             }
         }
@@ -136,11 +136,11 @@ namespace Siotrix.Discord.Utility
             return false;
         }
 
-        private static EmbedBuilder SeenEmbed(SocketCommandContext context, string avatar, string name,
+        private static async Task<EmbedBuilder> SeenEmbed(SocketCommandContext context, string avatar, string name,
             string serverjoined, string description = null)
         {
             //Make the embed builder
-            var gColor = context.GetGuildColor();
+            var gColor = await context.GetGuildColorAsync();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(avatar)

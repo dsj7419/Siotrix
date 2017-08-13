@@ -140,7 +140,7 @@ namespace Siotrix.Discord.Moderation
                     _warningsOfCaps++;
                     if (_warningsOfCaps == muteCapsSpamValue)
                         await MuteSpamUser(context.User as IGuildUser, muteCapsTimeValue, context);
-                    _builder = GetBuilder(context, _warningsOfCaps, null, _numberOfTheCapMsg, true);
+                    _builder = await GetBuilder(context, _warningsOfCaps, null, _numberOfTheCapMsg, true);
                     if (_warningsOfCaps == 1)
                         _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());
                     else
@@ -159,7 +159,7 @@ namespace Siotrix.Discord.Moderation
                         _warningsOfRepeat++;
                         if (_warningsOfRepeat == muteRepeatSpamValue)
                             await MuteSpamUser(context.User as IGuildUser, muteRepeatTimeValue, context);
-                        _builder = GetBuilder(context, _warningsOfRepeat, message.Content, _numberOfTheSameMsg + 1,
+                        _builder = await GetBuilder(context, _warningsOfRepeat, message.Content, _numberOfTheSameMsg + 1,
                             false);
                         if (_warningsOfRepeat == 1)
                             _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());
@@ -197,26 +197,26 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private EmbedBuilder GetBuilder(SocketCommandContext context, int warnCount, string spamword, int spamCount,
+        private async Task<EmbedBuilder> GetBuilder(SocketCommandContext context, int warnCount, string spamword, int spamCount,
             bool isCapsSpam)
         {
             string value = null;
-            var gIconUrl = context.GetGuildIconUrl();
-            var gName = context.GetGuildName();
-            var gUrl = context.GetGuildUrl();
-            var gThumbnail = context.GetGuildThumbNail();
-            var gFooter = context.GetGuildFooter();
+            var gIconUrl = await context.GetGuildIconUrlAsync();
+            var gName = await context.GetGuildNameAsync();
+            var gUrl = await context.GetGuildUrlAsync();
+            var gThumbnail = await context.GetGuildThumbNailAsync();
+            var gFooter = await context.GetGuildFooterAsync();
             var gPrefix = context.GetGuildPrefix();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(new Color(255, 0, 0))
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
             if (isCapsSpam)
@@ -240,11 +240,11 @@ namespace Siotrix.Discord.Moderation
         //private EmbedBuilder GetBuilder(SocketCommandContext context, int set_num, long spam_num, bool is_repeat_message)
         //{
         //    string value = null;
-        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(context);
-        //    string g_name = GuildEmbedName.GetGuildName(context);
-        //    string g_url = GuildEmbedUrl.GetGuildUrl(context);
-        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(context);
-        //    string[] g_footer = GuildEmbedFooter.GetGuildFooter(context);
+        //    string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrlAsync(context);
+        //    string g_name = GuildEmbedName.GetGuildNameAsync(context);
+        //    string g_url = GuildEmbedUrl.GetGuildUrlAsync(context);
+        //    string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNailAsync(context);
+        //    string[] g_footer = GuildEmbedFooter.GetGuildFooterAsync(context);
         //    string g_prefix = PrefixExtensions.GetGuildPrefix(context);
         //    var embed = new EmbedBuilder()
         //        .WithAuthor(new EmbedAuthorBuilder()

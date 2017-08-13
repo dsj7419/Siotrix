@@ -1,31 +1,62 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Discord.Commands;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
     public static class GuildEmbedName
     {
-        public static string GetGuildName(this SocketCommandContext context)
+        public static async Task<DiscordGuildName> GetGuildNameAsync(this SocketCommandContext context)
         {
-            var guildId = context.Guild.Id;
-            string name = null;
+            var val = new DiscordGuildName();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gnames.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        name = context.Guild.Name;
-                    else
-                        name = val.First().GuildName;
+                    val = await db.Gnames.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return name;
+            return val;
+        }
+
+        public static async Task CreateDiscordGuildNameAsync(SocketCommandContext context, string name)
+        {
+            var val = new DiscordGuildName(context.Guild.Id.ToLong(), name);
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    await db.Gnames.AddAsync(val);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        public static async Task SetGuildName(DiscordGuildName discordGuildName, string name)
+        {
+            discordGuildName.SetGuildName(name);
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Gnames.Update(discordGuildName);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }

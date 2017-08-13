@@ -45,24 +45,24 @@ namespace Siotrix.Discord.Utility
         [Remarks(" - no argument needed.")]
         public async Task Help()
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var moduleList = GetModuleNames();
-            var gFooter = Context.GetGuildFooter();
+            var gFooter = await Context.GetGuildFooterAsync();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(gColor)
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
             builder
@@ -80,12 +80,12 @@ namespace Siotrix.Discord.Utility
         [Remarks(" [module] or [command name]")]
         public async Task Help(string predicate)
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             string groupCommands = null;
             string commands = null;
             var gPrefix = Context.GetGuildPrefix();
@@ -101,14 +101,14 @@ namespace Siotrix.Discord.Utility
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(gColor)
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
             var isMod = _service.Modules.Any(x => x.Name.IcEquals(predicate));

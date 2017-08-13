@@ -107,23 +107,23 @@ namespace Siotrix.Discord.Moderation
                 if (!LogChannelExtensions.IsToggledLog)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
-                var gIconUrl = context.GetGuildIconUrl();
-                var gName = context.GetGuildName();
-                var gUrl = context.GetGuildUrl();
-                var gThumbnail = context.GetGuildThumbNail();
-                var gFooter = context.GetGuildFooter();
+                var gIconUrl = await context.GetGuildIconUrlAsync();
+                var gName = await context.GetGuildNameAsync();
+                var gUrl = await context.GetGuildUrlAsync();
+                var gThumbnail = await context.GetGuildThumbNailAsync();
+                var gFooter = await context.GetGuildFooterAsync();
                 var gPrefix = context.GetGuildPrefix();
                 string value = null;
                 var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(gIconUrl)
-                        .WithName(gName)
-                        .WithUrl(gUrl))
+                        .WithIconUrl(gIconUrl.Avatar)
+                        .WithName(gName.GuildName)
+                        .WithUrl(gUrl.SiteUrl))
                     .WithColor(new Color(127, 255, 0))
-                    .WithThumbnailUrl(gThumbnail)
+                    .WithThumbnailUrl(gThumbnail.ThumbNail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(gFooter[0])
-                        .WithText(gFooter[1]))
+                        .WithIconUrl(gFooter.FooterIcon)
+                        .WithText(gFooter.FooterText))
                     .WithTimestamp(DateTime.UtcNow);
                 caseId = context.GetCaseNumber();
 
@@ -199,22 +199,22 @@ namespace Siotrix.Discord.Moderation
                 if (!LogChannelExtensions.IsToggledLog)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
-                var gIconUrl = context.GetGuildIconUrl();
-                var gName = context.GetGuildName();
-                var gUrl = context.GetGuildUrl();
-                var gThumbnail = context.GetGuildThumbNail();
-                var gFooter = context.GetGuildFooter();
+                var gIconUrl = await context.GetGuildIconUrlAsync();
+                var gName = await context.GetGuildNameAsync();
+                var gUrl = await context.GetGuildUrlAsync();
+                var gThumbnail = await context.GetGuildThumbNailAsync();
+                var gFooter = await context.GetGuildFooterAsync();
                 var gPrefix = context.GetGuildPrefix();
                 var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(gIconUrl)
-                        .WithName(gName)
-                        .WithUrl(gUrl))
+                        .WithIconUrl(gIconUrl.Avatar)
+                        .WithName(gName.GuildName)
+                        .WithUrl(gUrl.SiteUrl))
                     .WithColor(new Color(127, 255, 0))
-                    .WithThumbnailUrl(gThumbnail)
+                    .WithThumbnailUrl(gThumbnail.ThumbNail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(gFooter[0])
-                        .WithText(gFooter[1]))
+                        .WithIconUrl(gFooter.FooterIcon)
+                        .WithText(gFooter.FooterText))
                     .WithTimestamp(DateTime.UtcNow);
                 caseId = context.GetCaseNumber();
 
@@ -533,22 +533,22 @@ namespace Siotrix.Discord.Moderation
                     if (!LogChannelExtensions.IsToggledLog)
                         await channel.SendMessageAsync(userMention, false, builder.Build());
 
-                    var gIconUrl = context.GetGuildIconUrl();
-                    var gName = context.GetGuildName();
-                    var gUrl = context.GetGuildUrl();
-                    var gThumbnail = context.GetGuildThumbNail();
-                    var gFooter = context.GetGuildFooter();
+                    var gIconUrl = await context.GetGuildIconUrlAsync();
+                    var gName = await context.GetGuildNameAsync();
+                    var gUrl = await context.GetGuildUrlAsync();
+                    var gThumbnail = await context.GetGuildThumbNailAsync();
+                    var gFooter = await context.GetGuildFooterAsync();
                     var gPrefix = context.GetGuildPrefix();
                     var modBuilder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(gIconUrl)
-                            .WithName(gName)
-                            .WithUrl(gUrl))
+                            .WithIconUrl(gIconUrl.Avatar)
+                            .WithName(gName.GuildName)
+                            .WithUrl(gUrl.SiteUrl))
                         .WithColor(actionColor)
-                        .WithThumbnailUrl(gThumbnail)
+                        .WithThumbnailUrl(gThumbnail.ThumbNail)
                         .WithFooter(new EmbedFooterBuilder()
-                            .WithIconUrl(gFooter[0])
-                            .WithText(gFooter[1]))
+                            .WithIconUrl(gFooter.FooterIcon)
+                            .WithText(gFooter.FooterText))
                         .WithTimestamp(DateTime.UtcNow);
                     //case_id = GetCaseNumberAync(words[0], context, user as SocketGuildUser);
                     caseId = context.GetCaseNumber();

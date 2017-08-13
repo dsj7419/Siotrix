@@ -299,11 +299,11 @@ namespace Siotrix.Discord.Moderation
         private async Task MuteList()
         {
             string users = null;
-            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrl(Context);
-            string g_name = GuildEmbedName.GetGuildName(Context);
-            string g_url = GuildEmbedUrl.GetGuildUrl(Context);
-            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNail(Context);
-            string[] g_footer = GuildEmbedFooter.GetGuildFooter(Context);
+            string g_icon_url = GuildEmbedIconUrl.GetGuildIconUrlAsync(Context);
+            string g_name = GuildEmbedName.GetGuildNameAsync(Context);
+            string g_url = GuildEmbedUrl.GetGuildUrlAsync(Context);
+            string g_thumbnail = GuildEmbedThumbnail.GetGuildThumbNailAsync(Context);
+            string[] g_footer = GuildEmbedFooter.GetGuildFooterAsync(Context);
             string g_prefix = PrefixExtensions.GetGuildPrefix(Context);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -475,22 +475,22 @@ namespace Siotrix.Discord.Moderation
         private async Task MuteList()
         {
             string users = null;
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var gPrefix = Context.GetGuildPrefix();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
             using (var db = new LogDatabase())

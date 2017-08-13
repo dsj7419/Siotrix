@@ -28,7 +28,7 @@ namespace Siotrix.Discord.Admin.Modules
                 throw new ArgumentException("You must supply a role.");
             var grl = grp as SocketRole;
             var gls = gld;
-            var gColor = Context.GetGuildColor();
+            var gColor =  await Context.GetGuildColorAsync();
 
             var embed = new EmbedBuilder();
             embed.Color = gColor;

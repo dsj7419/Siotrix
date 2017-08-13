@@ -1,31 +1,62 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Discord.Commands;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
     public static class GuildEmbedThumbnail
     {
-        public static string GetGuildThumbNail(this SocketCommandContext context)
+        public static async Task<DiscordGuildThumbNail> GetGuildThumbNailAsync(this SocketCommandContext context)
         {
-            var guildId = context.Guild.Id;
-            string thumbnailUrl = null;
+            var val = new DiscordGuildThumbNail();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var val = db.Gthumbnails.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        thumbnailUrl = SiotrixConstants.BotLogo;
-                    else
-                        thumbnailUrl = val.First().ThumbNail;
+                    val = await db.Gthumbnails.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
             }
-            return thumbnailUrl;
+            return val;
+        }
+
+        public static async Task CreateDiscordGuildThumbNailAsync(SocketCommandContext context, string thumbNail)
+        {
+            var val = new DiscordGuildThumbNail(context.Guild.Id.ToLong(), thumbNail);
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    await db.Gthumbnails.AddAsync(val);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        public static async Task SetGuildThumbNail(DiscordGuildThumbNail discordGuildThumbNail, string thumbNail)
+        {
+            discordGuildThumbNail.SetGuildThumbNail(thumbNail);
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Gthumbnails.Update(discordGuildThumbNail);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
         }
     }
 }

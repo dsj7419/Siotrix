@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
-using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
-    public static class GuildEmbedIconUrl
+    public static class SiotrixEmbedWebsiteExtensions
     {
-        public static async Task<DiscordGuildAvatar> GetGuildIconUrlAsync(this SocketCommandContext context)
+        public static async Task<DiscordSiotrixSiteUrl> GetSiotrixSiteUrlAsync()
         {
-            var val = new DiscordGuildAvatar();
+            var val = new DiscordSiotrixSiteUrl();
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    val = await db.Gavatars.FirstOrDefaultAsync(p => p.GuildId == context.Guild.Id.ToLong());
+                    val = await db.Bwebsiteurls.FirstOrDefaultAsync();
                 }
                 catch (Exception e)
                 {
@@ -25,14 +25,14 @@ namespace Siotrix.Discord
             return val;
         }
 
-        public static async Task CreateDiscordGuildAvatarAsync(SocketCommandContext context, string avatar)
+        public static async Task CreateSiotrixSiteUrl(string siteUrl)
         {
-            var val = new DiscordGuildAvatar(context.Guild.Id.ToLong(), avatar);
+            var val = new DiscordSiotrixSiteUrl(siteUrl);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    await db.Gavatars.AddAsync(val);
+                    await db.Bwebsiteurls.AddAsync(val);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)
@@ -42,14 +42,14 @@ namespace Siotrix.Discord
             }
         }
 
-        public static async Task SetGuildAvatar(DiscordGuildAvatar discordGuildAvatar, string avatar)
+        public static async Task SetSiotrixSiteUrl(DiscordSiotrixSiteUrl discordSiotrixSiteUrl, string siteUrl)
         {
-            discordGuildAvatar.SetGuildAvatar(avatar);
+            discordSiotrixSiteUrl.SetSiotrixSiteUrl(siteUrl);
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    db.Gavatars.Update(discordGuildAvatar);
+                    db.Bwebsiteurls.Update(discordSiotrixSiteUrl);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)

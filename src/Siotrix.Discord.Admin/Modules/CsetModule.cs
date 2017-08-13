@@ -253,24 +253,24 @@ namespace Siotrix.Discord.Admin
         [Remarks("<command> toggle (optional:#Channelname)")]
         public async Task Cset(string command, [Remainder] string str)
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor =  await Context.GetGuildColorAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var gPrefix = Context.GetGuildPrefix();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                    .WithIconUrl(gIconUrl)
-                    .WithName(gName)
-                    .WithUrl(gUrl))
+                    .WithIconUrl(gIconUrl.Avatar)
+                    .WithName(gName.GuildName)
+                    .WithUrl(gUrl.SiteUrl))
                 .WithColor(gColor)
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
-                    .WithIconUrl(gFooter[0])
-                    .WithText(gFooter[1]))
+                    .WithIconUrl(gFooter.FooterIcon)
+                    .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
             var isFound = _service.Commands.Where(p => p.Name.Equals(command)).Any();
             var isGroupFound = _service.Modules.Where(p => p.Aliases.First().Equals(command)).Any();
@@ -328,12 +328,12 @@ namespace Siotrix.Discord.Admin
         [Remarks("toggled - must be that word exactly.")]
         public async Task Cset(string param)
         {
-            var gIconUrl = Context.GetGuildIconUrl();
-            var gName = Context.GetGuildName();
-            var gUrl = Context.GetGuildUrl();
-            var gColor = Context.GetGuildColor();
-            var gThumbnail = Context.GetGuildThumbNail();
-            var gFooter = Context.GetGuildFooter();
+            var gIconUrl = await Context.GetGuildIconUrlAsync();
+            var gName = await Context.GetGuildNameAsync();
+            var gUrl = await Context.GetGuildUrlAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
+            var gFooter = await Context.GetGuildFooterAsync();
             var gPrefix = Context.GetGuildPrefix();
             string result = null;
             EmbedBuilder builder = null;
@@ -356,14 +356,14 @@ namespace Siotrix.Discord.Admin
                         });
                     builder
                         .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(gIconUrl)
-                            .WithName(gName)
-                            .WithUrl(gUrl))
+                            .WithIconUrl(gIconUrl.Avatar)
+                            .WithName(gName.GuildName)
+                            .WithUrl(gUrl.SiteUrl))
                         .WithColor(gColor)
-                        .WithThumbnailUrl(gThumbnail)
+                        .WithThumbnailUrl(gThumbnail.ThumbNail)
                         .WithFooter(new EmbedFooterBuilder()
-                            .WithIconUrl(gFooter[0])
-                            .WithText(gFooter[1]))
+                            .WithIconUrl(gFooter.FooterIcon)
+                            .WithText(gFooter.FooterText))
                         .WithTimestamp(DateTime.UtcNow);
                 }
             }
@@ -383,14 +383,14 @@ namespace Siotrix.Discord.Admin
                     });
                 builder
                     .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(gIconUrl)
-                        .WithName(gName)
-                        .WithUrl(gUrl))
+                        .WithIconUrl(gIconUrl.Avatar)
+                        .WithName(gName.GuildName)
+                        .WithUrl(gUrl.SiteUrl))
                     .WithColor(gColor)
-                    .WithThumbnailUrl(gThumbnail)
+                    .WithThumbnailUrl(gThumbnail.ThumbNail)
                     .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(gFooter[0])
-                        .WithText(gFooter[1]))
+                        .WithIconUrl(gFooter.FooterIcon)
+                        .WithText(gFooter.FooterText))
                     .WithTimestamp(DateTime.UtcNow);
             }
             await ReplyAsync("", embed: builder);
