@@ -50,34 +50,8 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync()
         {
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        url = SiotrixConstants.BotAuthorIcon;
-                    }
-                    else
-                    {
-                        url = db.Authors.First().AuthorIcon;
-                        if (url == null || url == "")
-                        {
-                            url = SiotrixConstants.BotAuthorIcon;
-                            var data = db.Authors.First();
-                            data.AuthorIcon = url;
-                            db.Authors.Update(data);
-                        }
-                        db.SaveChanges();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(url);
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
+            await ReplyAsync(val.AuthorIcon);
         }
 
         [Command("authoricon")]
@@ -87,32 +61,16 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorIconAsync(Uri url)
         {
-            using (var db = new LogDatabase())
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
+
+            if (url.ToString().Trim().Equals("reset"))
             {
-                var val = new DiscordAuthor();
-                if (url.ToString().Equals("reset"))
-                    val.AuthorIcon = SiotrixConstants.BotAuthorIcon;
-                else
-                    val.AuthorIcon = url.ToString();
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorIcon = val.AuthorIcon;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorIcon(val, SiotrixConstants.BotAuthorIcon);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+
+            await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorIcon(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
@@ -122,34 +80,8 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync()
         {
-            string url = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        url = "No Url";
-                    }
-                    else
-                    {
-                        url = db.Authors.First().AuthorUrl;
-                        if (url == null || url == "")
-                        {
-                            url = "No Url";
-                            var data = db.Authors.First();
-                            data.AuthorUrl = "";
-                            db.Authors.Update(data);
-                            db.SaveChanges();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(url);
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
+            await ReplyAsync(val.AuthorUrl);
         }
 
         [Command("authorurl")]
@@ -159,68 +91,16 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorUrlAsync(Uri url)
         {
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordAuthor();
-                if (url.ToString().Equals("reset"))
-                    val.AuthorUrl = "";
-                else
-                    val.AuthorUrl = url.ToString();
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorUrl = val.AuthorUrl;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
 
-        [Command("authorname")]
-        [Summary("Will set bots current author name.")]
-        [Remarks(
-            "<name> - This defaults to your guild name. **note** You can use reset as the parameter to reset back to your guild name.")]
-        [MinPermissions(AccessLevel.BotOwner)]
-        public async Task AuthorNameAsync([Remainder] string txt)
-        {
-            using (var db = new LogDatabase())
+            if (url.ToString().Trim().Equals("reset"))
             {
-                var val = new DiscordAuthor();
-                if (txt.Equals("reset"))
-                    val.AuthorName = Context.Guild.Name;
-                else
-                    val.AuthorName = txt;
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        db.Authors.Add(val);
-                    }
-                    else
-                    {
-                        var data = db.Authors.First();
-                        data.AuthorName = val.AuthorName;
-                        db.Authors.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorUrl(val, SiotrixConstants.DiscordInv);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+
+            await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorUrl(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
@@ -230,35 +110,29 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task AuthorNameAsync()
         {
-            string txt = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    if (db.Authors == null || db.Authors.ToList().Count <= 0)
-                    {
-                        txt = Context.Guild.Name;
-                    }
-                    else
-                    {
-                        txt = db.Authors.First().AuthorName;
-                        if (txt == null || txt == "")
-                        {
-                            txt = Context.Guild.Name;
-                            var data = db.Authors.First();
-                            data.AuthorName = txt;
-                            db.Authors.Update(data);
-                            db.SaveChanges();
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(txt);
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
+            await ReplyAsync(val.AuthorName);
         }
+
+        [Command("authorname")]
+        [Summary("Will set bots current author name.")]
+        [Remarks(
+            "<name> - This defaults to your guild name. **note** You can use reset as the parameter to reset back to your guild name.")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task AuthorNameAsync([Remainder] string txt)
+        {
+            var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
+
+            if (txt.Equals("reset"))
+            {
+                await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorName(val, SiotrixConstants.BotName);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await SiotrixEmbedAuthorExtensions.SetSiotrixAuthorName(val, txt);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }      
 
         [Command("description")]
         [Summary("Will list Siotrix current description.")]
@@ -323,13 +197,6 @@ namespace Siotrix.Discord.Developer
         public async Task WebSiteAsync()
         {
             var val = await SiotrixEmbedWebsiteExtensions.GetSiotrixSiteUrlAsync();
-
-            if (val == null)
-            {
-                await SiotrixEmbedWebsiteExtensions.CreateSiotrixSiteUrl(SiotrixConstants.BotUrl);
-                await ReplyAsync(SiotrixConstants.BotUrl);
-                return;
-            }
             await ReplyAsync(val.SiteUrl);
         }
 
@@ -340,13 +207,6 @@ namespace Siotrix.Discord.Developer
         public async Task WebSiteAsync(Uri url)
         {
             var val = await SiotrixEmbedWebsiteExtensions.GetSiotrixSiteUrlAsync();
-
-            if (val == null)
-            {
-                await SiotrixEmbedWebsiteExtensions.CreateSiotrixSiteUrl(url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             await SiotrixEmbedWebsiteExtensions.SetSiotrixSiteUrl(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
@@ -357,14 +217,7 @@ namespace Siotrix.Discord.Developer
         [MinPermissions(AccessLevel.BotOwner)]
         public async Task FooterIconAsync()
         {
-            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-
-            if (val == null)
-            {                
-                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
-                await ReplyAsync(SiotrixConstants.BotFooterIcon);
-                return;
-            }            
+            var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();           
             await ReplyAsync(val.FooterIcon);
         }
 
@@ -393,13 +246,6 @@ namespace Siotrix.Discord.Developer
         public async Task FooterTextAsync()
         {
             var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-
-            if (val == null)
-            {
-                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
-                await ReplyAsync(SiotrixConstants.BotFooterText);
-                return;
-            }
             await ReplyAsync(val.FooterText);
         }
 

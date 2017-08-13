@@ -19,22 +19,6 @@ namespace Siotrix.Discord.Statistics
             _process = Process.GetCurrentProcess();
         }
 
-        private string GetAuthorIconUrl()
-        {
-            string iconurl = null;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    iconurl = db.Authors.First().AuthorIcon;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return iconurl;
-        }
 
         private string GetGuildIconUrl(int id)
         {
@@ -294,7 +278,7 @@ namespace Siotrix.Discord.Statistics
             var gName = GetGuildName(0);
             var gUrl = GetGuildUrl(0);
             var gColor = await Context.GetGuildColorAsync();
-            var gThumbnail = GetGuildThumbNail();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gDescription = GetGuildDescription(0);
             var gFooter = GetGuildFooter(0);
             var gPrefix = Context.GetGuildPrefix();
@@ -314,7 +298,7 @@ namespace Siotrix.Discord.Statistics
                 .WithDescription(gDescription)
                 .WithColor(gColor)
                 .WithTitle("General Information sheet for " + gName)
-                .WithThumbnailUrl(gThumbnail)
+                .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter[0])
                     .WithText(gFooter[1]))
@@ -394,7 +378,6 @@ namespace Siotrix.Discord.Statistics
             var mCount = GetLifeTimeMessages(user);
             var gPrefix = Context.GetGuildPrefix();
 
-            Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>{0}", id);
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl)

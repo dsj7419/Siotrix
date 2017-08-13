@@ -236,25 +236,21 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildDescriptionAsync()
         {
-            CheckGuildDescriptions();
-            var guildId = Context.Guild.Id;
-            string desc = null;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildDescriptionAsync();
+
+            if (val == null)
             {
-                try
-                {
-                    var val = db.Gdescriptions.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        desc = SiotrixConstants.BotDesc;
-                    else
-                        desc = val.First().Description;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
+                await ReplyAsync($"No description set for {Context.Guild.Name}");
+                return;
             }
-            await ReplyAsync(desc);
+
+            if (val.Description == null)
+            {
+                await ReplyAsync($"No description set for {Context.Guild.Name}");
+                return;
+            }
+            await ReplyAsync(val.Description);
         }
 
         [Command("gdescription")]
@@ -262,65 +258,33 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots description for your guild.")]
         [Remarks("<text> - text you would like to use as a guild description.")]
         [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task GuildDescriptionAsync([Remainder] string str)
+        public async Task GuildDescriptionAsync([Remainder] string desc)
         {
-            CheckGuildDescriptions();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildDescriptionAsync();
+
+            if (val == null)
             {
-                var val = new DiscordGuildDescription();
-                val.Description = str;
-                try
+                if (desc.Trim().Equals("reset"))
                 {
-                    var arr = db.Gdescriptions.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gdescriptions.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.Description = val.Description;
-                        db.Gdescriptions.Update(data);
-                    }
-                    db.SaveChanges();
+                    await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
+                    await ReplyAsync(SiotrixConstants.BotSuccess);
+                    return;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
+            if (desc.Trim().Equals("reset"))
+            {
+                await GuildEmbedDescription.SetGuildDescription(val, "");
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
+            }
+
+            await GuildEmbedDescription.SetGuildDescription(val, "");
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
-
-        private void CheckGuildDescriptions()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
-            {
-                var list = db.Gdescriptions.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildDescription();
-                        instance.GuildId = id;
-                        instance.Description = SiotrixConstants.BotDesc;
-                        db.Gdescriptions.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-            }
-        }
+        
 
         [Command("color")]
         [Summary("Set or list your guilds official embed color.")]
