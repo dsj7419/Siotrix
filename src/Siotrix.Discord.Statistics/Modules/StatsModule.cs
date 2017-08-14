@@ -845,7 +845,7 @@ namespace Siotrix.Discord.Statistics
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooterIcon = await GetGuildFooterIcon(0);
             var gFooterText = await GetGuildFooterText(0);
-            var gPrefix = await Context.GetGuildPrefixAsync();
+            var gPrefix = await Context.GetGuildPrefixAsync();            
             var mCount = GetLifeTimeMessagesPerGuild();
             var activeChannel = "None";
             if (GetActivityChannelPerGuild() > 0)
@@ -863,7 +863,7 @@ namespace Siotrix.Discord.Statistics
                     .WithIconUrl(gIconUrl)
                     .WithName(gName)
                     .WithUrl(gUrl))
-                .WithDescription($"for individual information or bot information please use {gPrefix}stats @username")
+                .WithDescription($"for individual information or bot information please use {gPrefix.Prefix}stats @username")
                 .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle("Statistical Information sheet for " + gName)
                 .WithThumbnailUrl(gThumbnail.ThumbNail)
@@ -991,7 +991,7 @@ namespace Siotrix.Discord.Statistics
                 var joinDate = string.Format("{0:dddd, MMMM d, yyyy}", person.JoinedAt?.DateTime ?? DateTime.Now);
                 builder
                     .WithTitle("Statistical Information sheet for " + Context.Guild.GetUser(user.Id).Username)
-                    .WithDescription($"for general guild information information please use {gPrefix}stats")
+                    .WithDescription($"for general guild information information please use {gPrefix.Prefix}stats")
                     .WithThumbnailUrl(person.GetAvatarUrl())
                     .AddField(new EmbedFieldBuilder
                     {
@@ -1046,7 +1046,7 @@ namespace Siotrix.Discord.Statistics
             {
                 builder
                     .WithTitle("Statistics for Siotrix Bot")
-                    .WithDescription($"for general guild information information please use {gPrefix}stats")
+                    .WithDescription($"for general guild information information please use {gPrefix.Prefix}stats")
                     .WithThumbnailUrl(Context.Client.CurrentUser.GetAvatarUrl())
                     .AddField(new EmbedFieldBuilder
                     {
