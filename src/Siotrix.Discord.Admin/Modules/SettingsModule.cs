@@ -586,25 +586,14 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildMotdAsync()
         {
-            CheckGuildMotds();
-            var guildId = Context.Guild.Id;
-            string str = null;
-            using (var db = new LogDatabase())
+            var val = await Context.GetGuildMotdAsync();
+
+            if (val.Message == null)
             {
-                try
-                {
-                    var val = db.Gmotds.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        str = $"Welcome to {Context.Guild.Name}.";
-                    else
-                        str = val.First().Message;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await ReplyAsync($"No MOTD set for {Context.Guild.Name}");
+                return;
             }
-            await ReplyAsync(str);
+            await ReplyAsync(val.Message);
         }
 
         [Command("gmotd")]
@@ -613,66 +602,18 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildMotdAsync([Remainder] string str)
         {
-            CheckGuildMotds();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildMotd();
-                if (str.Equals("reset"))
-                    val.Message = $"Welcome to {Context.Guild.Name}.";
-                else
-                    val.Message = str;
-                var arr = db.Gmotds.Where(p => p.GuildId == guildId.ToLong());
-                try
-                {
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gmotds.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.Message = val.Message;
-                        db.Gmotds.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildMotdAsync();
 
-        private void CheckGuildMotds()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
+            if (str.Trim().Equals("reset"))
             {
-                var list = db.Gmotds.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildMotd();
-                        instance.GuildId = id;
-                        instance.Message = $"Welcome to {Context.Guild.Name}.";
-                        db.Gmotds.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                await GuildMotdExtensions.SetGuildMotd(val, "");
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-        }
+
+            await GuildMotdExtensions.SetGuildMotd(val, str);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }        
 
         [Command("autodelete")]
         [Summary("")]
