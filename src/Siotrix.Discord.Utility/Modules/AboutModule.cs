@@ -20,7 +20,7 @@ namespace Siotrix.Discord.Utility
                 _specialThanks.Add(285790360804786186,
                     "");
 
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var message =
                 $"A little bit about Siotrx! Siotrix is a discord bot written in C# by {Context.Client.GetUser(173905004661309441).Username}.\n" +
                 $"I was created because a lot of the larger bots seem to miss having a personal touch for each guild. The goal was to make a\n" +

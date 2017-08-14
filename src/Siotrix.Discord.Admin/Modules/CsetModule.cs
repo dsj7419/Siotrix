@@ -259,7 +259,7 @@ namespace Siotrix.Discord.Admin
             var gColor =  await Context.GetGuildColorAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
@@ -334,7 +334,7 @@ namespace Siotrix.Discord.Admin
             var gColor = await Context.GetGuildColorAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             string result = null;
             EmbedBuilder builder = null;
 

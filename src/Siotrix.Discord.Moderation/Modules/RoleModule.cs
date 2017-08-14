@@ -401,7 +401,7 @@ namespace Siotrix.Discord.Moderation
             var gUrl = Context.GetGuildUrlAsync();
             var gThumbnail = Context.GetGuildThumbNailAsync();
             var gFooter = Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property
             var blue = Convert.ToString(rgbvalue.B); // Blue property

@@ -281,7 +281,7 @@ namespace Siotrix.Discord.Statistics
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gDescription = GetGuildDescription(0);
             var gFooter = GetGuildFooter(0);
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
 
             var dt = new DateTime(Context.Guild.CreatedAt.Year, Context.Guild.CreatedAt.Month,
                 Context.Guild.CreatedAt.Day, 0, 0, 0, 0);
@@ -376,7 +376,7 @@ namespace Siotrix.Discord.Statistics
             var gDescription = GetGuildDescription(id);
             var gFooter = GetGuildFooter(id);
             var mCount = GetLifeTimeMessages(user);
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
 
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()

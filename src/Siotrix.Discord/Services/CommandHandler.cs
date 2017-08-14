@@ -271,11 +271,12 @@ namespace Siotrix.Discord
             var msg = s as SocketUserMessage;
             var context = new SocketCommandContext(_client, msg);
             var user = msg.Author as SocketGuildUser;
+            var val = await context.GetGuildPrefixAsync();
             var argPos = 0;
             string spec = null;
             string content = null;
 
-            spec = context.GetGuildPrefix();
+            spec = val.Prefix;
             var blacklistedUser = await BlacklistExtensions.GetBlacklistAsync(context.Guild.Id, user.Id);
             if (blacklistedUser != null) return;
 

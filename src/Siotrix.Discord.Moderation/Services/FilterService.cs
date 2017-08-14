@@ -39,6 +39,7 @@ namespace Siotrix.Discord.Moderation
             string spec = null;
             var context = new SocketCommandContext(_client, message);
             var dictionary = LogChannelExtensions.GetFilterWords(context.Guild.Id.ToLong());
+            var val = await context.GetGuildPrefixAsync();
             var words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var channel =
@@ -56,7 +57,7 @@ namespace Siotrix.Discord.Moderation
                 await msg.DeleteAsync();
             }
 
-            spec = context.GetGuildPrefix();
+            spec = val.Prefix;
             var isFound = IsUsableAutoDeleteCommand(context.Guild.Id.ToLong());
             if (message.HasStringPrefix(spec, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
                 if (isFound)

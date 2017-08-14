@@ -125,7 +125,7 @@ namespace Siotrix.Discord.Moderation
             var gUrl = await context.GetGuildUrlAsync();
             var gThumbnail = await context.GetGuildThumbNailAsync();
             var gFooter = await context.GetGuildFooterAsync();
-            var gPrefix = context.GetGuildPrefix();
+            var gPrefix = await context.GetGuildPrefixAsync();
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)

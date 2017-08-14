@@ -190,7 +190,6 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildOwner)]
         public async Task GuildColorAsync()
         {
-            var guildId = Context.Guild.Id;
             var regexColorCode = new Regex("^#[A-Fa-f0-9]{6}$");
             var regexRgbCode =
                 new Regex(
@@ -378,7 +377,7 @@ namespace Siotrix.Discord.Admin
             var gUrl = await Context.GetGuildUrlAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var red = Convert.ToString(rgbvalue.R); // Red Property
             var green = Convert.ToString(rgbvalue.G); // Green property
             var blue = Convert.ToString(rgbvalue.B); // Blue property
@@ -437,13 +436,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildNameAsync()
         {
             var val = await Context.GetGuildNameAsync();
-
-            if (val == null)
-            {
-                await GuildEmbedName.CreateDiscordGuildNameAsync(Context, Context.Guild.Name);
-                await ReplyAsync(Context.Guild.Name);
-                return;
-            }
             await ReplyAsync(val.GuildName);
         }
 
@@ -456,19 +448,6 @@ namespace Siotrix.Discord.Admin
         {
             var val = await Context.GetGuildNameAsync();
 
-            if (val == null)
-            {
-                if (txt.Equals("reset"))
-                {
-                    await GuildEmbedName.CreateDiscordGuildNameAsync(Context, Context.Guild.Name);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                var siotrixVal = await Context.GetGuildNameAsync();
-                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, txt, siotrixVal.GuildName);
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             if (txt.Equals("reset"))
             {
                 await GuildEmbedName.SetGuildName(val, Context.Guild.Name);
@@ -530,7 +509,17 @@ namespace Siotrix.Discord.Admin
             val.SetGuildAvatar(url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
             return;
-        }        
+        }
+
+        [Command("prefix")]
+        [Summary("Will list bots current guild prefix.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task PrefixAsync()
+        {
+            var val = await Context.GetGuildPrefixAsync();
+            await ReplyAsync(val.Prefix);
+        }
 
         [Command("prefix")]
         [Summary("Will set bot prefix for your guild.")]
@@ -541,64 +530,18 @@ namespace Siotrix.Discord.Admin
         {
             //TODO: Prefix needs more work
             // string str = CheckEmojiText(txt);
-            CheckPrefixs();
-            var guildId = Context.Guild.Id;
-            using (var db = new LogDatabase())
-            {
-                var val = new DiscordGuildPrefix();
-                if (txt.Equals("reset"))
-                    val.Prefix = SiotrixConstants.BotPrefix;
-                else
-                    val.Prefix = txt;
-                try
-                {
-                    var arr = db.Gprefixs.Where(p => p.GuildId == guildId.ToLong());
-                    if (arr == null || arr.ToList().Count <= 0)
-                    {
-                        db.Gprefixs.Add(val);
-                    }
-                    else
-                    {
-                        var data = arr.First();
-                        data.Prefix = val.Prefix;
-                        db.Gprefixs.Update(data);
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            await ReplyAsync(SiotrixConstants.BotSuccess);
-        }
+            var val = await Context.GetGuildPrefixAsync();
 
-        [Command("prefix")]
-        [Summary("Will list bots current guild prefix.")]
-        [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
-        public async Task PrefixAsync()
-        {
-            CheckPrefixs();
-            var guildId = Context.Guild.Id;
-            string txt = null;
-            using (var db = new LogDatabase())
+            if (txt.Equals("reset"))
             {
-                try
-                {
-                    var val = db.Gprefixs.Where(p => p.GuildId == guildId.ToLong());
-                    if (val == null || val.ToList().Count <= 0)
-                        txt = SiotrixConstants.BotPrefix;
-                    else
-                        txt = val.First().Prefix;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                await GuildPrefixExtensions.SetGuildPrefix(val, SiotrixConstants.BotPrefix);
+                await ReplyAsync(SiotrixConstants.BotSuccess);
+                return;
             }
-            await ReplyAsync(txt);
-        }
+
+            await GuildPrefixExtensions.SetGuildPrefix(val, txt);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }        
 
         private bool CheckString(string str)
         {
@@ -611,36 +554,7 @@ namespace Siotrix.Discord.Admin
                     break;
                 }
             return isFounded;
-        }
-
-        private void CheckPrefixs()
-        {
-            var id = Context.Guild.Id.ToLong();
-            var isFounded = false;
-            using (var db = new LogDatabase())
-            {
-                var list = db.Gprefixs.ToList();
-                foreach (var item in list)
-                    if (id == item.GuildId)
-                    {
-                        isFounded = true;
-                        break;
-                    }
-                if (!isFounded)
-                    try
-                    {
-                        var instance = new DiscordGuildPrefix();
-                        instance.GuildId = id;
-                        instance.Prefix = SiotrixConstants.BotPrefix;
-                        db.Gprefixs.Add(instance);
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-            }
-        }
+        }        
 
         public static string FromText(string text)
         {

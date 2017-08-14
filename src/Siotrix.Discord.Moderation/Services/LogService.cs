@@ -112,7 +112,7 @@ namespace Siotrix.Discord.Moderation
                 var gUrl = await context.GetGuildUrlAsync();
                 var gThumbnail = await context.GetGuildThumbNailAsync();
                 var gFooter = await context.GetGuildFooterAsync();
-                var gPrefix = context.GetGuildPrefix();
+                var gPrefix = await context.GetGuildPrefixAsync();
                 string value = null;
                 var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
@@ -204,7 +204,7 @@ namespace Siotrix.Discord.Moderation
                 var gUrl = await context.GetGuildUrlAsync();
                 var gThumbnail = await context.GetGuildThumbNailAsync();
                 var gFooter = await context.GetGuildFooterAsync();
-                var gPrefix = context.GetGuildPrefix();
+                var gPrefix = await context.GetGuildPrefixAsync();
                 var modBuilder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(gIconUrl.Avatar)
@@ -489,6 +489,7 @@ namespace Siotrix.Discord.Moderation
                 var context = new SocketCommandContext(_client, msg);
                 var argPos = 0;
                 string spec = null;
+                var val = await context.GetGuildPrefixAsync();
                 string content = null;
                 long caseId = 0;
 
@@ -498,7 +499,7 @@ namespace Siotrix.Discord.Moderation
                 var modChannel =
                     context.Guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
-                spec = context.GetGuildPrefix();
+                spec = val.Prefix;
                 if (message.Author.IsBot
                     || msg == null
                     || !msg.Content.Except("?").Any()
@@ -538,7 +539,7 @@ namespace Siotrix.Discord.Moderation
                     var gUrl = await context.GetGuildUrlAsync();
                     var gThumbnail = await context.GetGuildThumbNailAsync();
                     var gFooter = await context.GetGuildFooterAsync();
-                    var gPrefix = context.GetGuildPrefix();
+                    var gPrefix = await context.GetGuildPrefixAsync();
                     var modBuilder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
                             .WithIconUrl(gIconUrl.Avatar)

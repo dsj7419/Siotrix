@@ -107,7 +107,7 @@ namespace Siotrix.Discord.Moderation
                 var gUrl = await Context.GetGuildUrlAsync();
                 var gThumbnail = await Context.GetGuildThumbNailAsync();
                 var gFooter = await Context.GetGuildFooterAsync();
-                var gPrefix = Context.GetGuildPrefix();
+                var gPrefix = await Context.GetGuildPrefixAsync();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(gIconUrl.Avatar)
@@ -141,7 +141,7 @@ namespace Siotrix.Discord.Moderation
             var gUrl = await Context.GetGuildUrlAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
@@ -174,7 +174,7 @@ namespace Siotrix.Discord.Moderation
             var gUrl = await Context.GetGuildUrlAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
@@ -207,7 +207,7 @@ namespace Siotrix.Discord.Moderation
             var gUrl = await Context.GetGuildUrlAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
@@ -242,7 +242,7 @@ namespace Siotrix.Discord.Moderation
                 var gUrl = await Context.GetGuildUrlAsync();
                 var gThumbnail = await Context.GetGuildThumbNailAsync();
                 var gFooter = await Context.GetGuildFooterAsync();
-                var gPrefix = Context.GetGuildPrefix();
+                var gPrefix = await Context.GetGuildPrefixAsync();
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(gIconUrl.Avatar)

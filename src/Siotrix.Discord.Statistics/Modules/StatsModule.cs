@@ -884,7 +884,7 @@ namespace Siotrix.Discord.Statistics
             var gColor = await Context.GetGuildColorAsync();
             var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = GetGuildFooter(0);
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var mCount = GetLifeTimeMessagesPerGuild();
             var activeChannel = "None";
             if (GetActivityChannelPerGuild() > 0)
@@ -990,7 +990,7 @@ namespace Siotrix.Discord.Statistics
             var gColor = await Context.GetGuildColorAsync();
             var gThumbnail = Context.GetGuildThumbNailAsync();
             var gFooter = GetGuildFooter(id);
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             var mCount = GetLifeTimeMessagesPerUser(person);
             var mStatsCount = GetStatsMessagesPerUser(person);
             //string active_channel = GetActivityChannelPerUser(person);

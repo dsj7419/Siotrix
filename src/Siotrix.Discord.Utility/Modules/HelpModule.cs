@@ -88,7 +88,7 @@ namespace Siotrix.Discord.Utility
             var gFooter = await Context.GetGuildFooterAsync();
             string groupCommands = null;
             string commands = null;
-            var gPrefix = Context.GetGuildPrefix();
+            var gPrefix = await Context.GetGuildPrefixAsync();
             string subCommands = null;
             string summary = null;
             string remark = null;
