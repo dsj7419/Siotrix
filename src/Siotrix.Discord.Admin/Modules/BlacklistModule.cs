@@ -34,7 +34,7 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithThumbnailUrl(Context.Guild.IconUrl)
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle($"Users blacklisted in {Context.Guild}")
                 .WithDescription(string.Join(", ", blacklist.Select(x => x.Username)));
 

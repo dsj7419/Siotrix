@@ -58,7 +58,7 @@ namespace Siotrix.Discord.Utility
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)
@@ -104,7 +104,7 @@ namespace Siotrix.Discord.Utility
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)
@@ -117,7 +117,6 @@ namespace Siotrix.Discord.Utility
             if (isMod && !isCommand)
             {
                 var modules = _service.Modules.Where(x => x.Name.IcEquals(predicate));
-                Console.WriteLine(">>>>>>>>>>{0}======={1}------{2}", isMod, isCommand, modules.Count());
                 foreach (var module in modules)
                 {
                     var isGroup = module.Aliases.First().Any();
@@ -147,7 +146,6 @@ namespace Siotrix.Discord.Utility
             }
             else if (!isMod && isCommand)
             {
-                Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
                 var command = _service.Commands.Where(x => x.Name.IcEquals(predicate)).FirstOrDefault();
                 hasGroup = command.Module.Aliases.First().Any();
                 var groupName = command.Module.Aliases.First() + " ";

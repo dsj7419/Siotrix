@@ -24,7 +24,7 @@ namespace Siotrix.Discord.Developer
                 embedCount++;
 
                 var builder = new EmbedBuilder()
-                    .WithColor(gColor)
+                    .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                     .WithTitle($"{res.ItemKind}: {res.DisplayName}")
                     .WithUrl(res.Url)
                     .WithDescription(res.Description);

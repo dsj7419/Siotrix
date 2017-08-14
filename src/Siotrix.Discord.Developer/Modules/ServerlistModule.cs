@@ -24,7 +24,7 @@ namespace Siotrix.Discord.Developer
                     x.IsInline = true;
                 });
             embed.Title = "=== Server List ===";
-            embed.Color = gColor;
+            embed.Color = GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex);
             embed.Footer = new EmbedFooterBuilder
             {
                 Text = $"Total Guilds: {client.Guilds.Count}",

@@ -201,13 +201,6 @@ namespace Siotrix.Discord.Developer
         public async Task FooterIconAsync(Uri url)
         {
             var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-
-            if (val == null)
-            {
-                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(SiotrixConstants.BotFooterText, url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             await SiotrixEmbedFooterExtensions.SetSiotrixFooterIcon(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
@@ -229,13 +222,6 @@ namespace Siotrix.Discord.Developer
         public async Task FooterTextAsync([Remainder] string txt)
         {
             var val = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-
-            if (val == null)
-            {
-                await SiotrixEmbedFooterExtensions.CreateSiotrixFooterAsync(txt, SiotrixConstants.BotFooterIcon);
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             await SiotrixEmbedFooterExtensions.SetSiotrixFooterText(val, txt);
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }

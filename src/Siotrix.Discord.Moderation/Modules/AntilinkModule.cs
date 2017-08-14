@@ -30,7 +30,7 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithTitle(title)
-                .WithColor(gColor);
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex));
 
             //  TableExtensions.TableBuilder tb = new TableExtensions.TableBuilder();
             // IEnumerable<Tuple<int, string, bool, bool>> channellist = new[] { Tuple.Create(1, "help", false, false)};
@@ -458,7 +458,7 @@ namespace Siotrix.Discord
 
             var builder = new EmbedBuilder()
                 .WithTitle(title)
-                .WithColor(gColor);
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex));
 
             string isActive = antilink.IsActive ? isActive = "On" : isActive = "Off";
             var channelcount = 0;

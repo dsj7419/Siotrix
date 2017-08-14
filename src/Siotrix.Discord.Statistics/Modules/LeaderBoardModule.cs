@@ -157,7 +157,7 @@ namespace Siotrix.Discord.Statistics
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
                 .WithDescription($"Last 30 days")
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle("Current Leaderboard for " + gName)
                 //  .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()
@@ -191,7 +191,7 @@ namespace Siotrix.Discord.Statistics
             var gName = await Context.GetGuildNameAsync();
             var gUrl = await Context.GetGuildUrlAsync();
             var gColor = await Context.GetGuildColorAsync();
-            var gThumbnail = Context.GetGuildThumbNailAsync();
+            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
             var list = GetLeaderBoardDatasPerGuild(true);
             var getValues = new string[2];
@@ -205,7 +205,7 @@ namespace Siotrix.Discord.Statistics
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
                 .WithDescription($"All Time")
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle("Current Leaderboard for " + gName)
                 //     .WithThumbnailUrl(g_thumbnail)
                 .WithFooter(new EmbedFooterBuilder()

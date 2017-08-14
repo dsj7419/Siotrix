@@ -31,14 +31,6 @@ namespace Siotrix.Discord.Admin
         public async Task FooterIconAsync()
         {
             var val = await Context.GetGuildFooterAsync();
-
-            if (val == null)
-            {
-                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, siotrixVal.FooterIcon);
-                await ReplyAsync(siotrixVal.FooterIcon);
-                return;
-            }
             await ReplyAsync(val.FooterIcon);
         }
 
@@ -50,20 +42,6 @@ namespace Siotrix.Discord.Admin
         public async Task FooterIconAsync(Uri url)
         {
             var val = await Context.GetGuildFooterAsync();
-
-            if (val == null)
-            {
-                if (url.ToString().Equals("reset"))
-                {
-                    await GuildEmbedFooter.CreateDiscordFooterAsync(Context, SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
 
             if (url.ToString().Equals("reset"))
             {
@@ -83,14 +61,6 @@ namespace Siotrix.Discord.Admin
         public async Task FooterTextAsync()
         {
             var val = await Context.GetGuildFooterAsync();
-
-            if (val == null)
-            {               
-                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, siotrixVal.FooterText, siotrixVal.FooterIcon);
-                await ReplyAsync(siotrixVal.FooterText);
-                return;
-            }
             await ReplyAsync(val.FooterText);
         }
 
@@ -103,19 +73,6 @@ namespace Siotrix.Discord.Admin
         {
             var val = await Context.GetGuildFooterAsync();
 
-            if (val == null)
-            {
-                if (txt.Equals("reset"))
-                {
-                    await GuildEmbedFooter.CreateDiscordFooterAsync(Context, SiotrixConstants.BotFooterText, SiotrixConstants.BotFooterIcon);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                var siotrixVal = await SiotrixEmbedFooterExtensions.GetSiotrixFooterAsync();
-                await GuildEmbedFooter.CreateDiscordFooterAsync(Context, txt, siotrixVal.FooterIcon);
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             if (txt.Equals("reset"))
             {
                 await GuildEmbedFooter.SetGuildFooterText(val, SiotrixConstants.BotFooterText);
@@ -134,13 +91,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildThumbNailAsync()
         {
             var val = await Context.GetGuildThumbNailAsync();
-
-            if (val == null)
-            {               
-                await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, SiotrixConstants.BotAvatar);
-                await ReplyAsync(SiotrixConstants.BotAvatar);
-                return;
-            }
             await ReplyAsync(val.ThumbNail);
         }
 
@@ -152,19 +102,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildThumbNailAsync(Uri url)
         {
             var val = await Context.GetGuildThumbNailAsync();
-
-            if (val == null)
-            {
-                if (url.ToString().Equals("reset"))
-                {
-                    await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, SiotrixConstants.BotAvatar);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                await GuildEmbedThumbnail.CreateDiscordGuildThumbNailAsync(Context, url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
 
             if (url.ToString().Equals("reset"))
             {
@@ -185,13 +122,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildWebSiteAsync()
         {
             var val = await Context.GetGuildUrlAsync();
-
-            if (val == null)
-            {
-                await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, SiotrixConstants.BotUrl);
-                await ReplyAsync(SiotrixConstants.BotUrl);
-                return;
-            }
             await ReplyAsync(val.SiteUrl);
         }
 
@@ -204,19 +134,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildWebSiteAsync(Uri url)
         {
             var val = await Context.GetGuildUrlAsync();
-
-            if (val == null)
-            {
-                if (url.ToString().Equals("reset"))
-                {
-                    await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, SiotrixConstants.BotUrl);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                await GuildEmbedUrl.CreateDiscordGuildUrlAsync(Context, url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
 
             if (url.ToString().Equals("reset"))
             {
@@ -238,13 +155,6 @@ namespace Siotrix.Discord.Admin
         {
             var val = await Context.GetGuildDescriptionAsync();
 
-            if (val == null)
-            {
-                await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
-                await ReplyAsync($"No description set for {Context.Guild.Name}");
-                return;
-            }
-
             if (val.Description == null)
             {
                 await ReplyAsync($"No description set for {Context.Guild.Name}");
@@ -262,18 +172,6 @@ namespace Siotrix.Discord.Admin
         {
             var val = await Context.GetGuildDescriptionAsync();
 
-            if (val == null)
-            {
-                if (desc.Trim().Equals("reset"))
-                {
-                    await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                await GuildEmbedDescription.CreateDiscordGuildDescriptionAsync(Context, "");
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
             if (desc.Trim().Equals("reset"))
             {
                 await GuildEmbedDescription.SetGuildDescription(val, "");
@@ -281,7 +179,7 @@ namespace Siotrix.Discord.Admin
                 return;
             }
 
-            await GuildEmbedDescription.SetGuildDescription(val, "");
+            await GuildEmbedDescription.SetGuildDescription(val, desc);
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
         
@@ -297,9 +195,14 @@ namespace Siotrix.Discord.Admin
             var regexRgbCode =
                 new Regex(
                     "^\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*,\\s*(0|[1-9]\\d?|1\\d\\d?|2[0-4]\\d|25[0-5])\\s*$");
-            var currentGColor = Context.GetGuildColorAsync();
+            var currentGColor = await Context.GetGuildColorAsync();
 
-            var currentHexColor = currentGColor.ToString();
+            var preColor = currentGColor.ColorHex;
+
+            if (preColor == "0x000000")
+                preColor = "0x010101";
+            var currentModifiedGColor = new Color(Convert.ToUInt32(preColor, 16));
+            var currentHexColor = currentModifiedGColor.ToString();
 
             if (currentHexColor.Length != 7)
             {
@@ -321,11 +224,8 @@ namespace Siotrix.Discord.Admin
             if (response.Content == "list")
             {
                 var cleanHex = currentHexColor.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
-                var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+                var colornamelower = HexColorDict.ColorName(cleanHex) ?? "no name found"; //look up hex in dictionary
 
-
-                if (colornamelower == null)
-                    colornamelower = "no name found";
 
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
@@ -357,35 +257,10 @@ namespace Siotrix.Discord.Admin
             if (regexColorCode.IsMatch(colorchoice.Trim()))
             {
                 var cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
-                var colornamelower = HexColorDict.ColorName(cleanHex); //look up hex in dictionary
+                var colornamelower = HexColorDict.ColorName(cleanHex) ?? "no name found"; //look up hex in dictionary
 
-                if (colornamelower == null)
-                    colornamelower = "no name found";
 
-                using (var db = new LogDatabase())
-                {
-                    var guildColor = new DiscordColor();
-                    guildColor.ColorHex = cleanHex;
-                    try
-                    {
-                        var arr = db.Gcolors.Where(p => p.GuildId == guildId.ToLong());
-                        if (arr == null || arr.ToList().Count <= 0)
-                        {
-                            db.Gcolors.Add(guildColor);
-                        }
-                        else
-                        {
-                            var data = arr.First();
-                            data.ColorHex = cleanHex;
-                            db.Gcolors.Update(data);
-                        }
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                }
+                await GuildEmbedColorExtensions.SetGuildColor(currentGColor, cleanHex);                
 
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
@@ -411,34 +286,11 @@ namespace Siotrix.Discord.Admin
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
             {
-                var colorhex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
+                var colorHex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
 
-                using (var db = new LogDatabase())
-                {
-                    var guildColor = new DiscordColor();
-                    guildColor.ColorHex = colorhex;
-                    try
-                    {
-                        var arr = db.Gcolors.Where(p => p.GuildId == guildId.ToLong());
-                        if (arr == null || arr.ToList().Count <= 0)
-                        {
-                            db.Gcolors.Add(guildColor);
-                        }
-                        else
-                        {
-                            var data = arr.First();
-                            data.ColorHex = colorhex;
-                            db.Gcolors.Update(data);
-                        }
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                }
+                await GuildEmbedColorExtensions.SetGuildColor(currentGColor, colorHex);
 
-                var cleanhex = colorhex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
+                var cleanhex = colorHex.Replace("0x", "#").ToUpper(); // convert the hex back to #FFFFFF format
 
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colorchoice);
@@ -488,30 +340,7 @@ namespace Siotrix.Discord.Admin
                     var cleanHexLower = cleanHex.ToLower();
                     var colornamelower = HexColorDict.ColorName(cleanHexLower); // get color name
 
-                    using (var db = new LogDatabase())
-                    {
-                        var guildColor = new DiscordColor();
-                        guildColor.ColorHex = cleanHexLower;
-                        try
-                        {
-                            var arr = db.Gcolors.Where(p => p.GuildId == guildId.ToLong());
-                            if (arr == null || arr.ToList().Count <= 0)
-                            {
-                                db.Gcolors.Add(guildColor);
-                            }
-                            else
-                            {
-                                var cdata = arr.First();
-                                cdata.ColorHex = cleanHexLower;
-                                db.Gcolors.Update(cdata);
-                            }
-                            db.SaveChanges();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e);
-                        }
-                    }
+                    await GuildEmbedColorExtensions.SetGuildColor(currentGColor, cleanHexLower);
 
 
                     if (colornamelower == null)

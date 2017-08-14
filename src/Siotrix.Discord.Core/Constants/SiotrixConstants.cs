@@ -14,6 +14,7 @@ namespace Siotrix.Discord
         public const long BotId = 344714431265243136;
         public const string DiscordInv = "https://discord.gg/qRDPXJF";
         public const string BotUrl = "https://discord.gg/qRDPXJF";
+        public const string BotColor = "0x010101";
 
         public const string BotInvite =
             "https://discordapp.com/oauth2/authorize?client_id=344714431265243136&scope=bot&permissions=2097176631";

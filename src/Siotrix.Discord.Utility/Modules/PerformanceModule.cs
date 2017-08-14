@@ -64,7 +64,7 @@ namespace Siotrix.Discord.Utility
                     .WithText($"{Context.User.Username}#{Context.User.Discriminator}"))
                 .WithTimestamp(DateTime.UtcNow);
 
-            builder.Color = gColor;
+            builder.Color = GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex);
             builder.ThumbnailUrl = gThumbnail.ThumbNail;
 
             var desc = $"**Uptime:** {GetUptime()}\n" +

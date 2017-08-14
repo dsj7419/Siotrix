@@ -155,7 +155,7 @@ namespace Siotrix.Discord.Moderation
 
             var eb = new EmbedBuilder
             {
-                Color = gColor,
+                Color = GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex),
                 Title = $"Roles in {Context.Guild.Name}",
                 Footer = new EmbedFooterBuilder
                 {

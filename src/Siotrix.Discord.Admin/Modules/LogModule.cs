@@ -253,7 +253,7 @@ namespace Siotrix.Discord.Admin
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithThumbnailUrl(gThumbnail.ThumbNail)
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)

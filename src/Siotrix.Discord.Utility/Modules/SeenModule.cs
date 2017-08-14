@@ -145,7 +145,7 @@ namespace Siotrix.Discord.Utility
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(avatar)
                     .WithName(name));
-            embed.WithColor(gColor);
+            embed.WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex));
 
             if (description != null)
                 embed.WithDescription(description);

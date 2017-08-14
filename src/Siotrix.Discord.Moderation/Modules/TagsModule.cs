@@ -34,7 +34,7 @@ namespace Siotrix.Discord.Moderation
 
             var builder = new EmbedBuilder()
                 .WithThumbnailUrl(Context.Guild.IconUrl)
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle($"Tags for {Context.Guild}")
                 .WithDescription(string.Join(", ", tags.Select(x => x.Name.ToString())));
 

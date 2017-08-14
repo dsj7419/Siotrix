@@ -52,7 +52,7 @@ namespace Siotrix.Discord.Developer
             foreach (var res in filteredRes.Take(3))
             {
                 var builder = new EmbedBuilder()
-                    .WithColor(gColor)
+                    .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                     .WithTitle($"{res.Score}: {WebUtility.HtmlDecode(res.Title)}")
                     .WithUrl(res.Link);
 
@@ -61,7 +61,7 @@ namespace Siotrix.Discord.Developer
             }
 
             var footer = new EmbedBuilder()
-                .WithColor(gColor)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithFooter(
                     new EmbedFooterBuilder().WithText($"tags: {tags} | site: {site}. [site=stackexchange tags=c#]"));
             footer.Build();

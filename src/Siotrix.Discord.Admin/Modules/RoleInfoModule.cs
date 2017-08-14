@@ -31,7 +31,7 @@ namespace Siotrix.Discord.Admin.Modules
             var gColor =  await Context.GetGuildColorAsync();
 
             var embed = new EmbedBuilder();
-            embed.Color = gColor;
+            embed.Color = GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex);
             embed.Title = "Role Infomation";
 
             embed.AddField(x =>
