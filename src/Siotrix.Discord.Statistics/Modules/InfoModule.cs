@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord.Statistics
 {
@@ -164,17 +165,23 @@ namespace Siotrix.Discord.Statistics
             return arr;
         }
 
-        private string GetLastMessageTime(SocketUser user)
+        private async Task<string> GetLastMessageTime(SocketUser target)
         {
             var last = "-";
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    if (db.Messages.Where(p => !p.IsBot && p.AuthorId == user.Id.ToLong()).ToList().Count > 0)
+                    if (db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).ToList().Count > 0)
                     {
-                        var date = db.Messages.Where(p => !p.IsBot && p.AuthorId == user.Id.ToLong()).Last().CreatedAt;
+                        /*  var date = db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).Last()
+                              .CreatedAt; */
+                        var date = await db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
                         last = string.Format("{0:dddd, MMMM d, yyyy}", date);
+                    }
+                    else
+                    {
+                        last = "No recorded message from user in this guild.";
                     }
                 }
                 catch (Exception e)
@@ -345,7 +352,7 @@ namespace Siotrix.Discord.Statistics
                 else
                     daysOldConcat = joinDate + " | " + daysOld + " days ago.";
 
-                var lastSeen = GetLastMessageTime(user);
+                var lastSeen = await GetLastMessageTime(user);
                 builder
                     .WithTitle("General Information sheet for " + Context.Guild.GetUser(user.Id).Username)
                     .WithThumbnailUrl(person.GetAvatarUrl())

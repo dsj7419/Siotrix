@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord.Utility
 {
@@ -24,7 +25,7 @@ namespace Siotrix.Discord.Utility
                 return;
             }
 
-            var lastSeen = GetLastMessageTime(target);
+            var lastSeen = await GetLastMessageTime(target);
             var name = $"{target.Username} was last seen on {lastSeen}";
 
             if (lastSeen == "No recorded message from user in this guild.")
@@ -60,7 +61,7 @@ namespace Siotrix.Discord.Utility
         }
 
 
-        private string GetLastMessageTime(SocketUser target)
+        private static async Task<string> GetLastMessageTime(SocketUser target)
         {
             var last = "-";
             using (var db = new LogDatabase())
@@ -69,8 +70,9 @@ namespace Siotrix.Discord.Utility
                 {
                     if (db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).ToList().Count > 0)
                     {
-                        var date = db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).Last()
-                            .CreatedAt;
+                      /*  var date = db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).Last()
+                            .CreatedAt; */
+                        var date = await db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
                         last = string.Format("{0:dddd, MMMM d, yyyy}", date);
                     }
                     else
