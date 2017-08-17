@@ -91,5 +91,27 @@ namespace Siotrix.Discord
                 "cset",
                 "help"
             });
+
+        public static ReadOnlyCollection<string> LogNamesCommandList = new ReadOnlyCollection<string>(
+            new List<string>
+            {
+                "user_join",
+                "user_leave",
+                "message_edit",
+                "message_deleted",
+                "user_muted",
+                "user_unmuted",
+                "role_created",
+                "role_deleted",
+                "role_modified",
+                "role_assigned",
+                "role_removed",
+                "username",
+                "nickname",
+                "blacklist",
+                "deblacklist",
+                "antilink_assigned",
+                "antilink_removed"
+            });
     }
 }
