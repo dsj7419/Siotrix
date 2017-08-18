@@ -36,35 +36,38 @@ namespace Siotrix.Discord.Admin
             var title = $"Logs Information for {Context.Guild.Name}";
 
             var modLogChannel = await LogsToggleExtensions.GetModLogChannelAsync(Context.Guild.Id);
-            description = $"Current moderation log information:\n\n";
+            description = $"**Current moderation log information:**\n\n";
 
             if (modLogChannel != null)
             {
+                bool isFound = false;
                 string isActive = modLogChannel.IsActive ? isActive = "ON" : isActive = "OFF";
                 foreach (var channel in Context.Guild.Channels)
                     if (channel.Id.ToLong() == modLogChannel.ChannelId)
                     {
                         description +=
                             $"Current channel: **{channel.Name}** Moderation logging is currently set to: **{isActive}**\n\n";
+                        isFound = true;
                     }
-                    else
-                    {
-                        await LogsToggleExtensions.DeleteModLogChannelAsync(modLogChannel);
-                        description +=
-                            $"Moderation channel has not yet been set. Please use: {prefix}logs logchannel #channelname\n\n";
-                    }
+
+                if (isFound == false)
+                {
+                    await LogsToggleExtensions.DeleteModLogChannelAsync(modLogChannel);                 
+                }
+
             }
             else
             {
                 description +=
-                    $"Moderation channel has not yet been set. Please use: {prefix}logs modlogchannel #channelname\n\n";
+                    $"Moderation channel has not yet been set.\n Please use: {prefix.Prefix}logs modlogchannel #channelname\n\n";
             }
 
             var logChannel = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
-            description = $"Current general log information:\n\n";
+            description += $"**Current general log information:**\n\n";
 
             if (logChannel != null)
             {
+                bool isFound = false;
                 string isActive = logChannel.IsActive ? isActive = "ON" : isActive = "OFF";
                 foreach (var channel in Context.Guild.Channels)
                     if (channel.Id.ToLong() == logChannel.ChannelId)
@@ -73,6 +76,7 @@ namespace Siotrix.Discord.Admin
 
                         description +=
                             $"Current channel: **{channel.Name}** general logging is currently set to: **{isActive}**\n\n";
+                        isFound = true;
 
                         if (val.Count() > 0)
                         {
@@ -82,22 +86,26 @@ namespace Siotrix.Discord.Admin
                         else
                         {
                             description +=
-                                $"Currently no activated logs in the logging channel. Please use {prefix.Prefix}logs togglelog (logname) to add to the active channel.";
+                                $"Currently no activated logs in the logging channel.\n Please use {prefix.Prefix}logs togglelog (logname) to add to the active channel.\n\n";
                         }
 
                     }
-                    else
-                    {
-                        await LogsToggleExtensions.DeleteLogChannelAsync(logChannel);
-                        description +=
-                            $"General logging channel has not yet been set. Please use: {prefix.Prefix}logs logchannel #channelname\n\n";
-                    }
-            }
+                if (isFound == false)
+                {
+                    await LogsToggleExtensions.DeleteLogChannelAsync(logChannel);
+                }
+            } 
             else
             {
                 description +=
-                    $"General logging channel has not yet been set. Please use: {prefix.Prefix}logs logchannel #channelname\n\n";
-            }
+                    $"General logging channel has not yet been set.\n Please use: {prefix.Prefix}logs logchannel #channelname\n\n";
+            }            
+
+            var builder = new EmbedBuilder()
+                .WithTitle(title)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
+                .WithDescription(description);
+            await ReplyAsync("", embed: builder);
         }
 
         [Command("logchannel")]
@@ -204,13 +212,13 @@ namespace Siotrix.Discord.Admin
                 if (logNameGuild == null)
                 {
                     await LogsToggleExtensions.CreateLogToggleAsync(Context.Guild.Id, name);
-                    await ReplyAsync($"{name} has been **activated** for reporting.");
+                    await ReplyAsync($"{name.ToLower()} has been **activated** for reporting.");
                     return;
                 }
                 else
                 {
                     await LogsToggleExtensions.DeleteLogToggleAsync(logNameGuild);
-                    await ReplyAsync($"{name} has been **de-activated** for reporting.");
+                    await ReplyAsync($"{name.ToLower()} has been **de-activated** for reporting.");
                     return;
                 }
             }

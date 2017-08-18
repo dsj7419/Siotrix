@@ -231,7 +231,7 @@ namespace Siotrix.Discord
 
         public static async Task CreateLogToggleAsync(ulong guildId, string logName)
         {
-            var newLog = new DiscordGuildLogsToggle(guildId.ToLong(), logName);
+            var newLog = new DiscordGuildLogsToggle(guildId.ToLong(), logName.ToLower());
             using (var db = new LogDatabase())
             {
                 try
