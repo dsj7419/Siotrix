@@ -30,7 +30,74 @@ namespace Siotrix.Discord.Admin
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task LogInfoAsync()
         {
-            
+            var gColor = await Context.GetGuildColorAsync();
+            var prefix = await Context.GetGuildPrefixAsync();
+            var description = "";
+            var title = $"Logs Information for {Context.Guild.Name}";
+
+            var modLogChannel = await LogsToggleExtensions.GetModLogChannelAsync(Context.Guild.Id);
+            description = $"Current moderation log information:\n\n";
+
+            if (modLogChannel != null)
+            {
+                string isActive = modLogChannel.IsActive ? isActive = "ON" : isActive = "OFF";
+                foreach (var channel in Context.Guild.Channels)
+                    if (channel.Id.ToLong() == modLogChannel.ChannelId)
+                    {
+                        description +=
+                            $"Current channel: **{channel.Name}** Moderation logging is currently set to: **{isActive}**\n\n";
+                    }
+                    else
+                    {
+                        await LogsToggleExtensions.DeleteModLogChannelAsync(modLogChannel);
+                        description +=
+                            $"Moderation channel has not yet been set. Please use: {prefix}logs logchannel #channelname\n\n";
+                    }
+            }
+            else
+            {
+                description +=
+                    $"Moderation channel has not yet been set. Please use: {prefix}logs modlogchannel #channelname\n\n";
+            }
+
+            var logChannel = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
+            description = $"Current general log information:\n\n";
+
+            if (logChannel != null)
+            {
+                string isActive = logChannel.IsActive ? isActive = "ON" : isActive = "OFF";
+                foreach (var channel in Context.Guild.Channels)
+                    if (channel.Id.ToLong() == logChannel.ChannelId)
+                    {
+                        var val = await LogsToggleExtensions.GetLogsToggleAsync(Context.Guild);
+
+                        description +=
+                            $"Current channel: **{channel.Name}** general logging is currently set to: **{isActive}**\n\n";
+
+                        if (val.Count() > 0)
+                        {
+                            description +=
+                                $"Current activated logs: {string.Join(", ", val.Select(x => x.LogName.ToString()))}";
+                        }
+                        else
+                        {
+                            description +=
+                                $"Currently no activated logs in the logging channel. Please use {prefix.Prefix}logs togglelog (logname) to add to the active channel.";
+                        }
+
+                    }
+                    else
+                    {
+                        await LogsToggleExtensions.DeleteLogChannelAsync(logChannel);
+                        description +=
+                            $"General logging channel has not yet been set. Please use: {prefix.Prefix}logs logchannel #channelname\n\n";
+                    }
+            }
+            else
+            {
+                description +=
+                    $"General logging channel has not yet been set. Please use: {prefix.Prefix}logs logchannel #channelname\n\n";
+            }
         }
 
         [Command("logchannel")]
@@ -78,7 +145,7 @@ namespace Siotrix.Discord.Admin
         [Command("togglelog")]
         [Summary("toggle various logs on and off, including toggling on and off logchannel and modlogchannel.")]
         [Remarks(
-            "(logchannel | modlogchannel | specific log) logchannel or modlogchannel will toggle master channel on/off. type list to see a list of specific logs you can toggle.")]
+            "(logchannel | modlogchannel | specific log) logchannel or modlogchannel will toggle master channel on/off.")]
         [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task ToggleLogsAsync([Remainder] string name)
         {
@@ -127,7 +194,39 @@ namespace Siotrix.Discord.Admin
                 await ReplyAsync("All moderator logging has been enabled for this guild.");
                 return;
             }
+
+        //    var logsToggled = LogsToggleExtensions.GetLogsToggleAsync(Context.Guild);
+
+            if (SiotrixConstants.LogNamesCommandList.Contains(name, StringComparer.OrdinalIgnoreCase))
+            {
+                var logNameGuild = await LogsToggleExtensions.GetLogToggleAsync(Context.Guild.Id, name.ToLower());
+
+                if (logNameGuild == null)
+                {
+                    await LogsToggleExtensions.CreateLogToggleAsync(Context.Guild.Id, name);
+                    await ReplyAsync($"{name} has been **activated** for reporting.");
+                    return;
+                }
+                else
+                {
+                    await LogsToggleExtensions.DeleteLogToggleAsync(logNameGuild);
+                    await ReplyAsync($"{name} has been **de-activated** for reporting.");
+                    return;
+                }
+            }
+            else
+            {
+                var gColor = await Context.GetGuildColorAsync();
+                var builder = new EmbedBuilder()
+                    .WithThumbnailUrl(Context.Guild.IconUrl)
+                    .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
+                    .WithTitle($"Available log names to turn on/off in {Context.Guild}")
+                    .WithDescription(string.Join(", ", SiotrixConstants.LogNamesCommandList));
+
+                await ReplyAsync("", embed: builder);
+            }
         }
+
 
 
 

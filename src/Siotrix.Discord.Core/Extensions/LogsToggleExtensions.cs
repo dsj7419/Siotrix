@@ -48,6 +48,22 @@ namespace Siotrix.Discord
             }
         }
 
+        public static async Task DeleteLogChannelAsync(DiscordGuildLogChannel logChannel)
+        {
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Glogchannels.Remove(logChannel);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
         public static async Task SetLogChannel(DiscordGuildLogChannel logChannel, SocketChannel channel)
         {
             logChannel.SetLogChannel(channel.Id.ToLong());
@@ -114,6 +130,22 @@ namespace Siotrix.Discord
                 try
                 {
                     await db.Gmodlogchannels.AddAsync(logChannel);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+        public static async Task DeleteModLogChannelAsync(DiscordGuildModLogChannel logChannel)
+        {
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Gmodlogchannels.Remove(logChannel);
                     await db.SaveChangesAsync().ConfigureAwait(false);
                 }
                 catch (Exception e)
