@@ -255,7 +255,11 @@ namespace Siotrix.Discord.Admin
 
             if (regexColorCode.IsMatch(colorchoice.Trim()))
             {
+                if (colorchoice.Trim() == "#000000")
+                    colorchoice = "#010101";
+
                 var cleanHex = colorchoice.Replace("#", "0x").ToLower(); //strip # and add 0x for dictionary search
+
                 var colornamelower = HexColorDict.ColorName(cleanHex) ?? "no name found"; //look up hex in dictionary
 
 
@@ -285,6 +289,9 @@ namespace Siotrix.Discord.Admin
             }
             else if (HexColorDict.colorHex.ContainsKey(colorchoice))
             {
+                if (colorchoice.ToLower() == "black")
+                    colorchoice = "black (for Discord)";
+
                 var colorHex = HexColorDict.ColorHex(colorchoice); // look up hex in color name Dictionary
 
                 await GuildEmbedColorExtensions.SetGuildColor(currentGColor, colorHex);
@@ -318,7 +325,10 @@ namespace Siotrix.Discord.Admin
                 var data = new RgBtoHex.Rgb((byte) red, (byte) green,
                     (byte) blue); // convert broken out ints into a data struct - prep for conversion
 
-                var colorhex = RgBtoHex.RgbToHexadecimal(data); // convert RGB input into hex           
+                var colorhex = RgBtoHex.RgbToHexadecimal(data); // convert RGB input into hex      
+
+                if(colorhex == "#000000")
+                    colorhex = "#010101";
 
                 if (!regexColorCode.IsMatch(colorhex))
                 {
@@ -337,6 +347,7 @@ namespace Siotrix.Discord.Admin
                     var hexcolorcaps = colorhex.ToUpper();
 
                     var cleanHexLower = cleanHex.ToLower();
+
                     var colornamelower = HexColorDict.ColorName(cleanHexLower); // get color name
 
                     await GuildEmbedColorExtensions.SetGuildColor(currentGColor, cleanHexLower);

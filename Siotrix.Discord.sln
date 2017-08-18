@@ -12,6 +12,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Discord.Core", "src\Siotrix.Discord.Core\Siotrix.Discord.Core.csproj", "{821EA31B-26C3-408C-95C6-2ABF3E79A093}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{DA9CA05E-8CE3-4413-89E2-311F8C6E748A}"
+	ProjectSection(SolutionItems) = preProject
+		src\Siotrix.Discord.Core\Utility\EntityHelper.cs = src\Siotrix.Discord.Core\Utility\EntityHelper.cs
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Siotrix.Discord.Moderation", "src\Siotrix.Discord.Moderation\Siotrix.Discord.Moderation.csproj", "{3B3D8F44-B4D6-415D-A110-7B14C1FB9835}"
 EndProject

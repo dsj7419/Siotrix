@@ -36,7 +36,7 @@ namespace Siotrix.Discord.Admin
             var title = $"Logs Information for {Context.Guild.Name}";
 
             var modLogChannel = await LogsToggleExtensions.GetModLogChannelAsync(Context.Guild.Id);
-            description = $"**Current moderation log information:**\n\n";
+            description = $"**Current moderation log information:**\n";
 
             if (modLogChannel != null)
             {
@@ -63,7 +63,7 @@ namespace Siotrix.Discord.Admin
             }
 
             var logChannel = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
-            description += $"**Current general log information:**\n\n";
+            description += $"**Current general log information:**\n";
 
             if (logChannel != null)
             {
