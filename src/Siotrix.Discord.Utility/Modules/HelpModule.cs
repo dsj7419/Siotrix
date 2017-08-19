@@ -158,10 +158,10 @@ namespace Siotrix.Discord.Utility
                         var cmdName = ele.Name + " ";
                         if (!hasGroup)
                             elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {gPrefix}{cmdName}{ele.Remarks}```\n";
+                                                           $"```Usage : {gPrefix.Prefix}{cmdName}{ele.Remarks}```\n";
                         else
                             elementSummaryRemarkList += $"[Option - {elementIndex}] " + $"**{ele.Summary}**\n" +
-                                                           $"```Usage : {gPrefix}{groupName}{cmdName}{ele.Remarks}```\n";
+                                                           $"```Usage : {gPrefix.Prefix}{groupName}{cmdName}{ele.Remarks}```\n";
                     }
                     builder
                         .AddField(x =>
@@ -174,9 +174,9 @@ namespace Siotrix.Discord.Utility
                 {
                     summary = $"**{command.Summary}**";
                     if (!hasGroup)
-                        remark = $"```Usage : {gPrefix}{command.Name} {command.Remarks}```";
+                        remark = $"```Usage : {gPrefix.Prefix}{command.Name} {command.Remarks}```";
                     else
-                        remark = $"```Usage : {gPrefix}{groupName}{command.Name} {command.Remarks}```";
+                        remark = $"```Usage : {gPrefix.Prefix}{groupName}{command.Name} {command.Remarks}```";
                     builder
                         .AddField(x =>
                         {
@@ -210,7 +210,7 @@ namespace Siotrix.Discord.Utility
                                             unnameCommandIndex++;
                                             unnameCommmandSummaryRemarkList +=
                                                 $"[Option - {unnameCommandIndex}] " + $"**{subCmd.Summary}**\n" +
-                                                $"```Usage : {gPrefix}{subCmd.Aliases.First()} {subCmd.Remarks}```\n";
+                                                $"```Usage : {gPrefix.Prefix}{subCmd.Aliases.First()} {subCmd.Remarks}```\n";
                                             continue;
                                         }
                                     }

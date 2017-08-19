@@ -171,7 +171,6 @@ namespace Siotrix.Discord
             }
             else if (!isMod && isCommand)
             {
-                Console.WriteLine(">>>>>>>>>>{0}======={1}", isMod, isCommand);
                 var command = _commands.Commands.Where(x => x.Name.IcEquals(predicate)).FirstOrDefault();
                 hasGroup = command.Module.Aliases.First().Any();
                 var groupName = command.Module.Aliases.First() + " ";

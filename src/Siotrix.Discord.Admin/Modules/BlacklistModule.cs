@@ -65,6 +65,19 @@ namespace Siotrix.Discord
             await BlacklistExtensions.CreateBlacklistUserAsync(Context, user);
             await ReplyAsync(
                 $"{user.Mention} has officially been blacklisted from using Siotrix commands in {Context.Guild.Name}.");
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(Context.Guild.Id, "blacklist");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+            {
+                var logChannel = Context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                        .WithIconUrl(user.GetAvatarUrl())
+                        .WithName(user.Id + " has been blacklisted."))
+                    .WithColor(new Color(0, 0, 0));
+                await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
         }
 
         [Command("remove")]
@@ -85,6 +98,20 @@ namespace Siotrix.Discord
             await BlacklistExtensions.DeleteBlacklistUserAsync(blacklistedUser);
             await ReplyAsync(
                 $"{user.Mention} has been removed from the blacklist, and can use Siotrix commands again in {Context.Guild.Name}.");
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(Context.Guild.Id, "deblacklist");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+            {
+                var logChannel = Context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                        .WithIconUrl(user.GetAvatarUrl())
+                        .WithName(user.Id + " has been de-blacklisted."))
+                    .WithColor(new Color(0, 0, 0));
+                await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
+
         }
 
         private bool HasTags(object obj, IEnumerable<DiscordGuildBlacklist> blacklist)

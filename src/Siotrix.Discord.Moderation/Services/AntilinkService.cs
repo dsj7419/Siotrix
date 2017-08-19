@@ -82,20 +82,37 @@ namespace Siotrix.Discord.Moderation
                 else if (antilinkUser != null && antilinkUser.IsOneTime)
                 {
                     await AntilinkExtensions.DeleteAntilinkUserAsync(antilinkUser);
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "antilink_removed");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
+                    if (logToggled.IsActive && channelToggle != null)
+                    {
+                        var logChannel = context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                        var builder = new EmbedBuilder()
+                            .WithAuthor(new EmbedAuthorBuilder()
+                                .WithIconUrl(user.GetAvatarUrl())
+                                .WithName(user.Id + " has used their hyperlink authorization, and permissions have been revoked."))
+                            .WithColor(new Color(100, 80, 0));
+                        await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+                    }
                 }
                 else
                 {
-                    LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
-                    var channelLog =
-                        context.Guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
-                    var builder = new EmbedBuilder()
-                        .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(msg.Author.GetAvatarUrl())
-                            .WithName("Removed Message - Broke Hyperlink Rules in " + channel.Name + ": " +
-                                      message.Content + " " + msg.Author.Username + "#" + msg.Author.Discriminator +
-                                      user.Mention))
-                        .WithColor(new Color(255, 127, 0));
-                    await channelLog.SendMessageAsync("", false, builder.Build());
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "antilink_violation");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
+                    if (logToggled.IsActive && channelToggle != null)
+                    {
+                        var logChannel = context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                        var builder = new EmbedBuilder()
+                            .WithAuthor(new EmbedAuthorBuilder()
+                                .WithIconUrl(msg.Author.GetAvatarUrl())
+                                .WithName("Removed Message - Broke Hyperlink Rules in " + channel.Name + ": " +
+                                          message.Content + " " + msg.Author.Username + "#" + msg.Author.Discriminator +
+                                          user.Mention))
+                            .WithColor(new Color(255, 127, 0));
+                        await logChannel.SendMessageAsync("", false, builder.Build());
+                    }
 
                     if (antilink.IsDmMessage)
                         await MessageExtensions.DmUser(user, antilink.DmMessage);

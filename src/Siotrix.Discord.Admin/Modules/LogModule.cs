@@ -165,7 +165,7 @@ namespace Siotrix.Discord.Admin
                 {
                     var prefix = await Context.GetGuildPrefixAsync();
                     await ReplyAsync(
-                        $"Channel has not been set. Please use {prefix}logs logchannel #channelname to set your channel and activate general logging.");
+                        $"Channel has not been set. Please use {prefix.Prefix}logs logchannel #channelname to set your channel and activate general logging.");
                     return;
                 }
                 var isActive = logChannel.IsActive;
@@ -188,7 +188,7 @@ namespace Siotrix.Discord.Admin
                 {
                     var prefix = await Context.GetGuildPrefixAsync();
                     await ReplyAsync(
-                        $"Channel has not been set. Please use {prefix}logs modlogchannel #channelname to set your channel and activate moderator logging.");
+                        $"Channel has not been set. Please use {prefix.Prefix}logs modlogchannel #channelname to set your channel and activate moderator logging.");
                     return;
                 }
                 var isActive = modLogChannel.IsActive;
@@ -202,8 +202,6 @@ namespace Siotrix.Discord.Admin
                 await ReplyAsync("All moderator logging has been enabled for this guild.");
                 return;
             }
-
-        //    var logsToggled = LogsToggleExtensions.GetLogsToggleAsync(Context.Guild);
 
             if (SiotrixConstants.LogNamesCommandList.Contains(name, StringComparer.OrdinalIgnoreCase))
             {

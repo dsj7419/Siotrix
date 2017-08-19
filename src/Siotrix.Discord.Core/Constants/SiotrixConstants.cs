@@ -101,6 +101,8 @@ namespace Siotrix.Discord
                 "message_deleted",
                 "user_muted",
                 "user_unmuted",
+                "user_banned",
+                "user_unbanned",
                 "role_created",
                 "role_deleted",
                 "role_modified",
@@ -111,7 +113,8 @@ namespace Siotrix.Discord
                 "blacklist",
                 "deblacklist",
                 "antilink_assigned",
-                "antilink_removed"
+                "antilink_removed",
+                "antilink_violation"
             });
     }
 }

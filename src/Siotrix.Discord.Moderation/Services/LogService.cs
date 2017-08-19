@@ -91,11 +91,11 @@ namespace Siotrix.Discord.Moderation
                         unmutes = "text";
                         break;
                     case MuteExtensions.MuteType.All:
-                        unmutes = "all";
+                        unmutes = "fully";
                         break;
                 }
                 if (isAuto)
-                    unmuteData = user.Username + "#" + user.Discriminator + " has been auto " + unmutes + " unmuted.";
+                    unmuteData = user.Username + "#" + user.Discriminator + " has been " + unmutes + " unmuted automatically.";
                 else
                     unmuteData = user.Username + "#" + user.Discriminator + " has been " + unmutes + " unmuted by " +
                                   context.User.Username + "#" + context.User.Discriminator + ".";
@@ -104,7 +104,11 @@ namespace Siotrix.Discord.Moderation
                         .WithIconUrl(user.GetAvatarUrl())
                         .WithName(unmuteData))
                     .WithColor(new Color(127, 255, 127));
-                if (!LogChannelExtensions.IsToggledLog)
+
+                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "user_unmuted");
+                var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
+               if(logToggled.IsActive && channelToggle != null)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
                 var gIconUrl = await context.GetGuildIconUrlAsync();
@@ -134,7 +138,7 @@ namespace Siotrix.Discord.Moderation
                 else
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.User.Username + " (" + context.User.Id + ")" + "\n" +
-                            "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
+                            "Reason : Type " + gPrefix.Prefix + "reason " + caseId + "<reason> to add it.";
                 modBuilder
                     .AddField(x =>
                     {
@@ -182,12 +186,12 @@ namespace Siotrix.Discord.Moderation
                         mutes = "text";
                         break;
                     case MuteExtensions.MuteType.All:
-                        mutes = "all";
+                        mutes = "fully";
                         break;
                 }
 
                 if (isAuto)
-                    muteData = user.Username + "#" + user.Discriminator + " has been auto " + mutes + " muted.";
+                    muteData = user.Username + "#" + user.Discriminator + " has been " + mutes + " muted automatically.";
                 else
                     muteData = user.Username + "#" + user.Discriminator + " has been " + mutes + " muted by " +
                                 context.User.Username + "#" + context.User.Discriminator + ".";
@@ -196,7 +200,11 @@ namespace Siotrix.Discord.Moderation
                         .WithIconUrl(user.GetAvatarUrl())
                         .WithName(muteData))
                     .WithColor(new Color(127, 255, 0));
-                if (!LogChannelExtensions.IsToggledLog)
+
+                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "user_muted");
+                var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
+                if (logToggled.IsActive && channelToggle != null)
                     await channel.SendMessageAsync(user.Mention, false, builder.Build());
 
                 var gIconUrl = await context.GetGuildIconUrlAsync();
@@ -227,7 +235,7 @@ namespace Siotrix.Discord.Moderation
                     value = "User : " + user.Mention + " (" + user.Id + ")" + "\n" + "Moderator : " +
                             context.User.Username + " (" + context.User.Id + ")" + "\n" +
                             "Length : " + minutes + "minutes" + "\n" +
-                            "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
+                            "Reason : Type " + gPrefix.Prefix + "reason " + caseId + "<reason> to add it.";
                 modBuilder
                     .AddField(x =>
                     {
@@ -403,7 +411,12 @@ namespace Siotrix.Discord.Moderation
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName("Role has been deleted."))
                 .WithColor(new Color(255, 0, 0));
-            await logChannel.SendMessageAsync("", false, builder.Build());
+
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(role.Guild.Id, "role_deleted");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(role.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+                await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnRoleUpdatedAsync(SocketRole role, SocketRole updateRole)
@@ -466,7 +479,12 @@ namespace Siotrix.Discord.Moderation
             else
                 builder.WithAuthor(new EmbedAuthorBuilder()
                     .WithName($"{updateRole.Name} role has been updated."));
-            await logChannel.SendMessageAsync("", false, builder.Build());
+
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(role.Guild.Id, "role_modified");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(role.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+                await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnRoleCreatedAsync(SocketRole role)
@@ -477,7 +495,12 @@ namespace Siotrix.Discord.Moderation
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName("Role has been created."))
                 .WithColor(new Color(127, 255, 0));
-            await logChannel.SendMessageAsync("", false, builder.Build());
+
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(role.Guild.Id, "role_created");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(role.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+                await logChannel.SendMessageAsync("", false, builder.Build());
         }
 
         private async Task OnMessageReceivedAsync(SocketMessage message)
@@ -531,7 +554,10 @@ namespace Siotrix.Discord.Moderation
                             .WithIconUrl(user.GetAvatarUrl())
                             .WithName(userIdentifier + " has been " + action + " by " + modIdentifier))
                         .WithColor(actionColor);
-                    if (!LogChannelExtensions.IsToggledLog)
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "user_banned");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
+                    if (logToggled.IsActive && channelToggle != null)
                         await channel.SendMessageAsync(userMention, false, builder.Build());
 
                     var gIconUrl = await context.GetGuildIconUrlAsync();
@@ -560,7 +586,7 @@ namespace Siotrix.Discord.Moderation
                             x.Value = "User : " + user.Mention + " (" + user.Id.ToString() + ")" + "\n" +
                                       "Moderator : " +
                                       context.User.Username + " (" + context.User.Id.ToString() + ")" + "\n" +
-                                      "Reason : Type " + gPrefix + "reason " + caseId + "<reason> to add it.";
+                                      "Reason : Type " + gPrefix.Prefix + "reason " + caseId + "<reason> to add it.";
                         });
                     if (!LogChannelExtensions.IsToggledModlog)
                     {
@@ -601,7 +627,10 @@ namespace Siotrix.Discord.Moderation
                                          "After: " + message.Content)
                         .WithColor(new Color(0, 127, 255));
 
-                    if (!LogChannelExtensions.IsToggledLog)
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_edit");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+
+                    if (logToggled.IsActive && channelToggle != null)
                         await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
             }
@@ -611,6 +640,7 @@ namespace Siotrix.Discord.Moderation
         {
             var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             var builder = new EmbedBuilder();
+            var msg = await _db.GetMessageAsync(cachemsg.Id);
             var numberOfCleanupMessages = MessageExtensions.NumberOfMessages;
             if (numberOfCleanupMessages > 0)
             {
@@ -621,11 +651,15 @@ namespace Siotrix.Discord.Moderation
                         .WithName(cleanupUser.Username + "#" + cleanupUser.Discriminator + " has deleted " +
                                   numberOfCleanupMessages + " messages."))
                     .WithColor(new Color(0, 127, 127));
-                await logChannel.SendMessageAsync("", false, builder.Build());
+
+                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+                var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+
+                if (logToggled.IsActive && channelToggle != null)
+                    await logChannel.SendMessageAsync("", false, builder.Build());
             }
             else
             {
-                var msg = await _db.GetMessageAsync(cachemsg.Id);
                 if (!msg.IsBot)
                 {
                     LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
@@ -637,7 +671,10 @@ namespace Siotrix.Discord.Moderation
                             .WithIconUrl(user.GetAvatarUrl())
                             .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
                         .WithColor(new Color(0, 127, 127));
-                    if (!LogChannelExtensions.IsToggledLog)
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+
+                    if (logToggled.IsActive && channelToggle != null)
                         await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
                 }
             }
@@ -724,7 +761,10 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Username + "#" + user.Discriminator + " has joined."))
                 .WithColor(new Color(0, 255, 127));
-            if (!LogChannelExtensions.IsToggledLog)
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(user.Guild.Id, "user_join");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(user.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
                 await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
             await announceChannel.SendMessageAsync(ReplaceInfo(user, customMessage));
         }
@@ -760,7 +800,10 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Id + " has been unbanned."))
                 .WithColor(new Color(255, 255, 127));
-            if (!LogChannelExtensions.IsToggledLog)
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(guild.Id, "user_unbanned");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
                 await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
         }
 
@@ -777,7 +820,10 @@ namespace Siotrix.Discord.Moderation
                     .WithIconUrl(user.GetAvatarUrl())
                     .WithName(user.Username + "#" + user.Discriminator + " has left."))
                 .WithColor(new Color(0, 0, 127));
-            if (!LogChannelExtensions.IsToggledLog)
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(user.Guild.Id, "user_leave");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(user.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
                 await logChannel.SendMessageAsync("", false, builder.Build());
             await announceChannel.SendMessageAsync(ReplaceInfo(user, customMessage));
         }
@@ -799,7 +845,11 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has lost role: {role.Name}"))
                         .WithColor(new Color(255, 67, 164));
-                    await logChannel.SendMessageAsync("", false, builder.Build());
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(b.Guild.Id, "role_removed");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync(b.Guild.Id);
+
+                    if (logToggled.IsActive && channelToggle != null)
+                        await logChannel.SendMessageAsync("", false, builder.Build());
                 }
             }
             else
@@ -813,9 +863,13 @@ namespace Siotrix.Discord.Moderation
                             .WithName(
                                 $"{b.Nickname ?? b.Username}#{b.Discriminator} ({b.Id}) has gained role: {role.Name}"))
                         .WithColor(new Color(67, 255, 164));
-                    await logChannel.SendMessageAsync("", false, builder.Build());
+                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(b.Guild.Id, "role_assigned");
+                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync(b.Guild.Id);
+
+                    if (logToggled.IsActive && channelToggle != null)
+                        await logChannel.SendMessageAsync("", false, builder.Build());
                 }
-            }
+            }            
         }
 
         //private async Task UserUpdated_NameChange(SocketUser b, SocketUser a)
@@ -839,7 +893,10 @@ namespace Siotrix.Discord.Moderation
             if (b.Nickname == a.Nickname) return;
             LogChannelExtensions.IsUsableLogChannel(b.Guild.Id.ToLong());
             var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
-            if (!LogChannelExtensions.IsToggledLog)
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(b.Guild.Id, "nickname");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(b.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
                 if (b.Nickname == null)
                 {
                     var builder = new EmbedBuilder()
@@ -873,11 +930,15 @@ namespace Siotrix.Discord.Moderation
         }
 
         private async Task UserNameChangedAsync(SocketUser b, SocketUser a)
-        {
+        {            
             if (b.Username == a.Username) return;
             LogChannelExtensions.IsUsableLogChannel(b.Id.ToLong());
             var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
-            if (!LogChannelExtensions.IsToggledLog)
+            var socketuser = a as SocketGuildUser;
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(socketuser.Guild.Id, "username");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(socketuser.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
             {
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()

@@ -337,7 +337,7 @@ namespace Siotrix.Discord
             [Remainder] string parameter = null)
         {
             var message = "";
-
+            var loggingMessage = "";
 
             if (channel.GetUser(user.Id) == null)
             {
@@ -392,7 +392,7 @@ namespace Siotrix.Discord
                 return;
             }
 
-            var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);
+            var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);            
 
             if (antilinkUser == null)
             {
@@ -400,19 +400,41 @@ namespace Siotrix.Discord
                     parameter == "permenant" ? false : true);
                 var isPermenent = parameter == "permenant" ? "permenantly." : "for a single use.";
                 message = $"You have authorized {user.Username} to use links in {channelname.Name} {isPermenent}.";
+                loggingMessage =
+                    $"{Context.User.Mention} has authorized {user.Mention} to use links in {channelname.Name} {isPermenent}.";
             }
             else if (parameter == "permenant")
             {
                 await AntilinkExtensions.SetIsOneTimeAsync(antilinkUser, false);
                 message = $"You have authorized {user.Username} to use links in {channelname.Name} permenantly.";
+                loggingMessage =
+                    $"{Context.User.Mention} has authorized {user.Mention} to use links in {channelname.Name} permenantly.";
             }
             else
             {
                 await AntilinkExtensions.SetIsOneTimeAsync(antilinkUser, true);
                 message = $"You have authorized {user.Username} to use a link in {channelname.Name} one time only.";
+                loggingMessage =
+                    $"{Context.User.Mention} has authorized {user.Mention} to use links in {channelname.Name} for a single use.";
             }
 
             await ReplyAsync(message);
+
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(Context.Guild.Id, "antilink_assigned");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
+
+            if (logToggled.IsActive && channelToggle != null)
+            {
+                var logChannel = Context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                var builder = new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder()
+                        .WithIconUrl(user.GetAvatarUrl())
+                        .WithName(user.Id + " " + loggingMessage))
+                    .WithColor(new Color(100, 80, 0));
+                await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+            }
+
+
         }
 
         [Command("deauthorize")]
@@ -422,6 +444,7 @@ namespace Siotrix.Discord
         public async Task AntilinkDeAuthorizeAsync(SocketGuildUser user, SocketChannel channel)
         {
             var message = "";
+            var loggingMessage = "";
             var antilinkUser = await AntilinkExtensions.GetAntilinkUserListAsync(Context.Guild.Id, user.Id, channel.Id);
             var channelname = channel as IChannel;
 
@@ -433,6 +456,22 @@ namespace Siotrix.Discord
             {
                 await AntilinkExtensions.DeleteAntilinkUserAsync(antilinkUser);
                 message = $"You have de-authorized {user.Username} from using links in {channelname.Name}.";
+                loggingMessage =
+                    $"{Context.User.Mention} has de-authorized {user.Mention} from using links in {channelname.Name}";
+
+                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(Context.Guild.Id, "antilink_removed");
+                var logToggled = await LogsToggleExtensions.GetLogChannelAsync(Context.Guild.Id);
+
+                if (logToggled.IsActive && channelToggle != null)
+                {
+                    var logChannel = Context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                    var builder = new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder()
+                            .WithIconUrl(user.GetAvatarUrl())
+                            .WithName(user.Id + " " + loggingMessage))
+                        .WithColor(new Color(100, 80, 0));
+                    await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+                }
             }
 
             await ReplyAsync(message);
