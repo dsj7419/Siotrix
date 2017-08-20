@@ -220,7 +220,7 @@ namespace Siotrix.Discord
                         if (!bufferData.Equals(subCommand.Name))
                         {
                             bufferData = subCommand.Name;
-                            subCommands += $"``{bufferData}``" + " , ";
+                            subCommands += $"``{bufferData}``" + ", ";
                         }
                     _error = 4;
                 }

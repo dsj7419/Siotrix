@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -13,6 +14,7 @@ namespace Siotrix.Discord.Moderation
 
         private readonly DiscordSocketClient _client;
         private LogDatabase _db;
+        private DateTime lastMessage = DateTime.Now;
 
         public LogService(DiscordSocketClient client)
         {
@@ -638,47 +640,144 @@ namespace Siotrix.Discord.Moderation
 
         private async Task OnMessageDeletedAsync(Cacheable<IMessage, ulong> cachemsg, ISocketMessageChannel channel)
         {
-            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
-            var builder = new EmbedBuilder();
+            var arg = await cachemsg.GetOrDownloadAsync();
             var msg = await _db.GetMessageAsync(cachemsg.Id);
-            var numberOfCleanupMessages = MessageExtensions.NumberOfMessages;
-            if (numberOfCleanupMessages > 0)
-            {
-                var cleanupUser = _client.GetUser(MessageExtensions.UserId);
-                builder
-                    .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(cleanupUser.GetAvatarUrl())
-                        .WithName(cleanupUser.Username + "#" + cleanupUser.Discriminator + " has deleted " +
-                                  numberOfCleanupMessages + " messages."))
-                    .WithColor(new Color(0, 127, 127));
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+            var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
 
-                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
-                var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
-
-                if (logToggled.IsActive && channelToggle != null)
-                    await logChannel.SendMessageAsync("", false, builder.Build());
-            }
-            else
+            if (logToggled.IsActive && channelToggle != null)
             {
-                if (!msg.IsBot)
+
+                if (DateTime.Now.AddMilliseconds(-500) > lastMessage)
                 {
-                    LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
-                    var oldmsg = await cachemsg.GetOrDownloadAsync();
+                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+                    if ((arg?.Content?.Length) > 0)
+                        fields.Add(new EmbedFieldBuilder {Name = "Content:", Value = $"```{arg?.Content}```"});
+                    if (arg.Attachments.Count == 1)
+                        fields.Add(new EmbedFieldBuilder
+                        {
+                            Name = "Attachments:",
+                            Value = $"```{arg.Attachments.First().Filename}```"
+                        });
+                    if (fields.Count == 0) return;
 
-                    var user = _client.GetUser(msg.AuthorId.ToUlong());
-                    builder
+                    var cleanupUser = _client.GetUser(MessageExtensions.UserId);
+
+                    await logChannel.SendMessageAsync("", false, new EmbedBuilder
+                    {
+                        Title = $"A message has been deleted in {arg?.Channel?.Name}!",
+                        Fields = fields,
+                        Color = new Color(0, 127, 127),
+                        Timestamp = arg?.Timestamp
+
+                    }
+
                         .WithAuthor(new EmbedAuthorBuilder()
-                            .WithIconUrl(user.GetAvatarUrl())
-                            .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
-                        .WithColor(new Color(0, 127, 127));
-                    var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
-                    var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
-
-                    if (logToggled.IsActive && channelToggle != null)
-                        await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+                            .WithIconUrl(cleanupUser.GetAvatarUrl())));
                 }
+                lastMessage = DateTime.Now;
             }
-        }
+            /* var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+             var msg = await _db.GetMessageAsync(cachemsg.Id);
+             var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+             var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+ 
+             Console.WriteLine("FIRST>>>>>>>>>>>>>>>>>>>>>");
+ 
+             if (logToggled.IsActive && channelToggle != null)
+             {
+                var messageList = await MessageExtensions.GetDeletedMessagesAsync(msg.GuildId.Value);
+                 var builder = new EmbedBuilder();
+ 
+                 if (messageList != null)
+                 {                    
+                     var messageCount = await MessageExtensions.CountDeleteMessagesAsync(msg.GuildId.Value);
+                     Console.WriteLine($"Message Count: {messageCount}");
+ 
+                     if (messageCount == 0) return;
+ 
+                     if (messageCount == 1)
+                     {
+                         foreach (var val in messageList)
+                         {
+                             var user = _client.GetUser(val.AuthorId.ToUlong());
+                             val.IsLogged = true;
+                             _db.Messages.Update(val);
+                             builder
+                                 .WithAuthor(new EmbedAuthorBuilder()
+                                     .WithIconUrl(user.GetAvatarUrl())
+                                     .WithName("Message --(" + val.Content + ")-- has been deleted!"))
+                                 .WithColor(new Color(0, 127, 127));
+                         }
+                     }
+                     else if(messageCount > 1)
+                     {
+                         int count = 0;
+                         var desc = "";
+                         Console.WriteLine("testing.............");
+                         foreach (var val in messageList)
+                         {
+                             count++;
+                             val.IsLogged = true;
+                             _db.Messages.Update(val);
+                             var user = _client.GetUser(val.AuthorId.ToUlong());
+                             desc += $"**{count})** {user.Username}: {val.Content}\n\n";
+                         }
+                         
+                         builder
+                             .WithDescription(desc)
+                             .WithColor(new Color(0, 127, 127));
+                     }
+                 }                
+                 await _db.SaveChangesAsync().ConfigureAwait(false);
+                 await logChannel.SendMessageAsync("", false, builder.Build());
+             } */
+
+
+
+                /*  var logChannel = _client.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
+                  var builder = new EmbedBuilder();
+                  var msg = await _db.GetMessageAsync(cachemsg.Id);
+                  var numberOfCleanupMessages = MessageExtensions.NumberOfMessages;
+
+                  if (numberOfCleanupMessages > 0)
+                  {
+                      var cleanupUser = _client.GetUser(MessageExtensions.UserId);
+                      builder
+                          .WithAuthor(new EmbedAuthorBuilder()
+                              .WithIconUrl(cleanupUser.GetAvatarUrl())
+                              .WithName(cleanupUser.Username + "#" + cleanupUser.Discriminator + " has deleted " +
+                                        numberOfCleanupMessages + " messages."))
+                          .WithColor(new Color(0, 127, 127));
+
+                      var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+                      var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+
+                      if (logToggled.IsActive && channelToggle != null)
+                          await logChannel.SendMessageAsync("", false, builder.Build()); 
+                  }
+                  else
+                  {
+                   if (!msg.IsBot)
+                      { 
+                          LogChannelExtensions.IsUsableLogChannel(msg.GuildId.Value);
+                          var oldmsg = await cachemsg.GetOrDownloadAsync();
+
+                          var user = _client.GetUser(msg.AuthorId.ToUlong());
+                          builder
+                              .WithAuthor(new EmbedAuthorBuilder()
+                                  .WithIconUrl(user.GetAvatarUrl())
+                                  .WithName("Message --(" + oldmsg.Content + ")-- has been deleted!"))
+                              .WithColor(new Color(0, 127, 127));
+                          var channelToggle = await LogsToggleExtensions.GetLogToggleAsync((ulong)msg.GuildId.Value, "message_deleted");
+                          var logToggled = await LogsToggleExtensions.GetLogChannelAsync((ulong)msg.GuildId.Value);
+
+                          if (logToggled.IsActive && channelToggle != null)
+                              await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
+                     }
+                  } */
+        } 
 
         private async Task OnReactionAddedAsync(Cacheable<IUserMessage, ulong> cachemsg, ISocketMessageChannel channel,
             SocketReaction reaction)

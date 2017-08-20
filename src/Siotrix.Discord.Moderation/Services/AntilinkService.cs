@@ -111,7 +111,7 @@ namespace Siotrix.Discord.Moderation
                                           message.Content + " " + msg.Author.Username + "#" + msg.Author.Discriminator +
                                           user.Mention))
                             .WithColor(new Color(255, 127, 0));
-                        await logChannel.SendMessageAsync("", false, builder.Build());
+                        await logChannel.SendMessageAsync(user.Mention, false, builder.Build());
                     }
 
                     if (antilink.IsDmMessage)
