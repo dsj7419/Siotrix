@@ -19,8 +19,8 @@ namespace Siotrix.Discord.Admin
         {
             if (report == null) throw new Exception("Please include a summary report. Only for emergencies please.");
             // var owner = Context.Client.GetUser(Configuration.Load().PConfigs.Owners[0]);
-            var devGuild = Context.Client.GetGuild(290395992107253761) as IGuild;
-            var devChannel = Context.Client.GetChannel(290397586798542848) as ITextChannel;
+            var devGuild = Context.Client.GetGuild(336874949618827267) as IGuild;
+            var devChannel = Context.Client.GetChannel(340892918254403585) as ITextChannel;
             var devRole = devGuild.Roles.First(x => x.Name == "developer");
             var invite = await (Context.Channel as IGuildChannel).CreateInviteAsync(maxUses: 1);
 

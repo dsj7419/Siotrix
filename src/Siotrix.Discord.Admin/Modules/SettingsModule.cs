@@ -656,5 +656,28 @@ namespace Siotrix.Discord.Admin
             }
             await ReplyAsync(status);
         }
+
+        [Command("nickname")]
+        [Summary("Lists Siotrix's nickname.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task NicknameAsync()
+        {
+            await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
+        }
+
+        [Command("nickname")]
+        [Summary("Sets Siotrix's nickname.")]
+        [Remarks(
+            "<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
+        [MinPermissions(AccessLevel.GuildOwner)]
+        public async Task NicknameAsync([Remainder] string name)
+        {
+            var self = Context.Guild.CurrentUser;
+            if (name.Equals("reset"))
+                name = SiotrixConstants.BotName;
+            await self.ModifyAsync(x => { x.Nickname = name; });
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }
     }
 }
