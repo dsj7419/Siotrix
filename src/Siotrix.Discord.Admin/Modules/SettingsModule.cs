@@ -477,14 +477,6 @@ namespace Siotrix.Discord.Admin
         public async Task GuildAvatarAsync()
         {
             var val = await Context.GetGuildIconUrlAsync();
-
-            if (val == null)
-            {
-                var avatar = Context.Client.CurrentUser.GetAvatarUrl();
-                await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, avatar);
-                await ReplyAsync(avatar);
-                return;
-            }
             await ReplyAsync(val.Avatar);
         }
 
@@ -497,29 +489,15 @@ namespace Siotrix.Discord.Admin
         {
             var val = await Context.GetGuildIconUrlAsync();
 
-            if (val == null)
-            {
-                if (url.ToString().Equals("reset"))
-                {
-                    await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, SiotrixConstants.BotAvatar);
-                    await ReplyAsync(SiotrixConstants.BotSuccess);
-                    return;
-                }
-                await GuildEmbedIconUrl.CreateDiscordGuildAvatarAsync(Context, url.ToString());
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-                return;
-            }
-
             if (url.ToString().Equals("reset"))
             {
-                val.SetGuildAvatar(SiotrixConstants.BotAvatar);
+                await GuildEmbedIconUrl.SetGuildAvatar(val, SiotrixConstants.BotAvatar);
                 await ReplyAsync(SiotrixConstants.BotSuccess);
                 return;
             }
 
-            val.SetGuildAvatar(url.ToString());
+            await GuildEmbedIconUrl.SetGuildAvatar(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
-            return;
         }
 
         [Command("prefix")]

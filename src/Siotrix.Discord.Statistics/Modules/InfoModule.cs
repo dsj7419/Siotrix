@@ -27,13 +27,13 @@ namespace Siotrix.Discord.Statistics
 
             if (id == 2)
             {
-                var val = await Context.GetGuildIconUrlAsync();
-                iconurl = val.Avatar;
+                var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();                
+                iconurl = val.AuthorIcon;
             }
             else
             {
-                var val = await SiotrixEmbedAuthorExtensions.GetSiotrixAuthorAsync();
-                iconurl = val.AuthorIcon;
+                var val = await Context.GetGuildIconUrlAsync();
+                iconurl = val.Avatar;
             }
             return iconurl;
         }
@@ -291,10 +291,10 @@ namespace Siotrix.Discord.Statistics
                     Name = Format.Underline("Channel Count"),
                     Value = Context.Guild.Channels.Count()
                 })
-                .AddField(x =>
+                .AddField(new EmbedFieldBuilder
                 {
-                    x.Name = Format.Underline("Avatar URL");
-                    x.Value = GetGuildIconUrl(0);
+                    Name = Format.Underline("Avatar URL"),
+                    Value = gIconUrl // await GetGuildIconUrl(0);
                 })
                 .AddField(x =>
                 {
