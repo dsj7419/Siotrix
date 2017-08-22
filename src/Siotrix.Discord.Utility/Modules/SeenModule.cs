@@ -73,7 +73,7 @@ namespace Siotrix.Discord.Utility
                       /*  var date = db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).Last()
                             .CreatedAt; */
                         var date = await db.Messages.Where(p => !p.IsBot && p.AuthorId == target.Id.ToLong()).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
-                        last = string.Format("{0:dddd, MMMM d, yyyy}", date);
+                        last = string.Format("{0:dddd, MMMM d, yyyy}", date.CreatedAt);
                     }
                     else
                     {
