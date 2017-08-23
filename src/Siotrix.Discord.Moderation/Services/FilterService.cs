@@ -42,18 +42,24 @@ namespace Siotrix.Discord.Moderation
             var val = await context.GetGuildPrefixAsync();
             var words = msg.Content.Split(' ');
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
-            var channel =
-                context.Guild.GetChannel(LogChannelExtensions.LogchannelId.ToUlong()) as ISocketMessageChannel;
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
+
+            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "filter_violation");
+            var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
+
             if (badword != null)
             {
-                var builder = new EmbedBuilder()
-                    .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(msg.Author.GetAvatarUrl())
-                        .WithName("Found --" + badword + "-- word from message of " + msg.Author.Username + "#" +
-                                  msg.Author.Discriminator))
-                    .WithColor(new Color(255, 0, 0));
-                await channel.SendMessageAsync("", false, builder.Build());
+                if (logToggled.IsActive && channelToggle != null)
+                {
+                    var logChannel = context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
+                    var builder = new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder()
+                            .WithIconUrl(msg.Author.GetAvatarUrl())
+                            .WithName("Found --" + badword + "-- word from message by " + msg.Author.Username + "#" +
+                                      msg.Author.Discriminator))
+                        .WithColor(new Color(255, 0, 0));
+                    await logChannel.SendMessageAsync("", false, builder.Build());
+                }
                 await msg.DeleteAsync();
             }
 

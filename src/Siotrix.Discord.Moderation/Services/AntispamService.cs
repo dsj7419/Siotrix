@@ -67,6 +67,11 @@ namespace Siotrix.Discord.Moderation
                 return;
             if (message == null)
                 return;
+            var channel = message.Channel as SocketGuildChannel;
+            var user = message.Author as SocketGuildUser;
+
+            if (user.GetPermissions(channel).ManageMessages)
+                return;
             var context = new SocketCommandContext(_client, message);
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var repeatSpamValue = GetSpamValue(context.Guild.Id.ToLong(), 1);

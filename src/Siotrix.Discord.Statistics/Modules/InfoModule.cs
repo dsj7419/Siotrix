@@ -311,10 +311,17 @@ namespace Siotrix.Discord.Statistics
         [Remarks("<@username> - any @user in guild. May also user it for the bot as well!")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public async Task InfoAsync(SocketUser user)
+        public async Task InfoAsync(SocketGuildUser user)
         {
             var id = 0;
             var bot = CheckBot(user);
+
+            if (bot && user.Id != SiotrixConstants.BotId)
+            {
+                await ReplyAsync("It's a bot, and its not me..not much more you need to know!");
+                return;
+            }
+
             var person = user as IGuildUser;
             if (!bot)
                 id = 1;

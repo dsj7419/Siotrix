@@ -71,6 +71,8 @@ namespace Siotrix.Discord
         public const int MaxFieldLines = 5;
         public const int MaxLengthForFieldValue = 250000;
 
+        public static readonly string[] BadWords = { "shit", "fuck", "nigger", "rape", "sex", "coon" };
+
         public static ReadOnlyCollection<string> ValidImageExtensions =
             new ReadOnlyCollection<string>(new List<string>
             {
@@ -114,7 +116,8 @@ namespace Siotrix.Discord
                 "deblacklist",
                 "antilink_assigned",
                 "antilink_removed",
-                "antilink_violation"
+                "antilink_violation",
+                "filter_violation"
             });
     }
 }

@@ -35,6 +35,12 @@ namespace Siotrix.Discord.Moderation
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
+            var channel = message.Channel as SocketGuildChannel;
+            var user = message.Author as SocketGuildUser;
+
+            if (user.GetPermissions(channel).ManageMessages)
+                return;
+
             var context = new SocketCommandContext(_client, message);
             var dictionary = LogChannelExtensions.GetFilterWords(context.Guild.Id.ToLong());
             var words = msg.Content.Split(' ');
@@ -42,7 +48,7 @@ namespace Siotrix.Discord.Moderation
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
             {
-                _count++;
+                _count = 1;
                 _badWords += badword + " ";
                 var warnCount = GetWarnValue(context.Guild.Id.ToLong(), 1);
                 var warnMuteTime = GetWarnValue(context.Guild.Id.ToLong(), 2);
@@ -139,8 +145,8 @@ namespace Siotrix.Discord.Moderation
                 .WithTimestamp(DateTime.UtcNow);
 
             value = context.User.Mention + " has been issued **" + warnCount +
-                    "** warning points for breaking filter rule\n" +
-                    "Reason : use of the words : ***" + badword + "***\n";
+                    "** warning point for breaking filter rule\n" +
+                    "Reason : use of the word : ***" + badword + "***\n";
 
             embed
                 .AddField(x =>

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Addons.InteractiveCommands;
 using Discord.Commands;
 
@@ -12,10 +14,8 @@ namespace Siotrix.Discord.Moderation
     [RequireContext(ContextType.Guild)]
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
-    {
-        private readonly string[] _badWords = {"shit", "fuck", "nigger", "rape", "sex", "coon"};
-
-        private bool SaveAndUpdateFilterWord(string word, long guildId)
+    {        
+      /*  private bool SaveAndUpdateFilterWord(string word, long guildId)
         {
             var isSuccess = false;
             using (var db = new LogDatabase())
@@ -45,9 +45,9 @@ namespace Siotrix.Discord.Moderation
                 }
             }
             return isSuccess;
-        }
+        } */
 
-        private bool ImportFilterWord(string[] words, long guildId)
+ /*       private bool ImportFilterWord(string[] words, long guildId)
         {
             var isSuccess = false;
             using (var db = new LogDatabase())
@@ -119,13 +119,26 @@ namespace Siotrix.Discord.Moderation
                 }
             }
             return isSuccess;
-        }
+        } */
 
-        [Command]
+        [Command("list")]
         [Summary("Receive a private message listing words filtered from this channel.")]
         [Remarks(" - No additional arguments needed.")]
         public async Task FilterAsync()
         {
+            var gColor = await Context.GetGuildColorAsync();           
+            var filteredWords = await FilterExtensions.GetFilteredWordsAsync(Context.Guild.Id);
+
+            if (!HasWords(Context.Guild, filteredWords)) return;
+
+            var builder = new EmbedBuilder()
+                .WithThumbnailUrl(Context.Guild.IconUrl)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
+                .WithTitle($"Filtered Words for {Context.Guild}")
+                .WithDescription(string.Join(", ", filteredWords.Select(x => x.Word.ToString())));
+
+            // await ReplyAsync("", embed: builder);
+            await MessageExtensions.DmUser(Context.User, embed: builder);
             await Task.Delay(1);
         }
 
@@ -134,9 +147,11 @@ namespace Siotrix.Discord.Moderation
         [Remarks(" (word or phrase)")]
         public async Task AddAsync(string word)
         {
-            var success = SaveAndUpdateFilterWord(word, Context.Guild.Id.ToLong());
-            if (success)
-                await ReplyAsync(SiotrixConstants.BotSuccess);
+            var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
+            if (Exists(filteredWord, word)) return;
+
+            await FilterExtensions.CreateFilteredWordAsync(Context.Guild.Id, word);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("remove")]
@@ -144,11 +159,12 @@ namespace Siotrix.Discord.Moderation
         [Remarks(" (word or phrase)")]
         public async Task RemoveAsync(string word)
         {
-            var success = RemoveFilterWord(word, Context.Guild.Id.ToLong());
-            if (success)
-                await ReplyAsync(SiotrixConstants.BotSuccess);
-            else
-                await ReplyAsync("📣 : Not Found like that word!");
+            var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
+
+            if (NotExists(filteredWord, word)) return;
+
+            await FilterExtensions.DeleteFilteredWordAsync(filteredWord);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("import")]
@@ -161,9 +177,8 @@ namespace Siotrix.Discord.Moderation
             var response = await WaitForMessage(Context.Message.Author, Context.Channel);
             if (response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
             {
-                var success = ImportFilterWord(_badWords, Context.Guild.Id.ToLong());
-                if (success)
-                    await ReplyAsync("📣 : Siotrix imports filter and confirms with user.");
+                await FilterExtensions.ImportFilteredWords(SiotrixConstants.BadWords, Context.Guild.Id);
+                await ReplyAsync("📣 : Import is complete.");
             }
         }
 
@@ -177,10 +192,39 @@ namespace Siotrix.Discord.Moderation
             var response = await WaitForMessage(Context.Message.Author, Context.Channel);
             if (response.Content.ToUpper().Equals("YES") || response.Content.ToUpper().Equals("Y"))
             {
-                var success = DeleteAllFilterWords(Context.Guild.Id.ToLong());
-                if (success)
-                    await ReplyAsync("📣 : All filters has been deleted.");
+                await FilterExtensions.DeleteAllFilteredWords(Context.Guild.Id);
+                await ReplyAsync("📣 : All filters have been deleted.");
             }
+        }
+
+        private bool Exists(DiscordGuildFilterList filteredWord, string name)
+        {
+            if (filteredWord != null)
+            {
+                var _ = ReplyAsync($"The filter, `{name}` already exists..");
+                return true;
+            }
+            return false;
+        }
+
+        private bool NotExists(DiscordGuildFilterList filteredWord, string name)
+        {
+            if (filteredWord == null)
+            {
+                var _ = ReplyAsync($"The filter, `{name}` does not exist..");
+                return true;
+            }
+            return false;
+        }
+
+        private bool HasWords(object obj, IEnumerable<DiscordGuildFilterList> filteredWords)
+        {
+            if (filteredWords.Count() == 0)
+            {
+                var _ = ReplyAsync($"{obj} currently has no filtered words.");
+                return false;
+            }
+            return true;
         }
     }
 }

@@ -933,13 +933,19 @@ namespace Siotrix.Discord.Statistics
         [Command("stats")]
         [Alias("statistics")]
         [Summary("Statistical command to display user or bot information data.")]
-        [Remarks("<@username> - any @user or bot.")]
+        [Remarks("(@username)")]
         [RequireContext(ContextType.Guild)]
         [MinPermissions(AccessLevel.User)]
-        public async Task StatsAsync(SocketUser user)
+        public async Task StatsAsync(SocketGuildUser user)
         {
             var id = 0;
             var bot = CheckBot(user);
+            if (bot && user.Id != SiotrixConstants.BotId)
+            {
+                await ReplyAsync("It's a bot, and its not me..not much more you need to know!");
+                return;
+            }
+
             var person = user as IGuildUser;
             if (!bot)
                 id = 1;
