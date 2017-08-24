@@ -22,7 +22,6 @@ namespace Siotrix.Discord.Moderation
         private readonly DiscordSocketClient _client;
         private EmbedBuilder _builder;
         private IUserMessage _logMsg;
-        private IUserMessage _msg;
         private int _numberOfTheCapMsg;
         private int _numberOfTheSameMsg;
         private int _warningsOfCaps;

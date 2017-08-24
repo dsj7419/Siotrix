@@ -29,9 +29,9 @@ namespace Siotrix.Discord
             return val;
         }
 
-        public static async Task CreateFilteredWordAsync(ulong guildId, string name)
+        public static async Task CreateFilteredWordAsync(ulong guildId, string name, int warnPoints)
         {
-            var filteredWord = new DiscordGuildFilterList(guildId.ToLong(), name);
+            var filteredWord = new DiscordGuildFilterList(guildId.ToLong(), name, warnPoints);
 
             using (var db = new LogDatabase())
             {
@@ -80,6 +80,24 @@ namespace Siotrix.Discord
             return val;
         }
 
+        public static async Task ModifyFilterPointsAsync(DiscordGuildFilterList filteredWord, int warnPoints)
+        {
+            filteredWord.SetWarnPoints(warnPoints);
+
+            using (var db = new LogDatabase())
+            {
+                try
+                {
+                    db.Gfilterlists.Update(filteredWord);
+                    await db.SaveChangesAsync().ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
         public static async Task<int> CountFilteredWordsAsync(ulong guildId)
         {
             var count = 0;
@@ -110,7 +128,7 @@ namespace Siotrix.Discord
             }
             foreach (var word in words)
             {
-                await CreateFilteredWordAsync(guildId, word);
+                await CreateFilteredWordAsync(guildId, word, 0);
             }
         }
 

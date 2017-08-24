@@ -35,6 +35,8 @@ namespace Siotrix.Discord.Moderation
         private async Task OnMessageReceivedAsync(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
+            var user = message.Author as SocketGuildUser;
+            var channel = message.Channel as SocketGuildChannel;
             var argPos = 0;
             string spec = null;
             var context = new SocketCommandContext(_client, message);
@@ -44,19 +46,23 @@ namespace Siotrix.Discord.Moderation
             LogChannelExtensions.IsUsableLogChannel(context.Guild.Id.ToLong());
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
 
-            var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "filter_violation");
+            if (user.GetPermissions(channel).ManageMessages)
+                return;
+
+                var channelToggle = await LogsToggleExtensions.GetLogToggleAsync(context.Guild.Id, "filter_violation");
             var logToggled = await LogsToggleExtensions.GetLogChannelAsync(context.Guild.Id);
 
             if (badword != null)
             {
                 if (logToggled.IsActive && channelToggle != null)
                 {
+                    var filteredWord = await FilterExtensions.GetFilteredWordAsync(context.Guild.Id, badword);
+                    var points = (filteredWord.WarnPoints == 1) ? "point" : "points";
                     var logChannel = context.Guild.GetChannel(logToggled.ChannelId.ToUlong()) as ISocketMessageChannel;
                     var builder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
                             .WithIconUrl(msg.Author.GetAvatarUrl())
-                            .WithName("Found --" + badword + "-- word from message by " + msg.Author.Username + "#" +
-                                      msg.Author.Discriminator))
+                            .WithName(msg.Author.Username + "#" + msg.Author.Discriminator + $" **filtered word violation({filteredWord.Word}-{filteredWord.WarnPoints} {points})**"))
                         .WithColor(new Color(255, 0, 0));
                     await logChannel.SendMessageAsync("", false, builder.Build());
                 }

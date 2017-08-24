@@ -169,8 +169,8 @@ namespace Siotrix.Discord.Moderation
         }
 
         [Command]
-        [Summary(" - user, level, reason")]
-        [Remarks(" - user, level, reason")]
+        [Summary("Warn a user by X number of points, and provide a reason for the warning")]
+        [Remarks("(user) (amount) (reason)")]
         public async Task WarnAsync(SocketGuildUser user, int points, [Remainder] string reason)
         {
             var success = SaveAndUpdateWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong(), points, reason,

@@ -10,7 +10,7 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("filter")]
-    [Summary("A special guild-specific word and phrase filter.")]
+    [Summary("A special guild-specific word filter.")]
     [RequireContext(ContextType.Guild)]
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
@@ -123,7 +123,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("list")]
         [Summary("Receive a private message listing words filtered from this channel.")]
-        [Remarks(" - No additional arguments needed.")]
+        [Remarks("- No additional arguments needed.")]
         public async Task FilterAsync()
         {
             var gColor = await Context.GetGuildColorAsync();           
@@ -135,28 +135,27 @@ namespace Siotrix.Discord.Moderation
                 .WithThumbnailUrl(Context.Guild.IconUrl)
                 .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTitle($"Filtered Words for {Context.Guild}")
-                .WithDescription(string.Join(", ", filteredWords.Select(x => x.Word.ToString())));
+                .WithDescription(string.Join(", ", filteredWords.Select(x => $"{x.Word.ToString()}({x.WarnPoints})")));
 
-            // await ReplyAsync("", embed: builder);
             await MessageExtensions.DmUser(Context.User, embed: builder);
             await Task.Delay(1);
         }
 
         [Command("add")]
-        [Summary("Add a new word or phrase to this channel's filter.")]
-        [Remarks(" (word or phrase)")]
-        public async Task AddAsync(string word)
+        [Summary("Add a new word to this channel's filter with the option to assign how many warning points are issued if a user breaks the filter rule (defaults to 0).")]
+        [Remarks("(word) [number]")]
+        public async Task AddAsync(string word, int warnPoints = 0)
         {
             var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
             if (Exists(filteredWord, word)) return;
 
-            await FilterExtensions.CreateFilteredWordAsync(Context.Guild.Id, word);
+            await FilterExtensions.CreateFilteredWordAsync(Context.Guild.Id, word, warnPoints);
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         [Command("remove")]
-        [Summary("Remove an existing word or phrase from this channel's filter.")]
-        [Remarks(" (word or phrase)")]
+        [Summary("Remove an existing word from this channel's filter.")]
+        [Remarks("(word)")]
         public async Task RemoveAsync(string word)
         {
             var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
@@ -169,7 +168,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("import")]
         [Summary("This will import a default list for your guild and remove any other words you have saved.")]
-        [Remarks(" - No additional arguments needed.")]
+        [Remarks("- No additional arguments needed.")]
         public async Task ImportAsync()
         {
             await ReplyAsync(
@@ -184,7 +183,7 @@ namespace Siotrix.Discord.Moderation
 
         [Command("reset")]
         [Summary("This will move all words from your guild filter.")]
-        [Remarks(" - No additional arguments needed.")]
+        [Remarks("- No additional arguments needed.")]
         public async Task ResetAsync()
         {
             await ReplyAsync(
@@ -195,6 +194,35 @@ namespace Siotrix.Discord.Moderation
                 await FilterExtensions.DeleteAllFilteredWords(Context.Guild.Id);
                 await ReplyAsync("📣 : All filters have been deleted.");
             }
+        }
+
+        [Command("modify")]
+        [Summary("Modify inputted words warning point value.")]
+        [Remarks("(word) [number]")]
+        public async Task ModifyAsync(string word, int warnPoints = 0)
+        {
+            var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
+
+            if (NotExists(filteredWord, word)) return;
+
+            await FilterExtensions.ModifyFilterPointsAsync(filteredWord, warnPoints);
+            await ReplyAsync(SiotrixConstants.BotSuccess);
+        }
+
+        [Command("modifyall")]
+        [Summary("Modify inputted words warning point value.")]
+        [Remarks("(word) [number]")]
+        public async Task ModifyAllAsync(int warnPoints)
+        {
+            var filteredWords = await FilterExtensions.GetFilteredWordsAsync(Context.Guild.Id);
+
+            if (!HasWords(Context.Guild, filteredWords)) return;
+
+            foreach (var filteredWord in filteredWords)
+            {
+                await FilterExtensions.ModifyFilterPointsAsync(filteredWord, warnPoints);
+            }
+            await ReplyAsync(SiotrixConstants.BotSuccess);
         }
 
         private bool Exists(DiscordGuildFilterList filteredWord, string name)

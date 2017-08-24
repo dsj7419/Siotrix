@@ -48,38 +48,19 @@ namespace Siotrix.Discord.Moderation
             var badword = LogChannelExtensions.ParseMessages(words, dictionary);
             if (badword != null)
             {
-                _count = 1;
-                _badWords += badword + " ";
-                var warnCount = GetWarnValue(context.Guild.Id.ToLong(), 1);
-                var warnMuteTime = GetWarnValue(context.Guild.Id.ToLong(), 2);
+
+                var filteredWord = await FilterExtensions.GetFilteredWordAsync(context.Guild.Id, badword);
+                if (filteredWord.WarnPoints != 0)
+                {
+                    
+                }
+             //   var warnCount = GetWarnValue(context.Guild.Id.ToLong(), 1);
+             //   var warnMuteTime = GetWarnValue(context.Guild.Id.ToLong(), 2);
                 var modChannel =
                     context.Guild.GetChannel(LogChannelExtensions.ModlogchannelId.ToUlong()) as ISocketMessageChannel;
 
-                //if (count == warn_count)
-                //{
-                //    builder = GetBuilder(context, warn_count, warn_count);
-                //    log_msg = await MessageExtensions.SendMessageSafeAsync(mod_channel, "", false, builder.Build());
-                //    return;
-                //}
-                //else if (count > warn_count)
-                //{
-                //    await MuteWarnUser(context.User as IGuildUser, warn_mute_time, context);
-                //    builder = GetBuilder(context, warn_count, count);
-                //    await log_msg.ModifyAsync(x => { x.Embed = builder.Build(); });
-                //    return;
-                //}
-                if (_count == 1)
-                {
-                    _builder = await GetBuilder(context, 1, badword);
-                    _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());
-                }
-                else
-                {
-                    if (_count > warnCount)
-                        await MuteWarnUser(context.User as IGuildUser, warnMuteTime, context);
-                    _builder = await GetBuilder(context, _count, _badWords);
-                    await _logMsg.ModifyAsync(x => { x.Embed = _builder.Build(); });
-                }
+                _builder = await GetBuilder(context, filteredWord, badword);
+                _logMsg = await modChannel.SendMessageSafeAsync("", false, _builder.Build());                
             }
         }
 
@@ -123,7 +104,7 @@ namespace Siotrix.Discord.Moderation
             }
         }
 
-        private async Task<EmbedBuilder> GetBuilder(SocketCommandContext context, int warnCount, string badword)
+        private async Task<EmbedBuilder> GetBuilder(SocketCommandContext context, DiscordGuildFilterList filteredWord, string badword)
         {
             string value = null;
             var gIconUrl = await context.GetGuildIconUrlAsync();
@@ -132,6 +113,7 @@ namespace Siotrix.Discord.Moderation
             var gThumbnail = await context.GetGuildThumbNailAsync();
             var gFooter = await context.GetGuildFooterAsync();
             var gPrefix = await context.GetGuildPrefixAsync();
+            var points = (filteredWord.WarnPoints == 1) ? "point" : "points";
             var embed = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
@@ -144,9 +126,8 @@ namespace Siotrix.Discord.Moderation
                     .WithText(gFooter.FooterText))
                 .WithTimestamp(DateTime.UtcNow);
 
-            value = context.User.Mention + " has been issued **" + warnCount +
-                    "** warning point for breaking filter rule\n" +
-                    "Reason : use of the word : ***" + badword + "***\n";
+            value = context.User.Mention + $" has been issued **{filteredWord.WarnPoints}** warning {points}\nfor breaking filter rule.\n" +
+                    "Reason : use of the word : ***" + badword + "***";
 
             embed
                 .AddField(x =>
