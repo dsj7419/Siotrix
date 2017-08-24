@@ -95,9 +95,11 @@ namespace Siotrix.Discord.Moderation
             var tag = await TagExtensions.GetTagAsync(name, Context.Guild);
             var author = Context.Guild.GetUser(tag.OwnerId.ToUlong());
             var count = await TagExtensions.CountLogsAsync((ulong) tag.Id);
+            var gColor = await Context.GetGuildColorAsync();
 
             var builder = new EmbedBuilder()
                 .WithFooter(x => x.Text = "Last Updated")
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithTimestamp(tag.UpdatedAt)
                 .AddInlineField("Owner", author.Mention)
                 .AddInlineField("Name", string.Join(", ", tag.Name))
