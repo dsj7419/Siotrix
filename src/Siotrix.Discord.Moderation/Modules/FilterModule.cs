@@ -46,7 +46,7 @@ namespace Siotrix.Discord.Moderation
                 return;
             }
 
-            if (IsAboveMax(warnPoints))
+            if (warnPoints > SiotrixConstants.FilterMaxWarnPoints)
             {
                 await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
                 return;
@@ -108,13 +108,13 @@ namespace Siotrix.Discord.Moderation
         public async Task ModifyAsync(string word, int warnPoints = 0)
         {
 
-            if (IsNegative(warnPoints))
+            if (warnPoints > SiotrixConstants.FilterMaxWarnPoints)
             {
                 await ReplyAsync("You must use a number 0 or greater");
                 return;
             }
 
-            if (IsAboveMax(warnPoints))
+            if (warnPoints > SiotrixConstants.FilterMaxWarnPoints)
             {
                 await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
                 return;
@@ -140,7 +140,7 @@ namespace Siotrix.Discord.Moderation
                 return;
             }
 
-            if (IsAboveMax(warnPoints))
+            if (warnPoints > SiotrixConstants.FilterMaxWarnPoints)
             {
                 await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
                 return;
@@ -191,12 +191,6 @@ namespace Siotrix.Discord.Moderation
             where T : struct, IComparable<T>
         {
             return value.CompareTo(default(T)) < 0;
-        }
-
-        private static bool IsAboveMax<T>(T value)
-            where T : struct, IComparable<T>
-        {
-            return value.CompareTo(default(T)) > SiotrixConstants.FilterMaxWarnPoints;
         }
     }
 }
