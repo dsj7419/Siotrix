@@ -25,6 +25,9 @@ namespace Siotrix.Discord
         public const string BotSuccess = "👍";
         public const int WaitTime = 3;
 
+        //Warning Contants
+        public const int FilterMaxWarnPoints = 200;
+
         // Other Constants
         public const long BugChannel = 336881482712743937;
         public const long SuggestionChannel = 336882503006814210;

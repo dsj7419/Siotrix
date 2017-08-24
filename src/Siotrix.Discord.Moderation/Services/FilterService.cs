@@ -62,7 +62,7 @@ namespace Siotrix.Discord.Moderation
                     var builder = new EmbedBuilder()
                         .WithAuthor(new EmbedAuthorBuilder()
                             .WithIconUrl(msg.Author.GetAvatarUrl())
-                            .WithName(msg.Author.Username + "#" + msg.Author.Discriminator + $" **filtered word violation({filteredWord.Word}-{filteredWord.WarnPoints} {points})**"))
+                            .WithName(msg.Author.Username + "#" + msg.Author.Discriminator + $" filtered word violation({filteredWord.Word}-{filteredWord.WarnPoints} {points})"))
                         .WithColor(new Color(255, 0, 0));
                     await logChannel.SendMessageAsync("", false, builder.Build());
                 }

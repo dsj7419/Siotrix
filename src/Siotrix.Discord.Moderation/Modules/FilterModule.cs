@@ -15,112 +15,6 @@ namespace Siotrix.Discord.Moderation
     [MinPermissions(AccessLevel.GuildMod)]
     public class FilterModule : InteractiveModuleBase<SocketCommandContext>
     {        
-      /*  private bool SaveAndUpdateFilterWord(string word, long guildId)
-        {
-            var isSuccess = false;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId && x.Word.Equals(word));
-                    if (!result.Any())
-                    {
-                        var record = new DiscordGuildFilterList();
-                        record.GuildId = guildId;
-                        record.Word = word;
-                        db.Gfilterlists.Add(record);
-                    }
-                    else
-                    {
-                        var data = result.First();
-                        data.Word = word;
-                        db.Gfilterlists.Update(data);
-                    }
-                    db.SaveChanges();
-                    isSuccess = true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return isSuccess;
-        } */
-
- /*       private bool ImportFilterWord(string[] words, long guildId)
-        {
-            var isSuccess = false;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId);
-                    if (result.Any())
-                        db.Gfilterlists.RemoveRange(result);
-                    foreach (var word in words)
-                    {
-                        var record = new DiscordGuildFilterList();
-                        record.GuildId = guildId;
-                        record.Word = word;
-                        db.Gfilterlists.Add(record);
-                    }
-                    db.SaveChanges();
-                    isSuccess = true;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return isSuccess;
-        }
-
-        private bool RemoveFilterWord(string word, long guildId)
-        {
-            var isSuccess = false;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId && x.Word.Equals(word));
-                    if (result.Any())
-                    {
-                        db.Gfilterlists.RemoveRange(result);
-                        isSuccess = true;
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return isSuccess;
-        }
-
-        private bool DeleteAllFilterWords(long guildId)
-        {
-            var isSuccess = false;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gfilterlists.Where(x => x.GuildId == guildId);
-                    if (result.Any())
-                    {
-                        db.Gfilterlists.RemoveRange(result);
-                        isSuccess = true;
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return isSuccess;
-        } */
-
         [Command("list")]
         [Summary("Receive a private message listing words filtered from this channel.")]
         [Remarks("- No additional arguments needed.")]
@@ -146,6 +40,18 @@ namespace Siotrix.Discord.Moderation
         [Remarks("(word) [number]")]
         public async Task AddAsync(string word, int warnPoints = 0)
         {
+            if (IsNegative(warnPoints))
+            {
+                await ReplyAsync("You must use a number 0 or greater");
+                return;
+            }
+
+            if (IsAboveMax(warnPoints))
+            {
+                await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
+                return;
+            }
+
             var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
             if (Exists(filteredWord, word)) return;
 
@@ -201,6 +107,19 @@ namespace Siotrix.Discord.Moderation
         [Remarks("(word) [number]")]
         public async Task ModifyAsync(string word, int warnPoints = 0)
         {
+
+            if (IsNegative(warnPoints))
+            {
+                await ReplyAsync("You must use a number 0 or greater");
+                return;
+            }
+
+            if (IsAboveMax(warnPoints))
+            {
+                await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
+                return;
+            }
+
             var filteredWord = await FilterExtensions.GetFilteredWordAsync(Context.Guild.Id, word);
 
             if (NotExists(filteredWord, word)) return;
@@ -214,6 +133,19 @@ namespace Siotrix.Discord.Moderation
         [Remarks("(word) [number]")]
         public async Task ModifyAllAsync(int warnPoints)
         {
+
+            if (IsNegative(warnPoints))
+            {
+                await ReplyAsync("You must use a number 0 or greater");
+                return;
+            }
+
+            if (IsAboveMax(warnPoints))
+            {
+                await ReplyAsync($"I can't see a reason to need to assign a number higher than {SiotrixConstants.FilterMaxWarnPoints}. If you do, go tell the devs why.");
+                return;
+            }
+
             var filteredWords = await FilterExtensions.GetFilteredWordsAsync(Context.Guild.Id);
 
             if (!HasWords(Context.Guild, filteredWords)) return;
@@ -253,6 +185,18 @@ namespace Siotrix.Discord.Moderation
                 return false;
             }
             return true;
+        }
+
+        private static bool IsNegative<T>(T value)
+            where T : struct, IComparable<T>
+        {
+            return value.CompareTo(default(T)) < 0;
+        }
+
+        private static bool IsAboveMax<T>(T value)
+            where T : struct, IComparable<T>
+        {
+            return value.CompareTo(default(T)) > SiotrixConstants.FilterMaxWarnPoints;
         }
     }
 }
