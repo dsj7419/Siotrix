@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace Siotrix.Discord
 {
@@ -74,6 +75,21 @@ namespace Siotrix.Discord
         public static DateTime FirstDayOfNextMonth(this DateTime dt)
         {
             return dt.FirstDayOfMonth().AddMonths(1);
+        }
+
+        public static string ToTimespanPrettyFormat(this TimeSpan span)
+        {
+
+            if (span == TimeSpan.Zero) return "0 minutes";
+
+            var sb = new StringBuilder();
+            if (span.Days > 0)
+                sb.AppendFormat("{0} day{1} ", span.Days, span.Days > 1 ? "s" : String.Empty);
+            if (span.Hours > 0)
+                sb.AppendFormat("{0} hour{1} ", span.Hours, span.Hours > 1 ? "s" : String.Empty);
+            if (span.Minutes > 0)
+                sb.AppendFormat("{0} minute{1} ", span.Minutes, span.Minutes > 1 ? "s" : String.Empty);
+            return sb.ToString();
         }
     }
 }

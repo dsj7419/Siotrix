@@ -9,29 +9,6 @@ namespace Siotrix.Discord.Moderation
     [Name("Moderator")]
     public class ForgiveModule : ModuleBase<SocketCommandContext>
     {
-        private bool DeleteWarningUser(long userId, long guildId)
-        {
-            var isSuccess = false;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                    var result = db.Gwarningusers.Where(x => x.UserId == userId && x.GuildId == guildId);
-                    if (result.Any())
-                    {
-                        db.Gwarningusers.RemoveRange(result);
-                        isSuccess = true;
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return isSuccess;
-        }
-
         [Command("Forgive")]
         [Summary("Forgive a user from ALL of their previous warnings.")]
         [Remarks(" - No additional arguments needed.")]

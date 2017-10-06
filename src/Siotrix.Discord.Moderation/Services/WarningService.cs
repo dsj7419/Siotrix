@@ -71,7 +71,7 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var result = db.Gwarns.Where(p => p.GuildId.Equals(guildId) && p.Option.Equals(optionValue));
+                    var result = db.Gwarnsettings.Where(p => p.GuildId.Equals(guildId) && p.Option.Equals(optionValue));
                     if (result.Any())
                         warnValue = result.First().WarnValue;
                 }

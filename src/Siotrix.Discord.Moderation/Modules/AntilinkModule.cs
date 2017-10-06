@@ -86,8 +86,8 @@ namespace Siotrix.Discord
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
-                await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
+                antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
+                await AntilinkExtensions.SetIsActiveAsync(antilink, true);
                 await ReplyAsync(
                     "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
@@ -149,8 +149,8 @@ namespace Siotrix.Discord
             if (antilink == null && message != null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
-                await AntilinkExtensions.SetDmMessageAsync(subAntilink, message);
+                antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
+                await AntilinkExtensions.SetDmMessageAsync(antilink, message);
                 await ReplyAsync(
                     "I am not able to find your guilds Antilink settings. Creating default setup with your DM message.");
                 return;
@@ -193,8 +193,8 @@ namespace Siotrix.Discord
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
-                await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
+                antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
+                await AntilinkExtensions.SetIsActiveAsync(antilink, true);
                 await ReplyAsync(
                     "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
@@ -205,8 +205,8 @@ namespace Siotrix.Discord
             if (antilinkChannel == null)
             {
                 await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
-                var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
-                await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
+                antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);
                 await ReplyAsync(
                     "I am not able to find this channels Antilink settings. Creating and activating for this channel.");
                 return;
@@ -238,8 +238,8 @@ namespace Siotrix.Discord
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
-                await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
+                antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
+                await AntilinkExtensions.SetIsActiveAsync(antilink, true);
                 await ReplyAsync(
                     "I am not able to find your guilds Antilink settings. Creating default and activating Antilink");
                 return;
@@ -250,9 +250,9 @@ namespace Siotrix.Discord
             if (antilinkChannel == null)
             {
                 await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
-                var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
-                await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
-                await AntilinkExtensions.SetIsStrictChannelAsync(subAntilink, true);
+                antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);
+                await AntilinkExtensions.SetIsStrictChannelAsync(antilinkChannel, true);
                 await ReplyAsync(
                     "I am not able to find this channels Antilink settings. Creating and activating strict rules for this channel.");
                 return;
@@ -303,9 +303,9 @@ namespace Siotrix.Discord
                     if (antilinkChannel == null)
                     {
                         await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
-                        var subAntilink =
+                        antilinkChannel =
                             await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
-                        await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
+                        await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);
                         activecount++;
                     }
                     else
@@ -363,8 +363,8 @@ namespace Siotrix.Discord
             if (antilink == null)
             {
                 await AntilinkExtensions.CreateAntilinkAsync(Context);
-                var subAntilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
-                await AntilinkExtensions.SetIsActiveAsync(subAntilink, true);
+                antilink = await AntilinkExtensions.GetAntilinkAsync(Context.Guild.Id);
+                await AntilinkExtensions.SetIsActiveAsync(antilink, true);
                 await ReplyAsync(
                     "I am not able to find your guilds Antilink settings. Creating default and activating Antilink. Try command again.");
                 return;
@@ -375,8 +375,8 @@ namespace Siotrix.Discord
             if (antilinkChannel == null)
             {
                 await AntilinkExtensions.CreateAntilinkChannelAsync(Context, antilink, channel);
-                var subAntilink = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
-                await AntilinkExtensions.SetIsActiveChannelAsync(subAntilink, true);
+                antilinkChannel = await AntilinkExtensions.GetAntilinkChanneListAsync(Context.Guild.Id, channel);
+                await AntilinkExtensions.SetIsActiveChannelAsync(antilinkChannel, true);
                 await ReplyAsync(
                     "I am not able to find this channels Antilink settings. Creating and activating for this channel. Try command again.");
                 return;

@@ -160,41 +160,6 @@ namespace Siotrix.Discord
             sb.Append(str.Substring(previousIndex));
 
             return sb.ToString();
-        }
-
-        public static async Task<IEnumerable<DiscordMessage>> GetDeletedMessagesAsync(long id)
-        {
-            IEnumerable<DiscordMessage> val = new List<DiscordMessage>();
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                   // val = await db.Messages.Where(x => x.GuildId == id && x.DeletedAt != null && x.DeletedAt <= DateTime.Now.AddSeconds(-10) && x.IsLogged == false).ToListAsync();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return val;
-        }
-
-        public static async Task<int> CountDeleteMessagesAsync(long id)
-        {
-            var count = 0;
-            using (var db = new LogDatabase())
-            {
-                try
-                {
-                   // count = await db.Messages.CountAsync(x => x.GuildId == id && x.DeletedAt != null && x.DeletedAt <= DateTime.Now.AddSeconds(-10) && x.IsLogged == false);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-            return count;
-        }
-
+        }    
     }
 }

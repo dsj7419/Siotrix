@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Siotrix.Discord
 {
-    public static class GuildPrefixExtensions
+    public static class PrefixExtensions
     {
         public static async Task<DiscordGuildPrefix> GetGuildPrefixAsync(this SocketCommandContext context)
         {

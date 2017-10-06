@@ -26,7 +26,17 @@ namespace Siotrix.Discord
         public const int WaitTime = 3;
 
         //Warning Contants
+
         public const int FilterMaxWarnPoints = 200;
+        public const int TimesBeforeMute = 5;
+        public const int MuteTimeLengthMinutes = 2880;
+        public const int TimesBeforeBan = 8;
+        public const int BanTimeLengthMinutes = 1080;
+        public const int SrsInfractionsBeforePermBan = 3;
+        public const int WarningFalloffMinutes = 2880;
+
+        // mute role constant name
+        public const string BotMuteRoleName = "siotrix_mute";
 
         // Other Constants
         public const long BugChannel = 336881482712743937;
@@ -53,8 +63,7 @@ namespace Siotrix.Discord
             "https://s3.us-east-2.amazonaws.com/siotriximages/ShareX/2017/06/chrome_2017-06-22_10-54-00.png";
 
         // embeds
-        public const int MaxMessageLengthLong = 1900;
-
+        public const int MaxMessageLengthLong = 1900;   
         public const int MaxMessageLengthShort = 750;
         public const int MaxNicknameLength = 32;
         public const int MinNicknameLength = 2;

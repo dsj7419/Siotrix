@@ -14,6 +14,7 @@ namespace Siotrix.Discord.Admin
     [Name("Admin")]
     [Group("settings")]
     [Summary("Various settings for guild to customize Siotrix with.")]
+    [RequireContext(ContextType.Guild)]
     public class SettingsModule : ModuleBase<SocketCommandContext>
     {
         private readonly Stopwatch _timer = new Stopwatch();
@@ -27,7 +28,7 @@ namespace Siotrix.Discord.Admin
         [Command("gfootericon")]
         [Summary("Will list bots current footer icon.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task FooterIconAsync()
         {
             var val = await Context.GetGuildFooterAsync();
@@ -38,7 +39,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots footer icon.")]
         [Remarks(
             "<url> - url of picture to assign as bot footer icon **note** using keyword reset will reset to Siotrix icon.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task FooterIconAsync(Uri url)
         {
             var val = await Context.GetGuildFooterAsync();
@@ -52,12 +53,12 @@ namespace Siotrix.Discord.Admin
 
             await GuildEmbedFooter.SetGuildFooterIcon(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }       
+        }
 
         [Command("gfootertext")]
         [Summary("Will list bots current footer text.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task FooterTextAsync()
         {
             var val = await Context.GetGuildFooterAsync();
@@ -68,7 +69,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots footer text.")]
         [Remarks(
             "<text> - text you would like to use on embed footers. **note** using keyword reset will reset to Siotrix footer text.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task FooterTextAsync([Remainder] string txt)
         {
             var val = await Context.GetGuildFooterAsync();
@@ -82,12 +83,12 @@ namespace Siotrix.Discord.Admin
 
             await GuildEmbedFooter.SetGuildFooterText(val, txt);
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }        
+        }
 
         [Command("gthumbnail")]
         [Summary("Will list bots current thumbnail image link.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildThumbNailAsync()
         {
             var val = await Context.GetGuildThumbNailAsync();
@@ -98,7 +99,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots thumbnail image.")]
         [Remarks(
             "<url> - url of picture to assign as bot thumbnail **note** using keyword reset will reset to Siotrix image.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildThumbNailAsync(Uri url)
         {
             var val = await Context.GetGuildThumbNailAsync();
@@ -112,13 +113,13 @@ namespace Siotrix.Discord.Admin
 
             await GuildEmbedThumbnail.SetGuildThumbNail(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }       
+        }
 
         [Command("gwebsite")]
         [Alias("gweb")]
         [Summary("Will list bots current website.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildWebSiteAsync()
         {
             var val = await Context.GetGuildUrlAsync();
@@ -130,7 +131,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots website.")]
         [Remarks(
             "<url> - url of bots website (guild website maybe?) **note** using keyword reset will reset to Siotrix website.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildWebSiteAsync(Uri url)
         {
             var val = await Context.GetGuildUrlAsync();
@@ -144,13 +145,13 @@ namespace Siotrix.Discord.Admin
 
             await GuildEmbedUrl.SetGuildUrl(val, url.ToString());
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }        
+        }
 
         [Command("gdescription")]
         [Alias("gdesc")]
         [Summary("Will list bots current description.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildDescriptionAsync()
         {
             var val = await Context.GetGuildDescriptionAsync();
@@ -167,7 +168,7 @@ namespace Siotrix.Discord.Admin
         [Alias("gdesc")]
         [Summary("Will set bots description for your guild.")]
         [Remarks("<text> - text you would like to use as a guild description.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildDescriptionAsync([Remainder] string desc)
         {
             var val = await Context.GetGuildDescriptionAsync();
@@ -182,12 +183,12 @@ namespace Siotrix.Discord.Admin
             await GuildEmbedDescription.SetGuildDescription(val, desc);
             await ReplyAsync(SiotrixConstants.BotSuccess);
         }
-        
+
 
         [Command("color")]
         [Summary("Set or list your guilds official embed color.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildColorAsync()
         {
             var regexColorCode = new Regex("^#[A-Fa-f0-9]{6}$");
@@ -263,7 +264,7 @@ namespace Siotrix.Discord.Admin
                 var colornamelower = HexColorDict.ColorName(cleanHex) ?? "no name found"; //look up hex in dictionary
 
 
-                await GuildEmbedColorExtensions.SetGuildColor(currentGColor, cleanHex);                
+                await GuildEmbedColorExtensions.SetGuildColor(currentGColor, cleanHex);
 
                 var text = new CultureInfo("en-US").TextInfo;
                 var colorname = text.ToTitleCase(colornamelower);
@@ -327,7 +328,7 @@ namespace Siotrix.Discord.Admin
 
                 var colorhex = RgBtoHex.RgbToHexadecimal(data); // convert RGB input into hex      
 
-                if(colorhex == "#000000")
+                if (colorhex == "#000000")
                     colorhex = "#010101";
 
                 if (!regexColorCode.IsMatch(colorhex))
@@ -380,7 +381,8 @@ namespace Siotrix.Discord.Admin
             }
         }
 
-        private async Task<EmbedBuilder> GetEmbed(string colorchoice, string colorname, string colorhex, HextoRgb.Rgb rgbvalue)
+        private async Task<EmbedBuilder> GetEmbed(string colorchoice, string colorname, string colorhex,
+            HextoRgb.Rgb rgbvalue)
         {
             _timer.Stop();
             var gIconUrl = await Context.GetGuildIconUrlAsync();
@@ -443,7 +445,7 @@ namespace Siotrix.Discord.Admin
         [Command("gname")]
         [Summary("Lists your guilds current name thats been set for embeds.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildNameAsync()
         {
             var val = await Context.GetGuildNameAsync();
@@ -454,7 +456,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Sets guild name.")]
         [Remarks(
             "<name> - Name of guild you want to use in embeds. **note** reset will reset to your actual guild name.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildNameAsync([Remainder] string txt)
         {
             var val = await Context.GetGuildNameAsync();
@@ -468,12 +470,12 @@ namespace Siotrix.Discord.Admin
 
             await GuildEmbedName.SetGuildName(val, txt);
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }              
+        }
 
         [Command("gavatar")]
         [Summary("Will list bots current guild avatar for embeds.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildAvatarAsync()
         {
             var val = await Context.GetGuildIconUrlAsync();
@@ -484,7 +486,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bots guild avatar for embeds.")]
         [Remarks(
             "<url> - url of picture to assign as bot avatar **note** using keyword reset will reset to Siotrix embed avatar.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildAvatarAsync(Uri url)
         {
             var val = await Context.GetGuildIconUrlAsync();
@@ -503,7 +505,7 @@ namespace Siotrix.Discord.Admin
         [Command("prefix")]
         [Summary("Will list bots current guild prefix.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task PrefixAsync()
         {
             var val = await Context.GetGuildPrefixAsync();
@@ -514,7 +516,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Will set bot prefix for your guild.")]
         [Remarks(
             "<prefix> - Any prefix you'd like, up to 10 characters for your guild. **note** reset will change prefix to !.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task PrefixAsync([Remainder] string txt)
         {
             //TODO: Prefix needs more work
@@ -523,14 +525,14 @@ namespace Siotrix.Discord.Admin
 
             if (txt.Equals("reset"))
             {
-                await GuildPrefixExtensions.SetGuildPrefix(val, SiotrixConstants.BotPrefix);
+                await PrefixExtensions.SetGuildPrefix(val, SiotrixConstants.BotPrefix);
                 await ReplyAsync(SiotrixConstants.BotSuccess);
                 return;
             }
 
-            await GuildPrefixExtensions.SetGuildPrefix(val, txt);
+            await PrefixExtensions.SetGuildPrefix(val, txt);
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }        
+        }
 
         private bool CheckString(string str)
         {
@@ -543,7 +545,7 @@ namespace Siotrix.Discord.Admin
                     break;
                 }
             return isFounded;
-        }        
+        }
 
         public static string FromText(string text)
         {
@@ -572,7 +574,7 @@ namespace Siotrix.Discord.Admin
         [Command("gmotd")]
         [Summary("Lists guild current motd.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildMotdAsync()
         {
             var val = await Context.GetGuildMotdAsync();
@@ -588,7 +590,7 @@ namespace Siotrix.Discord.Admin
         [Command("gmotd")]
         [Summary("Sets guild motd.")]
         [Remarks("<motd> - Motd text for guild. **note** reset will revert back to default motd.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildMotdAsync([Remainder] string str)
         {
             var val = await Context.GetGuildMotdAsync();
@@ -602,12 +604,12 @@ namespace Siotrix.Discord.Admin
 
             await GuildMotdExtensions.SetGuildMotd(val, str);
             await ReplyAsync(SiotrixConstants.BotSuccess);
-        }        
+        }
 
         [Command("autodelete")]
         [Summary("")]
         [Remarks("")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task GuildAutoDeleteAsync(string user = "None")
         {
             var guildId = Context.Guild.Id;
@@ -660,7 +662,7 @@ namespace Siotrix.Discord.Admin
         [Command("nickname")]
         [Summary("Lists Siotrix's nickname.")]
         [Remarks(" - no additional arguments needed.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task NicknameAsync()
         {
             await ReplyAsync(Context.Guild.CurrentUser.Nickname ?? Context.Guild.CurrentUser.ToString());
@@ -670,7 +672,7 @@ namespace Siotrix.Discord.Admin
         [Summary("Sets Siotrix's nickname.")]
         [Remarks(
             "<name> - Set a nickname for Siotrix just for your guild. **note** reset will change it back to Siotrx.")]
-        [MinPermissions(AccessLevel.GuildOwner)]
+        [MinPermissions(AccessLevel.GuildAdmin)]
         public async Task NicknameAsync([Remainder] string name)
         {
             var self = Context.Guild.CurrentUser;
@@ -678,6 +680,300 @@ namespace Siotrix.Discord.Admin
                 name = SiotrixConstants.BotName;
             await self.ModifyAsync(x => { x.Nickname = name; });
             await ReplyAsync(SiotrixConstants.BotSuccess);
+        }
+
+        [Command("warnsetup")]
+        [Summary("Will do an interactive setup for automated warning.")]
+        [Remarks(" - no additional arguments needed.")]
+        [MinPermissions(AccessLevel.GuildAdmin)]
+        public async Task WarnSetupAsync()
+        {
+            var val = await WarningExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+
+            if (val == null)
+            {
+                await WarningExtensions.CreateWarnSettingsAsync(Context.Guild.Id, SiotrixConstants.TimesBeforeMute,
+                    SiotrixConstants.MuteTimeLengthMinutes, SiotrixConstants.TimesBeforeBan,
+                    SiotrixConstants.BanTimeLengthMinutes, SiotrixConstants.SrsInfractionsBeforePermBan,
+                    SiotrixConstants.WarningFalloffMinutes);
+                val = await WarningExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+                var muteTimeLength = TimeSpan.FromMinutes(val.MuteTimeLengthMinutes);
+                var banTimeLength = TimeSpan.FromMinutes(val.BanTimeLengthMinutes);
+                var falloff = TimeSpan.FromMinutes(val.WarningFalloffMinutes);
+
+                await ReplyAsync(
+                    $"Welcome to the initial setup of my automated warning system! Please respond within 30 seconds for each question." +
+                    " if you type cancel at any time, it will close the process and you will have to start over. Since this is your first time i've" +
+                    "set you up with default settings as follows:\n" +
+                    $"Warning points before user muted: {val.TimesBeforeMute}.\n" +
+                    $"Length of mute time a user will receive once they break the warning threshold: {val.MuteTimeLengthMinutes} minutes ({muteTimeLength.ToTimespanPrettyFormat()})\n" +
+                    $"Warning points before user is banned: {val.TimesBeforeBan}.\n" +
+                    $"Length of ban time a user will receive once they break the warning threshold: {val.BanTimeLengthMinutes} minutes ({banTimeLength.ToTimespanPrettyFormat()})\n" +
+                    $"Number of serious infractions (times they have been temp banned) before they receive a permenant ban {val.SrsInfractionsBeforePermBan}.\n" +
+                    $"Falloff timer for each warning point a user has: {val.WarningFalloffMinutes} minutes ({falloff.ToTimespanPrettyFormat()}).\n\n" +
+                    "Please enter the number of warning points before a user should get muted(you can set the length of mute afterwards):");
+            }
+            else
+            {
+                var muteTimeLength = TimeSpan.FromMinutes(val.MuteTimeLengthMinutes);
+                var banTimeLength = TimeSpan.FromMinutes(val.BanTimeLengthMinutes);
+                var falloff = TimeSpan.FromMinutes(val.WarningFalloffMinutes);
+
+                await ReplyAsync(
+                    $"Welcome to the automated warning sytem setup. I've retreived your current settings for your reference:\n" +
+                    $"Warning points before user muted: {val.TimesBeforeMute}.\n" +
+                    $"Length of mute time a user will receive once they break the warning threshold: {val.MuteTimeLengthMinutes} minutes ({muteTimeLength.ToTimespanPrettyFormat()})\n" +
+                    $"Warning points before user is banned: {val.TimesBeforeBan}.\n" +
+                    $"Length of ban time a user will receive once they break the warning threshold: {val.BanTimeLengthMinutes} minutes ({banTimeLength.ToTimespanPrettyFormat()})\n" +
+                    $"Number of serious infractions (times they have been temp banned) before they receive a permenant ban {val.SrsInfractionsBeforePermBan}.\n" +
+                    $"Falloff timer for each warning point a user has: {val.WarningFalloffMinutes} minutes ({falloff.ToTimespanPrettyFormat()}).\n\n" +
+                    "Please enter the number of warning points before a user should get muted(you can set the length of mute afterwards) (value 1 to 99): ");
+            }
+
+
+
+            var timesBeforeMute =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (timesBeforeMute.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            if (timesBeforeMute.Content.Length > 0 && timesBeforeMute.Content.Length < 3 &&
+                timesBeforeMute.Content.All(c => c >= '0' && c <= '9') && timesBeforeMute.Content != "0" &&
+                timesBeforeMute.Content != "00")
+            {
+                int x;
+                int.TryParse(timesBeforeMute.Content, out x);
+                await WarningExtensions.ModifyWarnTimesBeforeMute(val, x);
+            }
+            else
+            {
+                await ReplyAsync(
+                    $"{timesBeforeMute.Content} is not a number 1 to 99. I will keep your current setting of **{val.TimesBeforeMute}**.");
+            }
+
+            await Task.Delay(1000);
+
+            await ReplyAsync(
+                "Please enter the length of mute time a user will receive once they break the warning threshold (for example: 3 days 12 hours 45 minutes):");
+            var muteTimeLengthMinutes =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (muteTimeLengthMinutes.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            try
+            {
+                TimeSpan muteTimeSpan = TimeSpan.Parse(muteTimeLengthMinutes.Content);
+                if (muteTimeSpan != null)
+                {
+                    long muteTimeMinutes = (long) muteTimeSpan.TotalMinutes;
+                    await WarningExtensions.ModifyWarnMuteTimeLengthMinutes(val, muteTimeMinutes);
+                    await ReplyAsync(
+                        $"I have updated to the mute time of **{muteTimeMinutes} minutes ({muteTimeSpan.ToTimespanPrettyFormat()})**.");
+                }
+                else
+                {
+                    var muteTimeLength = TimeSpan.FromMinutes(val.MuteTimeLengthMinutes);
+                    await ReplyAsync(
+                        $"{muteTimeLengthMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.MuteTimeLengthMinutes} minutes ({muteTimeLength.ToTimespanPrettyFormat()})**.");
+                }
+            }
+            catch (Exception)
+            {
+                var muteTimeLength = TimeSpan.FromMinutes(val.MuteTimeLengthMinutes);
+                await ReplyAsync(
+                    $"{muteTimeLengthMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.MuteTimeLengthMinutes} minutes ({muteTimeLength.ToTimespanPrettyFormat()})**.");
+            }
+
+            await Task.Delay(1000);
+
+            await ReplyAsync(
+                "Please enter the number of warning points before a user should get banned(you can set the length of ban afterwards) (value 1 to 99): ");
+
+            var timesBeforeBan =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (timesBeforeBan.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            if (timesBeforeBan.Content.Length > 0 && timesBeforeBan.Content.Length < 3 &&
+                timesBeforeBan.Content.All(c => c >= '0' && c <= '9') && timesBeforeBan.Content != "0" &&
+                timesBeforeBan.Content != "00")
+            {
+                int x;
+                int.TryParse(timesBeforeBan.Content, out x);
+                await WarningExtensions.ModifyWarnTimesBeforeBan(val, x);
+            }
+            else
+            {
+                await ReplyAsync(
+                    $"{timesBeforeBan.Content} is not a number 1 to 99. I will keep your current setting of **{val.TimesBeforeBan}**.");
+            }
+
+            await Task.Delay(1000);
+
+            await ReplyAsync(
+                "Please enter the length of ban time a user will receive once they break the warning threshold (for example: 3 days 12 hours 45 minutes):");
+            var banTimeLengthMinutes =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (banTimeLengthMinutes.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            try
+            {
+                TimeSpan banTimeSpan = TimeSpan.Parse(banTimeLengthMinutes.Content);
+                if (banTimeSpan != null)
+                {
+                    long banTimeMinutes = (long) banTimeSpan.TotalMinutes;
+                    await WarningExtensions.ModifyWarnMuteTimeLengthMinutes(val, banTimeMinutes);
+                    await ReplyAsync(
+                        $"I have updated to the ban time of **{banTimeMinutes} minutes ({banTimeSpan.ToTimespanPrettyFormat()})**.");
+                }
+                else
+                {
+                    var banTimeLength = TimeSpan.FromMinutes(val.BanTimeLengthMinutes);
+                    await ReplyAsync(
+                        $"{banTimeLengthMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.BanTimeLengthMinutes} minutes ({banTimeLength.ToTimespanPrettyFormat()})**.");
+                }
+            }
+            catch (Exception)
+            {
+                var banTimeLength = TimeSpan.FromMinutes(val.BanTimeLengthMinutes);
+                await ReplyAsync(
+                    $"{banTimeLengthMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.BanTimeLengthMinutes} minutes ({banTimeLength.ToTimespanPrettyFormat()})**.");
+            }
+
+            await Task.Delay(1000);
+
+            await ReplyAsync(
+                "Please enter the number of serious offenses(1 point per temporary ban either automatic or manual) before a permenant ban (value 1 to 99): ");
+
+            var srsInfractionsBeforePermBan =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (srsInfractionsBeforePermBan.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            if (srsInfractionsBeforePermBan.Content.Length > 0 && srsInfractionsBeforePermBan.Content.Length < 3 &&
+                srsInfractionsBeforePermBan.Content.All(c => c >= '0' && c <= '9') &&
+                srsInfractionsBeforePermBan.Content != "0" && srsInfractionsBeforePermBan.Content != "00")
+            {
+                int x;
+                int.TryParse(srsInfractionsBeforePermBan.Content, out x);
+                await WarningExtensions.ModifyWarnSrsInfractionsBeforePermBan(val, x);
+            }
+            else
+            {
+                await ReplyAsync(
+                    $"{srsInfractionsBeforePermBan.Content} is not a number 1 to 99. I will keep your current setting of **{val.SrsInfractionsBeforePermBan}**.");
+            }
+
+            await Task.Delay(1000);
+
+            await ReplyAsync(
+                "Please enter the length of falloff time on each warning point. Once falloff time is reached, users with a warning point will be reduced by 1 warning." +
+                "This allows users to automatically be forgiven over time (for example: 3 days 12 hours 45 minutes):");
+            var warningFalloffMinutes =
+                await _interactive.WaitForMessage(Context.User, Context.Channel, TimeSpan.FromSeconds(30));
+
+            if (warningFalloffMinutes.Content == "cancel")
+            {
+                await ReplyAsync("I have cancelled your request. You will keep your current settings.");
+                return;
+            }
+
+            try
+            {
+                TimeSpan falloffTimeSpan = TimeSpan.Parse(warningFalloffMinutes.Content);
+                if (falloffTimeSpan != null)
+                {
+                    long falloffTimeMinutes = (long) falloffTimeSpan.TotalMinutes;
+                    await WarningExtensions.ModifyWarnMuteTimeLengthMinutes(val, falloffTimeMinutes);
+                    await ReplyAsync(
+                        $"I have updated to the falloff time of **{falloffTimeMinutes} minutes ({falloffTimeSpan.ToTimespanPrettyFormat()})**.");
+                }
+                else
+                {
+                    var falloffTimeLength = TimeSpan.FromMinutes(val.WarningFalloffMinutes);
+                    await ReplyAsync(
+                        $"{warningFalloffMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.WarningFalloffMinutes} minutes ({falloffTimeLength.ToTimespanPrettyFormat()})**.");
+                }
+            }
+            catch (Exception)
+            {
+                var falloffTimeLength = TimeSpan.FromMinutes(val.WarningFalloffMinutes);
+                await ReplyAsync(
+                    $"{warningFalloffMinutes.Content} is not a valid time frame. I will keep your current setting of **{val.WarningFalloffMinutes} minutes ({falloffTimeLength.ToTimespanPrettyFormat()})**.");
+            }
+
+            var finalVal = await WarningExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+
+            await Task.Delay(1000);
+
+            await WarningExtensions.ModifyWarnIsActive(finalVal, true);
+
+            var finalMuteTimeLength = TimeSpan.FromMinutes(finalVal.MuteTimeLengthMinutes);
+            var finalBanTimeLength = TimeSpan.FromMinutes(finalVal.BanTimeLengthMinutes);
+            var finalFalloff = TimeSpan.FromMinutes(finalVal.WarningFalloffMinutes);
+            var prefix = await Context.GetGuildPrefixAsync();
+
+            await ReplyAsync(
+                $"You are all set up, and I have actrivated the automated system! Here are the final settings for your reference:\n" +
+                $"Warning points before user muted: {finalVal.TimesBeforeMute}.\n" +
+                $"Length of mute time a user will receive once they break the warning threshold: {finalVal.MuteTimeLengthMinutes} minutes ({finalMuteTimeLength.ToTimespanPrettyFormat()})\n" +
+                $"Warning points before user is banned: {finalVal.TimesBeforeBan}.\n" +
+                $"Length of ban time a user will receive once they break the warning threshold: {finalVal.BanTimeLengthMinutes} minutes ({finalBanTimeLength.ToTimespanPrettyFormat()})\n" +
+                $"Number of serious infractions (times they have been temp banned) before they receive a permenant ban {finalVal.SrsInfractionsBeforePermBan}.\n" +
+                $"Falloff timer for each warning point a user has: {finalVal.WarningFalloffMinutes} minutes ({finalFalloff.ToTimespanPrettyFormat()}).\n\n" +
+                $"**NOTE** you can deactivate/re-activate the system at anytime using {prefix.Prefix}settings warntoggle");
+        }
+
+        [Command("warntoggle")]
+        [Summary("Will toggle on or off the automated warning module.")]
+        [Remarks("- No other argument needed")]
+        [MinPermissions(AccessLevel.GuildAdmin)]
+        public async Task WarnToggleAsync()
+        {
+            var val = await WarningExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+
+            if (val == null)
+            {
+                await WarningExtensions.CreateWarnSettingsAsync(Context.Guild.Id, SiotrixConstants.TimesBeforeMute,
+                    SiotrixConstants.MuteTimeLengthMinutes, SiotrixConstants.TimesBeforeBan,
+                    SiotrixConstants.BanTimeLengthMinutes, SiotrixConstants.SrsInfractionsBeforePermBan,
+                    SiotrixConstants.WarningFalloffMinutes);
+                val = await WarningExtensions.GetWarnSettingsAsync(Context.Guild.Id);                
+            }
+
+            var isActive = val.IsActive;
+
+            if (isActive)
+            {
+                await WarningExtensions.ModifyWarnIsActive(val, false);
+                await ReplyAsync("Automated warnings have been disabled for the guild.");
+            }
+            else
+            {
+                await WarningExtensions.ModifyWarnIsActive(val, true);
+                await ReplyAsync("Automated warnings have been disabled for the guild.");
+            }
         }
     }
 }

@@ -9,18 +9,18 @@ namespace Siotrix.Discord.Moderation
 {
     [Name("Moderator")]
     [Group("warning")]
-    [Summary("A custom automated warning system that can be controlled by guilds.")]
+    [Summary("Check warning status of yourself as a user, or others as a moderator")]
     [RequireContext(ContextType.Guild)]
     public class WarningModule : ModuleBase<SocketCommandContext>
     {
-        private string GetWarningUser(long userId, int id, long guildId)
+      /*  private string GetWarningUser(long userId, int id, long guildId)
         {
             string output = null;
             using (var db = new LogDatabase())
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(
+                    var data = db.Gusercases.Where(
                         x => x.Index == id && x.UserId == userId && x.GuildId == guildId);
                     if (data.Any())
                     {
@@ -47,8 +47,8 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(x => x.UserId == userId && x.GuildId == guildId);
-                    var falloff = db.Gwarns.Where(x => x.GuildId == guildId && x.Option == 6);
+                    var data = db.Gusercases.Where(x => x.UserId == userId && x.GuildId == guildId);
+                    var falloff = db.Gwarnsettings.Where(x => x.GuildId == guildId && x.Option == 6);
                     if (data.Any() && falloff.Any())
                     {
                         var list = data.OrderByDescending(x => x.CreatedAt).Take(10);
@@ -77,7 +77,7 @@ namespace Siotrix.Discord.Moderation
             {
                 try
                 {
-                    var data = db.Gwarningusers.Where(x => x.GuildId == guildId && x.CreatedAt >= from &&
+                    var data = db.Gusercases.Where(x => x.GuildId == guildId && x.CreatedAt >= from &&
                                                            x.CreatedAt <= to);
                     if (data.Any())
                         foreach (var item in data)
@@ -90,31 +90,55 @@ namespace Siotrix.Discord.Moderation
                 }
             }
             return output;
-        }
+        } */
 
-        [Command]
-        [Summary("Check your current warning level")]
+        [Command("check")]
+        [Summary("Check your current active warning level.")]
         [Remarks(" - No additional arguments needed.")]
         [MinPermissions(AccessLevel.User)]
         public async Task WarningAsync()
         {
             if (!Context.User.IsBot)
-            {
-                var user = Context.User;
-                var value = GetWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong()) ?? "No Active Warnings";
+            {                             
                 var gIconUrl = await Context.GetGuildIconUrlAsync();
                 var gName = await Context.GetGuildNameAsync();
                 var gUrl = await Context.GetGuildUrlAsync();
-                var gThumbnail = await Context.GetGuildThumbNailAsync();
                 var gFooter = await Context.GetGuildFooterAsync();
-                var gPrefix = await Context.GetGuildPrefixAsync();
+                var gColor = await Context.GetGuildColorAsync();
+                int count = 0;
+                string value = null;
+
+                var userWarnings = await UserCaseExtensions.GetUserCasessAsync(Context.Guild.Id, Context.User.Id, true);
+
+                if (userWarnings == null)
+                {
+                    await ReplyAsync("You have no active warnings, good job!");
+                    return;
+                }
+
+                var guildWarnInfo = await UserCaseExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+                var guildUserWarnTracking = await UserCaseExtensions.GetUserCaseTrackingAsync(Context.Guild.Id, Context.User.Id);
+
+                foreach (var userWarning in userWarnings)
+                {
+                    count++;
+                    if (userWarning.Type == "WARN")
+                    {
+                        value += $"{count}) Warning Points: {userWarning.WarningPoints} Reason: {userWarning.Reason}\n";
+                    }
+                    else
+                    {
+                        value += $"{count}) Warning Points: {userWarning.WarningPoints} Resuled in: {userWarning.Type} Reason: {userWarning.Reason}\n";
+                    }
+                }
+
                 var builder = new EmbedBuilder()
                     .WithAuthor(new EmbedAuthorBuilder()
                         .WithIconUrl(gIconUrl.Avatar)
                         .WithName(gName.GuildName)
                         .WithUrl(gUrl.SiteUrl))
-                    .WithColor(new Color(255, 127, 0))
-                    .WithThumbnailUrl(gThumbnail.ThumbNail)
+                    .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
+                    .WithTitle($"Total active warning points: {guildUserWarnTracking.ActiveWarningUserPoints} of a guild maximum: {guildWarnInfo.TimesBeforeBan}")
                     .WithFooter(new EmbedFooterBuilder()
                         .WithIconUrl(gFooter.FooterIcon)
                         .WithText(gFooter.FooterText))
@@ -122,33 +146,64 @@ namespace Siotrix.Discord.Moderation
                 builder
                     .AddField(x =>
                     {
-                        x.Name = "Active Warnings for " + user.Username + "#" + user.Discriminator;
+                        x.Name = "Your currently active warnings:";
                         x.Value = value;
                     });
                 await Context.Channel.SendMessageAsync("", false, builder.Build());
             }
         }
 
-        [Command]
-        [Summary("Check warnings you received between two dates.")]
-        [Remarks(" (from date) (to date)")]
+        [Command("userdaterange")]
+        [Summary("Check warnings a user as received between a certain date range")]
+        [Remarks("(username) (from date) (to date)")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task WarningAsync(DateTime from, DateTime to)
-        {
-            var value = GetWarningPeriod(Context.Guild.Id.ToLong(), from, to);
+        public async Task WarningAsync(SocketGuildUser user, DateTime from, DateTime to)
+        {;
             var gIconUrl = await Context.GetGuildIconUrlAsync();
             var gName = await Context.GetGuildNameAsync();
             var gUrl = await Context.GetGuildUrlAsync();
-            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = await Context.GetGuildPrefixAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            int count = 0;
+            string value = null;
+
+            var userWarnings = await UserCaseExtensions.GetUserCasessAsync(Context.Guild.Id, Context.User.Id, from, to);
+
+            if (userWarnings == null)
+            {
+                await ReplyAsync("They have no active warnings.");
+                return;
+            }
+
+            foreach (var userWarning in userWarnings)
+            {
+                count++;
+                var newTime = String.Format("{0:r}", userWarning.CreatedAt);
+                if (userWarning.Type == "WARN")
+                {
+                    value += $"{count}) Warning Points: {userWarning.WarningPoints} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                             $"Reason: {userWarning.Reason}\n";
+                }
+                else if (userWarning.WarningPoints > 0)
+                {
+                    value +=
+                        $"{count}) Warning Points: {userWarning.WarningPoints} Resuled in: {userWarning.Type} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                        $"Reason: {userWarning.Reason}\n";
+                }
+                else
+                {
+                    value +=
+                        $"{count}) Punish Type: {userWarning.Type} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                        $"Reason: {userWarning.Reason}\n";
+                }
+            }
+
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(gThumbnail.ThumbNail)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)
                     .WithText(gFooter.FooterText))
@@ -162,26 +217,82 @@ namespace Siotrix.Discord.Moderation
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
-        [Command]
-        [Summary("Check warnings of a specified user")]
-        [Remarks(" @username")]
+        [Command("checkuser")]
+        [Summary("Check warnings of a specified user, and optionally you can search all of users warnings")]
+        [Remarks("@username [false] - use false to see all users warnings.")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task WarningAsync(SocketGuildUser user)
+        public async Task WarningAsync(SocketGuildUser user, bool active = true)
         {
-            var value = GetWarningUsers(user.Id.ToLong(), Context.Guild.Id.ToLong()) ?? "No Active Warnings";
             var gIconUrl = await Context.GetGuildIconUrlAsync();
             var gName = await Context.GetGuildNameAsync();
             var gUrl = await Context.GetGuildUrlAsync();
-            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = await Context.GetGuildPrefixAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            int count = 0;
+            string value = null;
+
+            var userWarnings = await UserCaseExtensions.GetUserCasessAsync(Context.Guild.Id, user.Id, active);
+
+            if (userWarnings == null)
+            {
+                await ReplyAsync("They have no active warnings.");
+                return;
+            }
+
+            if (active)
+            {
+                foreach (var userWarning in userWarnings)
+                {
+                    count++;
+                    if (userWarning.Type == "WARN")
+                    {
+                        value += $"{count}) Case Number: {userWarning.CaseNum} Warning Points: {userWarning.WarningPoints} Reason: {userWarning.Reason}\n";
+                    }
+                    else if (userWarning.WarningPoints > 0)
+                    {
+                        value +=
+                            $"{count}) Case Number: {userWarning.CaseNum} Warning Points: {userWarning.WarningPoints} Resuled in: {userWarning.Type} Reason: {userWarning.Reason}\n";
+                    }
+                    else
+                    {
+                        value +=
+                            $"{count}) Case Number: {userWarning.CaseNum} Warning Points: {userWarning.WarningPoints} Resuled in: {userWarning.Type} Reason: {userWarning.Reason}\n";
+                    }
+                }
+            }
+            else
+            {
+                foreach (var userWarning in userWarnings)
+                {
+                    var newTime = String.Format("{0:r}", userWarning.CreatedAt);
+                    var isActivate = userWarning.IsActive ? "active" : "not active";
+                    count++;
+                    if (userWarning.Type == "WARN")
+                    {
+                        value += $"{count}) {isActivate} Warning Points: {userWarning.WarningPoints} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                                 $"Reason: {userWarning.Reason}\n";
+                    }
+                    else if (userWarning.WarningPoints > 0)
+                    {
+                        value +=
+                            $"{count}) {isActivate} Warning Points: {userWarning.WarningPoints} Resuled in: {userWarning.Type} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                            $"Reason: {userWarning.Reason}\n";
+                    }
+                    else
+                    {
+                        value +=
+                            $"{count}) {isActivate} Punish Type: {userWarning.Type} Case Number: {userWarning.CaseNum} Activate at: {newTime}\n" +
+                            $"Reason: {userWarning.Reason}\n";
+                    }
+                }
+            }
+
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(gThumbnail.ThumbNail)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)
                     .WithText(gFooter.FooterText))
@@ -195,26 +306,71 @@ namespace Siotrix.Discord.Moderation
             await Context.Channel.SendMessageAsync("", false, builder.Build());
         }
 
-        [Command]
-        [Summary("Check detailed warning of specified user using id number from list.")]
-        [Remarks(" @username [number] - number from users warning list")]
+        [Command("caseinfo")]
+        [Summary("Check detailed information about a specific guild case.")]
+        [Remarks("(number)")]
         [MinPermissions(AccessLevel.GuildMod)]
-        public async Task WarningAsync(SocketGuildUser user, int id)
+        public async Task WarningAsync(int id)
         {
-            var value = GetWarningUser(user.Id.ToLong(), id, Context.Guild.Id.ToLong()) ?? "No Information";
             var gIconUrl = await Context.GetGuildIconUrlAsync();
             var gName = await Context.GetGuildNameAsync();
             var gUrl = await Context.GetGuildUrlAsync();
-            var gThumbnail = await Context.GetGuildThumbNailAsync();
             var gFooter = await Context.GetGuildFooterAsync();
-            var gPrefix = await Context.GetGuildPrefixAsync();
+            var gColor = await Context.GetGuildColorAsync();
+            string timedLineBuilder = null;
+            string value = null;
+            string username = null;
+            string modname = null;
+
+            var userCase = await UserCaseExtensions.GetUserCaseAsync(Context.Guild.Id, id);            
+
+            if (userCase == null)
+            {
+                await ReplyAsync("That is not a valid case number, try again.");
+                return;
+            }
+
+            var user = await ((IGuild)Context.Guild).GetUserAsync(userCase.UserId.ToUlong());
+            var mod = await ((IGuild)Context.Guild).GetUserAsync(userCase.ModId.ToUlong());
+            
+            var guildWarnInfo = await UserCaseExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+            if (guildWarnInfo == null)
+            {
+                await UserCaseExtensions.CreateWarnSettingsAsync(Context.Guild.Id, SiotrixConstants.TimesBeforeMute,
+                    SiotrixConstants.MuteTimeLengthMinutes, SiotrixConstants.TimesBeforeBan,
+                    SiotrixConstants.BanTimeLengthMinutes, SiotrixConstants.SrsInfractionsBeforePermBan,
+                    SiotrixConstants.WarningFalloffMinutes);
+                guildWarnInfo = await UserCaseExtensions.GetWarnSettingsAsync(Context.Guild.Id);
+            }
+
+            var userFalloff = UserCaseExtensions.ProcessUserCaseFalloffTimeLeft(userCase, guildWarnInfo);
+
+            switch (userCase.Type)
+            {
+                case "MUTE":
+                    break;
+                case "TIMEBAN":
+                    break;
+                case "PERMBAN":
+                    break;
+                case "WARN":
+                    break;
+                default:
+                    await ReplyAsync("This isnt the kind of info I can display with this command");
+                    return;
+            }
+
+            value = $"User : {user.Mention} ({user.Id})\n" +
+                    $"Moderator : {mod.Mention}\n" +
+                    $"{timedLineBuilder}\n" +
+                    $"Reason: {userCase.Reason}";
+
             var builder = new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithIconUrl(gIconUrl.Avatar)
                     .WithName(gName.GuildName)
                     .WithUrl(gUrl.SiteUrl))
-                .WithColor(new Color(255, 127, 0))
-                .WithThumbnailUrl(gThumbnail.ThumbNail)
+                .WithColor(GuildEmbedColorExtensions.ConvertStringtoColorObject(gColor.ColorHex))
                 .WithFooter(new EmbedFooterBuilder()
                     .WithIconUrl(gFooter.FooterIcon)
                     .WithText(gFooter.FooterText))
@@ -222,46 +378,10 @@ namespace Siotrix.Discord.Moderation
             builder
                 .AddField(x =>
                 {
-                    x.Name = "Warning information of " + user.Username + "#" + user.Discriminator;
+                    x.Name = "Case Information for " + user.Username + "#" + user.Discriminator;
                     x.Value = value;
                 });
             await Context.Channel.SendMessageAsync("", false, builder.Build());
-        }
-
-        [Command]
-        [Summary("View information about a specific warning of yourself using a number from the list.")]
-        [Remarks(" [number] - number from personal warning list.")]
-        [MinPermissions(AccessLevel.User)]
-        public async Task WarningAsync(int id)
-        {
-            if (!Context.User.IsBot)
-            {
-                var value = GetWarningUser(Context.User.Id.ToLong(), id, Context.Guild.Id.ToLong()) ?? "No Information";
-                var gIconUrl = await Context.GetGuildIconUrlAsync();
-                var gName = await Context.GetGuildNameAsync();
-                var gUrl = await Context.GetGuildUrlAsync();
-                var gThumbnail = await Context.GetGuildThumbNailAsync();
-                var gFooter = await Context.GetGuildFooterAsync();
-                var gPrefix = await Context.GetGuildPrefixAsync();
-                var builder = new EmbedBuilder()
-                    .WithAuthor(new EmbedAuthorBuilder()
-                        .WithIconUrl(gIconUrl.Avatar)
-                        .WithName(gName.GuildName)
-                        .WithUrl(gUrl.SiteUrl))
-                    .WithColor(new Color(255, 127, 0))
-                    .WithThumbnailUrl(gThumbnail.ThumbNail)
-                    .WithFooter(new EmbedFooterBuilder()
-                        .WithIconUrl(gFooter.FooterIcon)
-                        .WithText(gFooter.FooterText))
-                    .WithTimestamp(DateTime.UtcNow);
-                builder
-                    .AddField(x =>
-                    {
-                        x.Name = "Waning Informations";
-                        x.Value = value;
-                    });
-                await Context.Channel.SendMessageAsync("", false, builder.Build());
-            }
-        }
+        }       
     }
 }
